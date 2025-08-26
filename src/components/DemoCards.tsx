@@ -65,13 +65,6 @@ export default function DemoCards({ onSelectDemo }: DemoCardsProps) {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Sparkles className="w-5 h-5 text-blue-500" />
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-          推荐攻略
-        </h2>
-      </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {demoGuides.map((demo) => (
           <div
@@ -79,18 +72,18 @@ export default function DemoCards({ onSelectDemo }: DemoCardsProps) {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 dark:border-gray-700 group"
             onClick={() => onSelectDemo(demo)}
           >
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <div className="p-3">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate pr-2">
                   {demo.title}
                 </h3>
                 <button
                   onClick={(e) => handleCopy(demo, e)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
                   title="复制攻略"
                 >
                   <Copy 
-                    className={`w-4 h-4 ${
+                    className={`w-3 h-3 ${
                       copiedId === demo.id 
                         ? 'text-green-500' 
                         : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -99,36 +92,30 @@ export default function DemoCards({ onSelectDemo }: DemoCardsProps) {
                 </button>
               </div>
 
-              <div className="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  <span>{demo.destination}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-0.5">
+                    <MapPin className="w-2.5 h-2.5" />
+                    <span>{demo.destination}</span>
+                  </div>
+                  <div className="flex items-center gap-0.5">
+                    <Clock className="w-2.5 h-2.5" />
+                    <span>{demo.duration}</span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{demo.duration}</span>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded-full font-medium">
-                  {demo.theme}
-                </span>
-              </div>
-
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed">
-                {demo.preview}
-              </p>
-
-              <div className="flex flex-wrap gap-1">
-                {demo.highlights.map((highlight, index) => (
-                  <span 
-                    key={index}
-                    className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded"
-                  >
-                    {highlight}
+                  <span className="inline-block px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                    {demo.theme}
                   </span>
-                ))}
+                  {demo.highlights.slice(0, 2).map((highlight, index) => (
+                    <span 
+                      key={index}
+                      className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-1 py-0.5 rounded"
+                    >
+                      {highlight}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

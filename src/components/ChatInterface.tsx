@@ -118,12 +118,43 @@ export default function ChatInterface({
         // 初始状态：居中的输入框
         <div className="flex flex-col items-center justify-center min-h-[400px] px-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-              AI旅游攻略生成器
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              告诉我你的旅行需求，我为你定制专属攻略
-            </p>
+            {/* Logo和品牌标题 */}
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="relative">
+                {/* 主Logo */}
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl transform rotate-12 animate-pulse-glow">
+                  <div className="w-14 h-14 bg-gradient-to-tr from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
+                    <span className="text-white text-5xl font-bold transform -rotate-12">✈</span>
+                  </div>
+                </div>
+                {/* 光晕效果 */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-2xl blur-xl animate-pulse -z-10"></div>
+                {/* 环形装饰 */}
+                <div className="absolute -top-1 -right-1 w-4 h-4 border-2 border-cyan-400 rounded-full animate-ping"></div>
+                <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full animate-bounce"></div>
+              </div>
+              <div className="text-center">
+                <h1 className="text-5xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift mb-1">
+                  行呗
+                </h1>
+                <div className="text-sm font-medium text-blue-500/70 tracking-widest">
+                  TRAVEL AI
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <h2 className="text-4xl font-bold text-gray-800 dark:text-gray-100 drop-shadow-lg">
+                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">AI</span>
+                <span className="mx-2">旅游攻略</span>
+                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">生成器</span>
+              </h2>
+              <div className="flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400 text-lg">
+                <span className="text-2xl">🌍</span>
+                <span>告诉我你的旅行需求，我为你定制专属攻略</span>
+                <span className="text-2xl">✨</span>
+              </div>
+            </div>
           </div>
           
           <form onSubmit={handleSubmit} className="w-full max-w-2xl">

@@ -158,15 +158,15 @@ export default function Home() {
   }, [handleSendMessage])
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* 动态背景层 */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950"></div>
       
       {/* 动态光影效果 */}
-      <div className="absolute inset-0 opacity-70 dark:opacity-50">
+      <div className="fixed inset-0 opacity-70 dark:opacity-50 pointer-events-none">
         {/* 主要光球组 */}
-        <div className="absolute top-20 -left-20 w-96 h-96 bg-gradient-to-r from-blue-400/40 to-cyan-400/40 rounded-full blur-3xl animate-pulse-glow"></div>
-        <div className="absolute top-40 -right-32 w-80 h-80 bg-gradient-to-r from-indigo-400/35 to-purple-400/35 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-20 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/40 to-cyan-400/40 rounded-full blur-3xl animate-pulse-glow"></div>
+        <div className="absolute top-40 right-0 w-80 h-80 bg-gradient-to-r from-indigo-400/35 to-purple-400/35 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
         <div className="absolute bottom-32 left-1/3 w-64 h-64 bg-gradient-to-r from-cyan-300/30 to-blue-400/30 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '2s' }}></div>
         
         {/* 次要光影层 */}
@@ -224,11 +224,11 @@ export default function Home() {
 
           {/* 右侧：地图展示区域 - 只有在生成内容后才显示 */}
           {!isInitialState && (
-            <div className="w-full lg:w-1/2 transition-all duration-500 animate-in slide-in-from-right">
-              <div className="sticky top-6">
+            <div className="w-full lg:w-1/2">
+              <div className="sticky top-2 transition-all duration-500 animate-in slide-in-from-right">
                 <MapDisplay 
                   itinerary={currentItinerary}
-                  className="h-full"
+                  className="h-[calc(100vh-30px)]"
                 />
               </div>
             </div>

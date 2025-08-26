@@ -201,7 +201,7 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
         {/* 地图控制栏 */}
         <div className="bg-gray-50 dark:bg-gray-700 p-4 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between mb-4">
@@ -240,9 +240,9 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
           )}
         </div>
         
-        <div className="relative">
+        <div className="relative flex-1 min-h-0">
           {/* 地图容器 */}
-          <div className="w-full h-[400px] lg:h-[500px]">
+          <div className="w-full h-full">
             <div
               ref={mapRef}
               className="w-full h-full"
@@ -297,9 +297,9 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
           </div>
         </div>
         
-        {/* 当前天行程信息 */}
+        {/* 当前天行程信息 - 固定在底部 */}
         {currentDayData && (
-          <div className="p-4 bg-gray-50 dark:bg-gray-700">
+          <div className="p-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 max-h-48 overflow-y-auto">
             <div className="flex items-center gap-2 mb-3">
               <Clock className="w-4 h-4 text-blue-500" />
               <h4 className="font-medium text-gray-800 dark:text-gray-200">
@@ -313,8 +313,8 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
                   <span className="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
                     {index + 1}
                   </span>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-gray-800 dark:text-gray-200">
                         {location.name}
                       </span>
@@ -325,7 +325,7 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
                         {location.duration}
                       </span>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-gray-600 dark:text-gray-400 mt-1 text-xs leading-relaxed">
                       {location.description}
                     </p>
                   </div>

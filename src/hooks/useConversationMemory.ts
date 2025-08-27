@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Message, ItineraryDay } from '@/components/ChatInterface'
+import { ItineraryDay } from '@/components/ChatInterface'
 
 interface ConversationContext {
   currentItinerary: ItineraryDay[]

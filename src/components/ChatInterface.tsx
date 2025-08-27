@@ -33,7 +33,6 @@ export interface Location {
 interface ChatInterfaceProps {
   messages: Message[]
   onSendMessage: (content: string, themePrompt?: string) => void
-  onItineraryGenerated?: (itinerary: ItineraryDay[]) => void
   isLoading: boolean
   isInitialState: boolean
 }
@@ -41,7 +40,6 @@ interface ChatInterfaceProps {
 export default function ChatInterface({ 
   messages, 
   onSendMessage, 
-  onItineraryGenerated,
   isLoading, 
   isInitialState 
 }: ChatInterfaceProps) {

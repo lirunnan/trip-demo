@@ -202,7 +202,7 @@ export function useSimpleDrag() {
   }, [dragState, findDropTarget, calculatePreviewItinerary])
 
   // 结束拖拽
-  const handleMouseUp = useCallback((e: MouseEvent) => {
+  const handleMouseUp = useCallback(() => {
     if (!dragState.isDragging || !dragState.draggedItem) return null
 
     console.log('🛑 结束拖拽')
@@ -288,16 +288,6 @@ export function useSimpleDrag() {
     onItineraryUpdate(reorderedItinerary)
   }, [dragState.draggedItem])
 
-  // 设置全局事件监听器
-  const setupGlobalListeners = useCallback(() => {
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [handleMouseMove, handleMouseUp])
 
   return {
     isDragging: dragState.isDragging,

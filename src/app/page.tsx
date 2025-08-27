@@ -467,7 +467,6 @@ export default function Home() {
             <ChatInterface
               messages={messages}
               onSendMessage={handleSendMessage}
-              onItineraryGenerated={setCurrentItinerary}
               isLoading={isLoading}
               isInitialState={isInitialState}
             />

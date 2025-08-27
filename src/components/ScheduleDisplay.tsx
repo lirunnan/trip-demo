@@ -47,8 +47,8 @@ export default function ScheduleDisplay({
       handleMouseMove(e)
     }
 
-    const globalMouseUp = (e: MouseEvent) => {
-      const finalTarget = handleMouseUp(e)
+    const globalMouseUp = (_e: MouseEvent) => {
+      const finalTarget = handleMouseUp()
       
       if (finalTarget && onLocationReorder) {
         console.log('🎯 确认拖拽目标:', finalTarget)

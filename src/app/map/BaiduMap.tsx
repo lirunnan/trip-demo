@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useScript } from '../../hooks/useScript';
 
 interface BaiduMapProps {
   className?: string

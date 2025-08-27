@@ -1,6 +1,6 @@
 'use client'
 
-import { MapPin, Clock, Copy, Sparkles } from 'lucide-react'
+import { MapPin, Clock, Copy } from 'lucide-react'
 import { useState } from 'react'
 
 interface DemoGuide {

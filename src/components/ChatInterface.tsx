@@ -1,6 +1,6 @@
 'use client'
 
-import { Send, User, Bot, Loader2 } from 'lucide-react'
+import { Send, User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 export interface Message {
@@ -188,6 +188,139 @@ export default function ChatInterface({
               </button>
             </div>
           </form>
+
+          {/* 装饰性行程路线 */}
+          <div className="w-full max-w-4xl relative">
+            {/* 主路线 */}
+            <div className="relative h-50">
+              {/* 背景路径 */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 400" preserveAspectRatio="none">
+                {/* 主路径 - 曲线 */}
+                <path
+                  d="M100,200 Q200,120 300,180 T500,160 Q600,140 700,200"
+                  stroke="url(#gradient1)"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeDasharray="8,4"
+                  className="animate-pulse"
+                />
+                {/* 第二条路径 */}
+                <path
+                  d="M150,250 Q250,180 350,220 T550,200 Q650,180 750,240"
+                  stroke="url(#gradient2)"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray="6,3"
+                  className="animate-pulse"
+                  style={{ animationDelay: '0.5s' }}
+                />
+                {/* 第三条路径 */}
+                <path
+                  d="M80,300 Q180,240 280,280 T480,260 Q580,240 680,300"
+                  stroke="url(#gradient3)"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray="4,2"
+                  className="animate-pulse"
+                  style={{ animationDelay: '1s' }}
+                />
+                
+                {/* 渐变定义 */}
+                <defs>
+                  <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                    <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.3" />
+                  </linearGradient>
+                  <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.4" />
+                  </linearGradient>
+                  <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#ef4444" stopOpacity="0.3" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              
+              {/* 地点标记点 */}
+              <div className="absolute top-[45%] left-[12%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full shadow-lg animate-bounce flex items-center justify-center" style={{ animationDelay: '0s' }}>
+                  <Plane className="w-5 h-5 text-white" />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">出发地</div>
+              </div>
+              
+              <div className="absolute top-[40%] left-[25%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg animate-bounce flex items-center justify-center" style={{ animationDelay: '0.2s' }}>
+                  <MapPin className="w-4 h-4 text-white" />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">景点1</div>
+              </div>
+              
+              <div className="absolute top-[45%] left-[37%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-full shadow-lg animate-bounce flex items-center justify-center" style={{ animationDelay: '0.4s' }}>
+                  <Utensils className="w-5 h-5 text-white" />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">美食街</div>
+              </div>
+              
+              <div className="absolute top-[38%] left-[50%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-9 h-9 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-lg animate-bounce flex items-center justify-center" style={{ animationDelay: '0.6s' }}>
+                  <Building2 className="w-4 h-4 text-white" />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">历史建筑</div>
+              </div>
+              
+              <div className="absolute top-[35%] left-[62%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full shadow-lg animate-bounce flex items-center justify-center" style={{ animationDelay: '0.8s' }}>
+                  <ShoppingBag className="w-4 h-4 text-white" />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">购物中心</div>
+              </div>
+              
+              <div className="absolute top-[40%] left-[75%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-9 h-9 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full shadow-lg animate-bounce flex items-center justify-center" style={{ animationDelay: '1s' }}>
+                  <Camera className="w-4 h-4 text-white" />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">观景台</div>
+              </div>
+              
+              <div className="absolute top-[48%] left-[87%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg animate-bounce flex items-center justify-center" style={{ animationDelay: '1.2s' }}>
+                  <Hotel className="w-5 h-5 text-white" />
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">酒店</div>
+              </div>
+              
+              {/* 浮动装饰元素 */}
+              <div className="absolute top-[25%] left-[20%] w-2 h-2 bg-blue-400/60 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute top-[65%] left-[35%] w-1.5 h-1.5 bg-purple-400/60 rounded-full animate-ping" style={{ animationDelay: '2.5s' }}></div>
+              <div className="absolute top-[20%] left-[55%] w-2 h-2 bg-green-400/60 rounded-full animate-ping" style={{ animationDelay: '3s' }}></div>
+              <div className="absolute top-[70%] left-[70%] w-1.5 h-1.5 bg-yellow-400/60 rounded-full animate-ping" style={{ animationDelay: '3.5s' }}></div>
+            </div>
+            
+            {/* 底部提示文字 */}
+            <div className="mt-3 text-center">
+              <p className="text-gray-400 dark:text-gray-500 text-sm">
+                ✨ AI为你规划最优路线，串联精彩景点 ✨
+              </p>
+              <div className="flex items-center justify-center gap-6 mt-4 text-xs text-gray-400 dark:text-gray-500">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span>智能路线规划</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                  <span>个性化推荐</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span>实时优化调整</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         // 对话状态：显示消息历史和底部输入框

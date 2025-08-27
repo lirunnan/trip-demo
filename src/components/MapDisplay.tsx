@@ -6,6 +6,9 @@ import { MapPin, Clock, Calendar } from 'lucide-react'
 interface MapDisplayProps {
   itinerary: ItineraryDay[]
   className?: string
+  onLocationDelete?: (dayIndex: number, locationIndex: number) => void
+  onLocationEdit?: (dayIndex: number, locationIndex: number) => void
+  interactive?: boolean
 }
 
 interface MapCenter {
@@ -15,15 +18,20 @@ interface MapCenter {
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    BMapGL: any
+    BMap: any
   }
 }
 
-export default function MapDisplay({ itinerary, className = '' }: MapDisplayProps) {
+export default function MapDisplay({ 
+  itinerary, 
+  className = '', 
+  onLocationDelete,
+  onLocationEdit,
+  interactive = false 
+}: MapDisplayProps) {
   const [selectedDay, setSelectedDay] = useState<number>(1)
   const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstance = useRef<any>(null) // eslint-disable-line @typescript-eslint/no-explicit-any
+  const mapInstance = useRef<any>(null)
   const [isMapReady, setIsMapReady] = useState(false)
   const [mapLoadError, setMapLoadError] = useState(false)
   // 计算地图中心点
@@ -43,34 +51,36 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
   const currentDayData = itinerary.find(day => day.day === selectedDay)
   const totalDays = itinerary.length
 
+  // 当删除节点后，如果当前选中天没有数据，自动切换到第一个有数据的天数
+  useEffect(() => {
+    if (itinerary.length > 0 && (!currentDayData || currentDayData.locations.length === 0)) {
+      const firstDayWithData = itinerary.find(day => day.locations.length > 0)
+      if (firstDayWithData && firstDayWithData.day !== selectedDay) {
+        setSelectedDay(firstDayWithData.day)
+      }
+    }
+  }, [itinerary, currentDayData, selectedDay])
+
+  const checkIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  
   // 初始化地图
   useEffect(() => {
     let timeoutCount = 0
     const maxTimeout = 100 // 最多等待10秒
-    let checkInterval: NodeJS.Timeout | null = null
 
     const initMap = () => {
-      if (typeof window !== 'undefined' && window.BMapGL && mapRef.current && !mapInstance.current) {
+      if (typeof window !== 'undefined' && window.BMap && mapRef.current && !mapInstance.current) {
         try {
           console.log('开始初始化百度地图...')
-          const map = new window.BMapGL.Map(mapRef.current)
-          const point = new window.BMapGL.Point(mapCenter.lng, mapCenter.lat)
+          const map = new window.BMap.Map(mapRef.current)
+          const point = new window.BMap.Point(mapCenter.lng, mapCenter.lat)
           map.centerAndZoom(point, 12)
           map.enableScrollWheelZoom(true)
-          
-          // 添加控件
-          const navigationControl = new window.BMapGL.NavigationControl()
-          map.addControl(navigationControl)
           
           mapInstance.current = map
           setIsMapReady(true)
           setMapLoadError(false)
           console.log('百度地图初始化成功')
-          
-          // 清理定时器
-          if (checkInterval) {
-            clearInterval(checkInterval)
-          }
         } catch (error) {
           console.error('地图初始化失败:', error)
           setIsMapReady(false)
@@ -81,32 +91,37 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
 
     const checkMapAPI = () => {
       timeoutCount++
-      console.log(`检查地图API状态 (${timeoutCount}/${maxTimeout})`, {
-        hasWindow: typeof window !== 'undefined',
-        hasBMapGL: !!(typeof window !== 'undefined' && window.BMapGL),
-        hasMapRef: !!mapRef.current,
-        hasMapInstance: !!mapInstance.current
-      })
+      console.log(`检查地图API状态 (${timeoutCount}/${maxTimeout})`)
 
-      if (typeof window !== 'undefined' && window.BMapGL) {
+      if (typeof window !== 'undefined' && window.BMap) {
         initMap()
+        // 地图初始化后检查是否成功，如果成功则清理定时器
+        if (mapInstance.current) {
+          console.log('地图初始化成功，清理定时器')
+          if (checkIntervalRef.current) {
+            clearInterval(checkIntervalRef.current)
+            checkIntervalRef.current = null
+          }
+        }
       } else if (timeoutCount >= maxTimeout) {
         console.error('百度地图API加载超时，请检查网络连接或API密钥')
         setIsMapReady(false)
         setMapLoadError(true)
-        if (checkInterval) {
-          clearInterval(checkInterval)
+        if (checkIntervalRef.current) {
+          clearInterval(checkIntervalRef.current)
+          checkIntervalRef.current = null
         }
       }
     }
 
     // 使用setInterval持续检查API状态
-    checkInterval = setInterval(checkMapAPI, 100)
+    checkIntervalRef.current = setInterval(checkMapAPI, 100)
 
     // 清理函数
     return () => {
-      if (checkInterval) {
-        clearInterval(checkInterval)
+      if (checkIntervalRef.current) {
+        clearInterval(checkIntervalRef.current)
+        checkIntervalRef.current = null
       }
     }
   }, [mapCenter.lng, mapCenter.lat])
@@ -114,33 +129,71 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
   // 当地图中心变化时重新定位
   useEffect(() => {
     if (isMapReady && mapInstance.current) {
-      const point = new window.BMapGL.Point(mapCenter.lng, mapCenter.lat)
+      const point = new window.BMap.Point(mapCenter.lng, mapCenter.lat)
       mapInstance.current.setCenter(point)
     }
-  }, [mapCenter.lng, mapCenter.lat, isMapReady])
+  }, [mapCenter.lng, mapCenter.lat, isMapReady, selectedDay, itinerary])
+
+  // 设置全局回调函数
+  useEffect(() => {
+    if (interactive) {
+      (window as any).editLocation = (dayIndex: number, locationIndex: number) => {
+        onLocationEdit?.(dayIndex, locationIndex)
+      };
+      (window as any).deleteLocation = (dayIndex: number, locationIndex: number) => {
+        onLocationDelete?.(dayIndex, locationIndex)
+      }
+    }
+    
+    return () => {
+      if (interactive) {
+        delete (window as any).editLocation;
+        delete (window as any).deleteLocation
+      }
+    }
+  }, [interactive, onLocationEdit, onLocationDelete])
 
   // 更新地图标记
   useEffect(() => {
-    if (isMapReady && mapInstance.current && currentDayData) {
+    if (isMapReady && mapInstance.current) {
       const map = mapInstance.current
       
       try {
         // 清除之前的标记
         map.clearOverlays()
         
-        const points: any[] = [] // eslint-disable-line @typescript-eslint/no-explicit-any
+        // 如果没有当前天数据或没有景点，直接返回
+        if (!currentDayData || currentDayData.locations.length === 0) {
+          return
+        }
+        
+        const points: any[] = []
         
         // 添加标记点
         currentDayData.locations.forEach((location, index) => {
-          const point = new window.BMapGL.Point(location.coordinates[0], location.coordinates[1])
+          const point = new window.BMap.Point(location.coordinates[0], location.coordinates[1])
           points.push(point)
           
+          // 创建自定义标记图标
+          const iconSize = new window.BMap.Size(24, 24)
+          const iconOffset = new window.BMap.Size(12, 12) // 图标中心偏移
+          const customIcon = new window.BMap.Icon(
+            `data:image/svg+xml;base64,${btoa(`
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="#1890ff" stroke="white" stroke-width="2"/>
+                <text x="12" y="16" text-anchor="middle" fill="white" font-size="10" font-weight="bold">${index + 1}</text>
+              </svg>
+            `)}`, 
+            iconSize, 
+            { offset: iconOffset }
+          )
+          
           // 创建标记
-          const marker = new window.BMapGL.Marker(point)
+          const marker = new window.BMap.Marker(point, { icon: customIcon })
           map.addOverlay(marker)
           
-          // 添加信息窗口
-          const infoWindow = new window.BMapGL.InfoWindow(`
+          // 构建信息窗口内容
+          let infoWindowContent = `
             <div style="padding: 8px; max-width: 200px;">
               <h4 style="margin: 0 0 8px 0; font-weight: bold; color: #333;">${location.name}</h4>
               <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
@@ -149,37 +202,38 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
               <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
                 ⏰ ${location.duration}
               </p>
-              <p style="margin: 0; color: #666; font-size: 12px;">${location.description}</p>
-            </div>
-          `)
+              <p style="margin: 0 0 8px 0; color: #666; font-size: 12px;">${location.description}</p>`
+          
+          if (interactive) {
+            infoWindowContent += `
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button 
+                  onclick="window.editLocation(${selectedDay - 1}, ${index})" 
+                  style="flex: 1; padding: 4px 8px; background: #1890ff; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;"
+                >
+                  编辑
+                </button>
+                <button 
+                  onclick="window.deleteLocation(${selectedDay - 1}, ${index})" 
+                  style="flex: 1; padding: 4px 8px; background: #ff4d4f; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;"
+                >
+                  删除
+                </button>
+              </div>`
+          }
+          
+          infoWindowContent += '</div>'
+          
+          const infoWindow = new window.BMap.InfoWindow(infoWindowContent)
           
           marker.addEventListener('click', () => {
             map.openInfoWindow(infoWindow, point)
           })
-          
-          // 添加标签
-          const label = new window.BMapGL.Label(`${index + 1}`, {
-            position: point,
-            offset: new window.BMapGL.Size(0, -30)
-          })
-          label.setStyle({
-            backgroundColor: '#1890ff',
-            color: 'white',
-            border: '1px solid #1890ff',
-            borderRadius: '50%',
-            width: '24px',
-            height: '24px',
-            textAlign: 'center',
-            lineHeight: '24px',
-            fontSize: '12px',
-            fontWeight: 'bold'
-          })
-          map.addOverlay(label)
         })
         
         // 绘制路线
         if (points.length > 1) {
-          const polyline = new window.BMapGL.Polyline(points, {
+          const polyline = new window.BMap.Polyline(points, {
             strokeColor: '#1890ff',
             strokeWeight: 3,
             strokeOpacity: 0.8
@@ -196,7 +250,7 @@ export default function MapDisplay({ itinerary, className = '' }: MapDisplayProp
         console.error('更新地图标记失败:', error)
       }
     }
-  }, [isMapReady, currentDayData, selectedDay])
+  }, [isMapReady, currentDayData, selectedDay, interactive, itinerary])
 
 
   return (

@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Map, Marker, NavigationControl, InfoWindow, Polyline } from 'react-bmap'
+import React from 'react'
+import { Map } from 'react-bmap'
 import { ItineraryDay } from './ChatInterface'
 import { MapPin } from 'lucide-react'
 
@@ -16,16 +16,8 @@ interface BaiduMapCoreProps {
 }
 
 export default function BaiduMapCore({ center, itinerary }: BaiduMapCoreProps) {
-  const [selectedMarker, setSelectedMarker] = useState<number | null>(null)
-
   // 获取当前行程数据
   const currentDayData = itinerary.length > 0 ? itinerary[0] : null
-  
-  // 生成路线点
-  const polylinePoints = currentDayData?.locations?.map(location => ({
-    lng: location.coordinates[0],
-    lat: location.coordinates[1]
-  })) || []
 
   return (
     <div className="relative w-full h-full">
@@ -35,53 +27,12 @@ export default function BaiduMapCore({ center, itinerary }: BaiduMapCoreProps) {
         enableScrollWheelZoom={true}
         className="w-full h-full"
         style={{ width: '100%', height: '100%' }}
-      >
-        <NavigationControl />
-        
-        {/* 渲染标记点 */}
-        {currentDayData?.locations?.map((location, index) => (
-          <React.Fragment key={index}>
-            <Marker
-              position={{
-                lng: location.coordinates[0],
-                lat: location.coordinates[1]
-              }}
-              onClick={() => setSelectedMarker(selectedMarker === index ? null : index)}
-            />
-            
-            {/* 信息窗口 */}
-            {selectedMarker === index && (
-              <InfoWindow
-                position={{
-                  lng: location.coordinates[0],
-                  lat: location.coordinates[1]
-                }}
-                title={location.name}
-                text={`<div style="padding: 4px; max-width: 200px;">
-                  <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
-                    📍 ${location.type}
-                  </p>
-                  <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
-                    ⏰ ${location.duration}
-                  </p>
-                  <p style="margin: 0; color: #666; font-size: 12px;">${location.description}</p>
-                </div>`}
-                onClose={() => setSelectedMarker(null)}
-              />
-            )}
-          </React.Fragment>
-        ))}
-        
-        {/* 绘制路线 */}
-        {polylinePoints.length > 1 && (
-          <Polyline
-            path={polylinePoints}
-            strokeColor="#1890ff"
-            strokeWeight={3}
-            strokeOpacity={0.8}
-          />
-        )}
-      </Map>
+      />
+      
+      {/* 用原生百度地图API实现交互功能，因为react-bmap组件有限制 */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* 这里可以添加自定义的UI覆盖层 */}
+      </div>
       
       {/* 地图为空状态 */}
       {(!currentDayData || currentDayData.locations.length === 0) && (

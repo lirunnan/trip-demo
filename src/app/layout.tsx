@@ -31,7 +31,8 @@ export default function RootLayout({
         {children}
         <Script
           type="text/javascript"
-          src="http://api.map.baidu.com/api?v=3.0&ak=MLoRNQ17VMnf5yhuPkKYvZmuQ3R0EkBd"
+          src="http://api.map.baidu.com/api?v=3.0&ak=mJwpzIn94sW5SBnGw2QP5LrrY8tLB6uL&callback=initialize"
+          async={false}
         />
       </body>
     </html>

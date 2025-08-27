@@ -2,22 +2,38 @@
 
 import { useMemo, useState } from 'react'
 import { ItineraryDay } from './ChatInterface'
-import { Calendar, Clock, MapPin, Trash2, Edit3, Maximize2, Minimize2 } from 'lucide-react'
+import { Calendar, Clock, MapPin, Trash2, Edit3, Maximize2, Minimize2, GripVertical } from 'lucide-react'
+import { useDragAndDrop } from '@/hooks/useDragAndDrop'
 
 interface ScheduleDisplayProps {
   itinerary: ItineraryDay[]
   className?: string
   onLocationDelete?: (dayIndex: number, locationIndex: number) => void
   onLocationEdit?: (dayIndex: number, locationIndex: number) => void
+  onLocationReorder?: (newItinerary: ItineraryDay[]) => void
+  enableDragDrop?: boolean
 }
 
 export default function ScheduleDisplay({ 
   itinerary, 
   className = '',
   onLocationDelete,
-  onLocationEdit
+  onLocationEdit,
+  onLocationReorder,
+  enableDragDrop = false
 }: ScheduleDisplayProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  
+  // 拖拽功能
+  const {
+    handleDragStart,
+    handleDragOver,
+    handleDragLeave,
+    handleDragEnd,
+    handleDrop,
+    recalculateSchedule,
+    getDragStyles
+  } = useDragAndDrop()
   
   const timeSlots = useMemo(() => {
     const slots = []
@@ -100,6 +116,8 @@ export default function ScheduleDisplay({
                   const topPosition = (startHour - 8) * 64
                   const height = duration * 64 - 8
                   
+                  const dragStyles = enableDragDrop ? getDragStyles(dayIndex, locationIndex) : {}
+                  
                   return (
                     <div
                       key={locationIndex}
@@ -107,10 +125,27 @@ export default function ScheduleDisplay({
                       style={{
                         top: `${topPosition + 4}px`,
                         height: `${Math.max(height, 48)}px`,
-                        zIndex: 10
+                        zIndex: 10,
+                        ...dragStyles
                       }}
+                      draggable={enableDragDrop}
+                      onDragStart={() => enableDragDrop && handleDragStart(dayIndex, locationIndex, location)}
+                      onDragOver={(e) => enableDragDrop && handleDragOver(e, dayIndex, locationIndex)}
+                      onDragLeave={enableDragDrop ? handleDragLeave : undefined}
+                      onDragEnd={enableDragDrop ? handleDragEnd : undefined}
+                      onDrop={(e) => enableDragDrop && onLocationReorder && handleDrop(e, dayIndex, locationIndex, itinerary, (newItinerary) => {
+                        const reorderedItinerary = recalculateSchedule(newItinerary)
+                        onLocationReorder(reorderedItinerary)
+                      })}
                     >
                       <div className="flex items-start justify-between h-full">
+                        {/* 拖拽手柄 */}
+                        {enableDragDrop && (
+                          <div className="flex-shrink-0 mr-2 cursor-grab active:cursor-grabbing">
+                            <GripVertical className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        )}
+                        
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1 mb-1 flex-wrap">
                             <span className="text-xs font-bold opacity-90">
@@ -136,20 +171,24 @@ export default function ScheduleDisplay({
                         
                         {/* 操作按钮 */}
                         <div className="flex flex-col gap-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => onLocationEdit?.(dayIndex, locationIndex)}
-                            className="p-1 bg-white/20 hover:bg-white/30 rounded text-white transition-colors"
-                            title="编辑"
-                          >
-                            <Edit3 className="w-3 h-3" />
-                          </button>
-                          <button
-                            onClick={() => onLocationDelete?.(dayIndex, locationIndex)}
-                            className="p-1 bg-white/20 hover:bg-red-400 rounded text-white transition-colors"
-                            title="删除"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+                          {onLocationEdit && (
+                            <button
+                              onClick={() => onLocationEdit(dayIndex, locationIndex)}
+                              className="p-1 bg-white/20 hover:bg-white/30 rounded text-white transition-colors"
+                              title="编辑"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                            </button>
+                          )}
+                          {onLocationDelete && (
+                            <button
+                              onClick={() => onLocationDelete(dayIndex, locationIndex)}
+                              className="p-1 bg-white/20 hover:bg-red-400 rounded text-white transition-colors"
+                              title="删除"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

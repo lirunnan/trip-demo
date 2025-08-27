@@ -47,12 +47,16 @@ export default function Home() {
     // 模拟API延迟
     await new Promise(resolve => setTimeout(resolve, 2000))
     
-    // 构建带上下文的完整提示词
+    // 构建带上下文的完整提示词（现在userMessage可能已经包含主题信息）
     const fullPrompt = buildPromptContext(userMessage)
     console.log('完整提示词:', fullPrompt)
     
     // 解析用户输入，更新上下文
     parseUserInput(userMessage)
+    
+    // 检测是否包含主题模式信息
+    const isThemeEnhanced = userMessage.includes('主题偏好：')
+    console.log('是否包含主题模式:', isThemeEnhanced)
 
     // 模拟AI生成的攻略内容和行程数据
     const mockItinerary: ItineraryDay[] = [
@@ -228,7 +232,7 @@ export default function Home() {
     }
   }, [buildPromptContext, parseUserInput, context.currentItinerary])
 
-  const handleSendMessage = useCallback(async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
     // 记录用户请求到上下文
     addUserRequest(content)
     
@@ -245,8 +249,8 @@ export default function Home() {
     setIsInitialState(false)
 
     try {
-      // 模拟AI响应
-      const aiResponse = await simulateAIResponse(content)
+      // 模拟AI响应，使用主题增强的提示词
+      const aiResponse = await simulateAIResponse(themePrompt || content)
       
       // 添加AI响应
       const assistantMessage: Message = {
@@ -320,6 +324,30 @@ export default function Home() {
       handleSendMessage(newMessage)
     }
   }, [currentItinerary, handleSendMessage])
+
+  // 处理景点重排序
+  const handleLocationReorder = useCallback(async (newItinerary: ItineraryDay[]) => {
+    // 更新行程状态
+    setCurrentItinerary(newItinerary)
+    updateItinerary(newItinerary)
+    
+    // 生成AI反馈消息
+    const reorderMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: `🔄 行程顺序已更新！我已重新计算了时间安排和路线规划。
+
+📍 **优化建议**
+• 根据新的顺序调整了游览时间
+• 重新规划了最优路线
+• 考虑了交通和时间成本
+
+您可以在地图上查看新的路线安排！`,
+      timestamp: new Date()
+    }
+    
+    setMessages(prev => [...prev, reorderMessage])
+  }, [updateItinerary])
 
   const handleShare = useCallback(async () => {
     if (currentItinerary.length === 0) return
@@ -447,6 +475,7 @@ export default function Home() {
                   className="h-[calc(100vh-30px)]"
                   onLocationDelete={handleLocationDelete}
                   onLocationEdit={handleLocationEdit}
+                  onLocationReorder={handleLocationReorder}
                   onExportPDF={handleExportPDF}
                   onShare={handleShare}
                 />

@@ -11,6 +11,7 @@ interface TravelViewsProps {
   className?: string
   onLocationDelete?: (dayIndex: number, locationIndex: number) => void
   onLocationEdit?: (dayIndex: number, locationIndex: number) => void
+  onLocationReorder?: (newItinerary: ItineraryDay[]) => void
   onExportPDF?: () => void
   onShare?: () => void
 }
@@ -22,6 +23,7 @@ export default function TravelViews({
   className = '',
   onLocationDelete,
   onLocationEdit,
+  onLocationReorder,
   onExportPDF,
   onShare
 }: TravelViewsProps) {
@@ -97,6 +99,8 @@ export default function TravelViews({
               className="h-full"
               onLocationDelete={onLocationDelete}
               onLocationEdit={onLocationEdit}
+              onLocationReorder={onLocationReorder}
+              enableDragDrop={true}
             />
           )}
         </div>

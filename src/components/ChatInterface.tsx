@@ -1,7 +1,9 @@
 'use client'
 
-import { Send, User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane } from 'lucide-react'
+import { User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
+import { useThemeMode } from '@/hooks/useThemeMode'
+import ThemeTagsInput from './ThemeTagsInput'
 
 export interface Message {
   id: string
@@ -27,7 +29,7 @@ export interface Location {
 
 interface ChatInterfaceProps {
   messages: Message[]
-  onSendMessage: (content: string) => void
+  onSendMessage: (content: string, themePrompt?: string) => void
   onItineraryGenerated?: (itinerary: ItineraryDay[]) => void
   isLoading: boolean
   isInitialState: boolean
@@ -42,7 +44,16 @@ export default function ChatInterface({
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // textareaRef 现在由 ThemeTagsInput 组件内部处理
+  
+  // 主题模式状态
+  const {
+    selectedThemes,
+    parseThemeTags,
+    addTheme,
+    removeTheme,
+    generateThemePrompt
+  } = useThemeMode()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -55,29 +66,22 @@ export default function ChatInterface({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (input.trim() && !isLoading) {
-      onSendMessage(input.trim())
+      // 解析主题标签
+      const { themes, cleanInput } = parseThemeTags(input.trim())
+      
+      // 添加解析到的主题
+      themes.forEach(theme => addTheme(theme))
+      
+      // 生成包含主题信息的提示词
+      const allSelectedThemes = [...selectedThemes, ...themes]
+      const themePrompt = generateThemePrompt(allSelectedThemes, cleanInput || input.trim())
+      
+      onSendMessage(cleanInput || input.trim(), themePrompt)
       setInput('')
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(e)
-    }
-  }
-
-  const adjustTextareaHeight = () => {
-    const textarea = textareaRef.current
-    if (textarea) {
-      textarea.style.height = 'auto'
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`
-    }
-  }
-
-  useEffect(() => {
-    adjustTextareaHeight()
-  }, [input])
+  // 现在 ThemeTagsInput 内部处理键盘事件，这些函数不再需要
 
   const renderItinerary = (itinerary: ItineraryDay[]) => {
     return (
@@ -157,37 +161,23 @@ export default function ChatInterface({
             </div>
           </div>
           
-          <form onSubmit={handleSubmit} className="w-full max-w-2xl">
-            <div className="relative">
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="例如：我想去日本东京玩3天，喜欢历史文化和美食，预算1万元..."
-                className="w-full p-4 pr-12 border border-gray-300 dark:border-gray-600 rounded-2xl 
-                         bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200
-                         placeholder-gray-500 dark:placeholder-gray-400
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                         resize-none overflow-hidden shadow-lg"
-                style={{ minHeight: '64px' }}
-                rows={1}
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="absolute right-3 bottom-3 p-2 rounded-full bg-blue-500 hover:bg-blue-600 
-                         disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
-                         text-white transition-colors"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Send className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-          </form>
+          <div className="w-full max-w-2xl">
+            <ThemeTagsInput
+              selectedThemes={selectedThemes}
+              onThemeAdd={addTheme}
+              onThemeRemove={removeTheme}
+              onInputChange={setInput}
+              inputValue={input}
+              placeholder="例如：我想去日本东京玩3天，喜欢历史文化和美食，预算1万元... 或输入 #亲子 #美食 选择主题模式"
+              onSubmit={() => {
+                if (input.trim() && !isLoading) {
+                  handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+                }
+              }}
+              isLoading={isLoading}
+              submitButtonText="开始规划"
+            />
+          </div>
 
           {/* 装饰性行程路线 */}
           <div className="w-full max-w-4xl relative">
@@ -376,37 +366,47 @@ export default function ChatInterface({
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <form onSubmit={handleSubmit}>
-              <div className="relative">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="继续对话，提出你的旅行需求..."
-                  className="w-full p-4 pr-12 border border-gray-300 dark:border-gray-600 rounded-2xl 
-                           bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200
-                           placeholder-gray-500 dark:placeholder-gray-400
-                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                           resize-none overflow-hidden"
-                  style={{ minHeight: '52px' }}
-                  rows={1}
-                />
-                <button
-                  type="submit"
-                  disabled={!input.trim() || isLoading}
-                  className="absolute right-3 bottom-3 p-2 rounded-full bg-blue-500 hover:bg-blue-600 
-                           disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
-                           text-white transition-colors"
-                >
-                  {isLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                </button>
+            {/* 已选择的主题标签显示 */}
+            {selectedThemes.length > 0 && (
+              <div className="mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">当前主题：</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedThemes.map((theme) => (
+                    <div
+                      key={theme.id}
+                      className="inline-flex items-center gap-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-3 py-1.5 rounded-full text-sm font-medium border border-blue-200 dark:border-blue-700"
+                    >
+                      <span className="text-base">{theme.emoji}</span>
+                      <span>{theme.name}</span>
+                      <button
+                        onClick={() => removeTheme(theme.id)}
+                        className="ml-1 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </form>
+            )}
+            
+            <ThemeTagsInput
+              selectedThemes={[]} // 在对话模式中不重复显示已选标签
+              onThemeAdd={addTheme}
+              onThemeRemove={removeTheme}
+              onInputChange={setInput}
+              inputValue={input}
+              placeholder="继续对话，提出你的旅行需求... 或输入 #标签 添加主题模式"
+              onSubmit={() => {
+                if (input.trim() && !isLoading) {
+                  handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+                }
+              }}
+              isLoading={isLoading}
+              submitButtonText="发送"
+            />
           </div>
         </div>
       )}

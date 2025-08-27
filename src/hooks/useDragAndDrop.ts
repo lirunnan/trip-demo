@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { ItineraryDay, Location } from '@/components/ChatInterface'
+import { recalculateItineraryTimes } from '@/utils/timeCalculator'
 
 export interface DragState {
   isDragging: boolean
@@ -29,6 +30,7 @@ export function useDragAndDrop() {
     locationIndex: number,
     location: Location
   ) => {
+    console.log('🚀 开始拖拽:', { dayIndex, locationIndex, location: location.name })
     setDragState({
       isDragging: true,
       draggedItem: { dayIndex, locationIndex, location },
@@ -44,6 +46,8 @@ export function useDragAndDrop() {
   ) => {
     e.preventDefault()
     e.stopPropagation()
+    
+    console.log('🎯 拖拽经过:', { dayIndex, locationIndex })
     
     setDragState(prev => ({
       ...prev,
@@ -89,8 +93,13 @@ export function useDragAndDrop() {
     e.preventDefault()
     e.stopPropagation()
 
+    console.log('💧 执行拖拽放置:', { targetDayIndex, targetLocationIndex })
+    
     const { draggedItem } = dragState
-    if (!draggedItem) return
+    if (!draggedItem) {
+      console.warn('⚠️ 没有拖拽项目')
+      return
+    }
 
     const { dayIndex: sourceDayIndex, locationIndex: sourceLocationIndex } = draggedItem
 
@@ -127,25 +136,14 @@ export function useDragAndDrop() {
     }
 
     // 更新行程
+    console.log('✅ 拖拽完成，更新行程:', newItinerary)
     onItineraryUpdate(newItinerary)
     handleDragEnd()
   }, [dragState, handleDragEnd])
 
   // 重新计算时间安排
   const recalculateSchedule = useCallback((itinerary: ItineraryDay[]): ItineraryDay[] => {
-    return itinerary.map(day => ({
-      ...day,
-      locations: day.locations.map((location, index) => {
-        // 重新计算每个景点的时间
-        const startHour = 9 + Math.floor(index * 2.5)
-        const duration = location.duration
-        
-        return {
-          ...location,
-          // 这里可以添加更多的时间计算逻辑
-        }
-      })
-    }))
+    return recalculateItineraryTimes(itinerary)
   }, [])
 
   // 获取拖拽样式

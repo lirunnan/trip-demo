@@ -25,6 +25,9 @@ export interface Location {
   coordinates: [number, number] // [lng, lat]
   description: string
   duration: string
+  startTime?: string // 开始时间
+  endTime?: string   // 结束时间
+  timeSlot?: string  // 时间段显示
 }
 
 interface ChatInterfaceProps {

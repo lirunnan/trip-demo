@@ -7,6 +7,7 @@ import TravelViews from '@/components/TravelViews'
 import { useConversationMemory } from '@/hooks/useConversationMemory'
 import { useItineraryActions } from '@/hooks/useItineraryActions'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
+import { addTimeInfoToItinerary } from '@/utils/timeCalculator'
 
 interface DemoGuide {
   id: string
@@ -58,8 +59,8 @@ export default function Home() {
     const isThemeEnhanced = userMessage.includes('主题偏好：')
     console.log('是否包含主题模式:', isThemeEnhanced)
 
-    // 模拟AI生成的攻略内容和行程数据
-    const mockItinerary: ItineraryDay[] = [
+    // 模拟AI生成的攻略内容和行程数据（不含时间信息）
+    const mockItineraryBase: ItineraryDay[] = [
       {
         day: 1,
         date: '2024-03-15',
@@ -109,6 +110,9 @@ export default function Home() {
       }
     ]
 
+    // 为模拟数据添加时间信息
+    const mockItinerary = addTimeInfoToItinerary(mockItineraryBase)
+    
     // 根据上下文生成不同回复
     let responseContent = ''
     let updatedItinerary = mockItinerary
@@ -116,26 +120,29 @@ export default function Home() {
     if (userMessage.includes('加一天') || userMessage.includes('再加')) {
       if (context.currentItinerary.length > 0) {
         // 基于现有行程添加新一天
-        updatedItinerary = [...context.currentItinerary, {
+        const newDay = {
           day: context.currentItinerary.length + 1,
           date: `2024-03-${17 + context.currentItinerary.length - 1}`,
           locations: [
             {
               name: '北海公园',
               type: '园林景点',
-              coordinates: [116.388, 39.928],
+              coordinates: [116.388, 39.928] as [number, number],
               description: '皇家园林，白塔倒影美如画',
               duration: '3小时'
             },
             {
               name: '什刹海',
               type: '历史街区',
-              coordinates: [116.391, 39.940],
+              coordinates: [116.391, 39.940] as [number, number],
               description: '老北京风情，酒吧街夜生活',
               duration: '2小时'
             }
           ]
-        }]
+        }
+        // 为新添加的一天添加时间信息
+        const newDayWithTime = addTimeInfoToItinerary([newDay])[0]
+        updatedItinerary = [...context.currentItinerary, newDayWithTime]
         responseContent = `好的！已为您增加第${updatedItinerary.length}天的行程安排：
 
 🗓️ **第${updatedItinerary.length}天新增内容**

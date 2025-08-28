@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageCircle, Send, Sparkles, Palette, Layout, X } from 'lucide-react'
+import { MessageCircle, Send, Sparkles, Palette, Layout } from 'lucide-react'
 
 interface CustomizationRequest {
   id: string
@@ -11,13 +11,12 @@ interface CustomizationRequest {
 }
 
 interface PageCustomizerProps {
-  isOpen: boolean
-  onClose: () => void
   onTemplateChange: (template: 'original' | 'minimal' | 'detailed') => void
   currentTemplate: 'original' | 'minimal' | 'detailed'
+  className?: string
 }
 
-export default function PageCustomizer({ isOpen, onClose, onTemplateChange, currentTemplate }: PageCustomizerProps) {
+export default function PageCustomizer({ onTemplateChange, currentTemplate, className = '' }: PageCustomizerProps) {
   const [messages, setMessages] = useState<CustomizationRequest[]>([
     {
       id: '1',
@@ -107,7 +106,7 @@ export default function PageCustomizer({ isOpen, onClose, onTemplateChange, curr
     }, 1000)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSend()
@@ -120,54 +119,45 @@ export default function PageCustomizer({ isOpen, onClose, onTemplateChange, curr
     { text: '调整颜色主题', icon: Palette },
   ]
 
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl h-[600px] flex flex-col">
-        {/* 头部 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                页面定制助手
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                通过自然语言调整页面布局和样式
-              </p>
-            </div>
+    <div className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full ${className}`}>
+      {/* 头部 */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              页面定制
+            </h2>
+          </div>
         </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          通过自然语言调整页面布局和样式
+        </p>
+      </div>
 
-        {/* 消息区域 */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      {/* 消息区域 */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.map((message) => (
             <div key={message.id}>
               {message.userMessage && (
                 <div className="flex justify-end mb-2">
-                  <div className="bg-blue-500 text-white rounded-2xl rounded-tr-md px-4 py-3 max-w-[80%]">
-                    <p className="text-sm">{message.userMessage}</p>
+                  <div className="bg-blue-500 text-white rounded-lg rounded-tr-md px-3 py-2 max-w-[85%]">
+                    <p className="text-xs">{message.userMessage}</p>
                   </div>
                 </div>
               )}
               
               {message.aiResponse && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-2xl rounded-tl-md px-4 py-3 max-w-[80%]">
-                    <div className="flex items-center gap-2 mb-2">
-                      <MessageCircle className="w-4 h-4 text-purple-500" />
+                  <div className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg rounded-tl-md px-3 py-2 max-w-[85%]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <MessageCircle className="w-3 h-3 text-purple-500" />
                       <span className="text-xs font-medium text-purple-500">AI助手</span>
                     </div>
-                    <div className="text-sm whitespace-pre-line">{message.aiResponse}</div>
+                    <div className="text-xs whitespace-pre-line leading-relaxed">{message.aiResponse}</div>
                   </div>
                 </div>
               )}
@@ -176,12 +166,12 @@ export default function PageCustomizer({ isOpen, onClose, onTemplateChange, curr
           
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-tl-md px-4 py-3">
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg rounded-tl-md px-3 py-2">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                   </div>
                   <span className="text-xs text-gray-500">AI正在思考...</span>
                 </div>
@@ -191,15 +181,15 @@ export default function PageCustomizer({ isOpen, onClose, onTemplateChange, curr
         </div>
 
         {/* 快捷操作 */}
-        <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex gap-2 mb-3">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="space-y-2 mb-3">
             {quickActions.map((action, index) => (
               <button
                 key={index}
                 onClick={() => setInput(action.text)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-xs text-gray-700 dark:text-gray-300 transition-colors"
               >
-                <action.icon className="w-4 h-4" />
+                <action.icon className="w-3 h-3" />
                 <span>{action.text}</span>
               </button>
             ))}
@@ -207,26 +197,26 @@ export default function PageCustomizer({ isOpen, onClose, onTemplateChange, curr
         </div>
 
         {/* 输入区域 */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex gap-3">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="space-y-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder="描述您想要的页面效果..."
-              className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl border-none focus:ring-2 focus:ring-purple-500 text-gray-800 dark:text-gray-200 placeholder-gray-500"
+              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg border-none focus:ring-2 focus:ring-purple-500 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500"
               disabled={isLoading}
             />
             <button
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
+              <span>发送</span>
             </button>
           </div>
         </div>
       </div>
-    </div>
   )
 }

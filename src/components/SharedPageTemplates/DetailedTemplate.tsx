@@ -18,9 +18,16 @@ interface DetailedTemplateProps {
   itinerary: ShareableItinerary
   onExport: () => void
   onShare: () => void
+  showCustomizer?: boolean
+  onToggleCustomizer?: () => void
+  customizerPanel?: React.ReactNode
 }
 
-export default function DetailedTemplate({ itinerary, onExport, onShare }: DetailedTemplateProps) {
+export default function DetailedTemplate({ 
+  itinerary, 
+  onExport, 
+  onShare
+}: DetailedTemplateProps) {
   // 计算总预计时间
   const totalHours = itinerary.itinerary.reduce((dayTotal, day) => {
     return dayTotal + day.locations.reduce((locationTotal, location) => {

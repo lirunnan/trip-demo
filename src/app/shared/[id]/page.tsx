@@ -18,59 +18,389 @@ interface ShareableItinerary {
   totalAttractions: number
 }
 
+interface ServerRenderedContent {
+  id: string
+  title: string
+  html: string
+  createdAt: string
+}
+
 export default function SharedItineraryPage() {
   const params = useParams()
   const id = params.id as string
   const [itinerary, setItinerary] = useState<ShareableItinerary | null>(null)
+  const [serverContent, setServerContent] = useState<ServerRenderedContent | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentTemplate, setCurrentTemplate] = useState<'original' | 'minimal' | 'detailed'>('original')
   const [showCustomizer, setShowCustomizer] = useState(false)
+  const [renderMode, setRenderMode] = useState<'server' | 'client'>('server')
   
   const { loadSharedItinerary, exportAsTextFile, copyShareLink } = useExportFeatures()
 
   useEffect(() => {
-    const loadItinerary = async () => {
+    const loadContent = async () => {
       try {
         setLoading(true)
+        
+        // 首先尝试从服务端API获取HTML内容
+        try {
+          const response = await fetch(`/api/shared/${id}`)
+          if (response.ok) {
+            const result = await response.json()
+            if (result.success && result.data) {
+              setServerContent(result.data)
+              setRenderMode('server')
+              return
+            }
+          }
+        } catch (apiError) {
+          console.log('服务端API获取失败，尝试客户端渲染:', apiError)
+        }
+        
+        // 如果服务端API失败，降级到客户端渲染
         const data = await loadSharedItinerary(id)
         if (data) {
           setItinerary(data)
+          setRenderMode('client')
         } else {
-          setError('行程不存在或已过期')
+          setError('分享内容不存在或已过期')
         }
+        
       } catch (err) {
-        setError('加载行程失败')
-        console.error('加载分享行程失败:', err)
+        setError('加载分享内容失败')
+        console.error('加载分享内容失败:', err)
       } finally {
         setLoading(false)
       }
     }
 
     if (id) {
-      loadItinerary()
+      loadContent()
     }
   }, [id, loadSharedItinerary])
 
   const handleExport = () => {
-    if (itinerary) {
+    if (renderMode === 'server' && serverContent) {
+      // 服务端渲染模式：导出HTML内容
+      const blob = new Blob([serverContent.html], { type: 'text/html;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${serverContent.title}_${new Date().toISOString().split('T')[0]}.html`
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } else if (renderMode === 'client' && itinerary) {
+      // 客户端渲染模式：使用原有导出逻辑
       exportAsTextFile(itinerary.itinerary, itinerary.title)
     }
   }
 
   const handleShare = async () => {
-    if (itinerary) {
-      try {
-        await copyShareLink(itinerary.itinerary, itinerary.title)
-        alert('分享链接已复制到剪贴板！')
-      } catch {
-        alert('分享失败，请稍后重试')
-      }
+    try {
+      const shareUrl = `${window.location.origin}/shared/${id}`
+      await navigator.clipboard.writeText(shareUrl)
+      alert('分享链接已复制到剪贴板！')
+    } catch {
+      alert('分享失败，请稍后重试')
     }
+  }
+
+  // 根据模板类型处理服务端HTML内容
+  const getStyledServerContent = () => {
+    if (!serverContent) return ''
+    
+    let styledContent = serverContent.html
+    
+    // 根据不同模板注入相应的样式覆盖
+    const templateStyles = {
+      minimal: `
+        <style>
+          .server-rendered-content .shared-content {
+            font-family: 'Georgia', serif !important;
+            background: white !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+          }
+          .server-rendered-content .header-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+            color: #495057 !important;
+            border: 1px solid #dee2e6 !important;
+          }
+          .server-rendered-content .main-title {
+            color: #212529 !important;
+            font-weight: 300 !important;
+            text-shadow: none !important;
+          }
+          .server-rendered-content .stat-item {
+            background: rgba(108, 117, 125, 0.1) !important;
+            color: #6c757d !important;
+          }
+          .server-rendered-content .day-card {
+            box-shadow: none !important;
+            border: 1px solid #e9ecef !important;
+            background: #fefefe !important;
+          }
+          .server-rendered-content .location-item {
+            background: #f8f9fa !important;
+            border-left: 2px solid #6c757d !important;
+          }
+          .server-rendered-content .time {
+            color: #6c757d !important;
+          }
+          .server-rendered-content .tips-section {
+            background: #f8f9fa !important;
+            border: 1px solid #dee2e6 !important;
+          }
+          .server-rendered-content .tips-section h2 {
+            color: #495057 !important;
+          }
+          .server-rendered-content .tips-section li {
+            color: #6c757d !important;
+          }
+        </style>
+      `,
+      detailed: `
+        <style>
+          .server-rendered-content .shared-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 30px !important;
+            border-radius: 20px !important;
+            margin: 0 !important;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .server-rendered-content .header-section {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%) !important;
+            transform: rotate(-2deg) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+            border-radius: 20px !important;
+          }
+          .server-rendered-content .main-title {
+            font-size: 3rem !important;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5) !important;
+            animation: pulse 2s infinite !important;
+          }
+          .server-rendered-content .stat-item {
+            background: rgba(255,255,255,0.3) !important;
+            backdrop-filter: blur(15px) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+          }
+          .server-rendered-content .day-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            transform: rotate(1deg) !important;
+            margin: 20px 0 !important;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important;
+            border-radius: 20px !important;
+            border: none !important;
+          }
+          .server-rendered-content .day-card:nth-child(even) {
+            transform: rotate(-1deg) !important;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%) !important;
+          }
+          .server-rendered-content .day-title {
+            color: white !important;
+            border-bottom: 2px solid rgba(255,255,255,0.3) !important;
+            font-size: 1.8rem !important;
+          }
+          .server-rendered-content .location-item {
+            background: rgba(255,255,255,0.15) !important;
+            border-left: 4px solid #ffd93d !important;
+            backdrop-filter: blur(10px) !important;
+            border-radius: 15px !important;
+          }
+          .server-rendered-content .location-item h3 {
+            color: white !important;
+            font-size: 1.3rem !important;
+          }
+          .server-rendered-content .location-item p {
+            color: rgba(255,255,255,0.9) !important;
+          }
+          .server-rendered-content .time {
+            color: #ffd93d !important;
+            font-weight: bold !important;
+          }
+          .server-rendered-content .tips-section {
+            background: linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 20px !important;
+            transform: rotate(-1deg) !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+          }
+          .server-rendered-content .tips-section h2 {
+            color: white !important;
+            font-size: 1.5rem !important;
+          }
+          .server-rendered-content .tips-section li {
+            color: white !important;
+          }
+          .server-rendered-content .footer-section {
+            background: rgba(255,255,255,0.1) !important;
+            color: white !important;
+            border-radius: 15px !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+          }
+          @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+          }
+        </style>
+      `,
+      original: `
+        <style>
+          .server-rendered-content .shared-content {
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+          }
+        </style>
+      `
+    }
+    
+    // 添加通用的容器样式，确保不会溢出
+    const baseStyles = `
+      <style>
+        .server-rendered-content {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+          overflow-x: hidden !important;
+        }
+        .server-rendered-content * {
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        .server-rendered-content img {
+          height: auto !important;
+          max-width: 100% !important;
+        }
+        .server-rendered-content table {
+          table-layout: fixed !important;
+          width: 100% !important;
+        }
+        .server-rendered-content pre, 
+        .server-rendered-content code {
+          white-space: pre-wrap !important;
+          word-wrap: break-word !important;
+        }
+      </style>
+    `
+    
+    // 在HTML内容末尾添加样式
+    const additionalStyles = templateStyles[currentTemplate] || templateStyles.original
+    const allStyles = baseStyles + additionalStyles
+    
+    // 在最后一个</div>前插入样式
+    const lastDivIndex = styledContent.lastIndexOf('</div>')
+    if (lastDivIndex !== -1) {
+      styledContent = styledContent.substring(0, lastDivIndex) + allStyles + styledContent.substring(lastDivIndex)
+    } else {
+      styledContent += allStyles
+    }
+    
+    return styledContent
   }
 
   // 渲染统一布局结构
   const renderTemplate = () => {
+    // 服务端渲染模式：直接渲染HTML内容
+    if (renderMode === 'server' && serverContent) {
+      return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+          {/* 统一的顶部导航 */}
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex items-center justify-between">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  返回首页
+                </Link>
+                
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                    服务端渲染
+                  </span>
+                  {!showCustomizer ? (
+                    <button
+                      onClick={() => setShowCustomizer(true)}
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                    >
+                      <Wand2 className="w-4 h-4" />
+                      定制页面
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowCustomizer(false)}
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <Wand2 className="w-4 h-4" />
+                      关闭定制
+                    </button>
+                  )}
+                  <button
+                    onClick={handleShare}
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    分享
+                  </button>
+                  <button
+                    onClick={handleExport}
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    导出HTML
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 主体区域：左侧定制面板 + 右侧内容 */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* 左侧定制面板 */}
+            {showCustomizer && (
+              <div className="w-80 flex-shrink-0">
+                <PageCustomizer
+                  onTemplateChange={setCurrentTemplate}
+                  currentTemplate={currentTemplate}
+                />
+              </div>
+            )}
+            
+            {/* 右侧服务端HTML内容区域 */}
+            <div className="flex-1 h-[calc(100vh-72px)] overflow-y-auto bg-gray-50 dark:bg-gray-900">
+              <div 
+                dangerouslySetInnerHTML={{ __html: getStyledServerContent() }}
+                className={`server-rendered-content template-${currentTemplate}`}
+                style={{
+                  padding: '20px',
+                  maxWidth: '100%',
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )
+    }
+    
+    // 客户端渲染模式：使用原有逻辑
     if (!itinerary) return null
 
     return (
@@ -88,6 +418,9 @@ export default function SharedItineraryPage() {
               </Link>
               
               <div className="flex items-center gap-2">
+                <span className="px-3 py-1 text-xs bg-orange-100 text-orange-800 rounded-full">
+                  客户端渲染
+                </span>
                 {!showCustomizer ? (
                   <button
                     onClick={() => setShowCustomizer(true)}
@@ -432,7 +765,7 @@ export default function SharedItineraryPage() {
     )
   }
 
-  if (error || !itinerary) {
+  if (error || (!itinerary && !serverContent)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center max-w-md">

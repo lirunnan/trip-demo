@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import DemoCards from '../components/DemoCards'
 import ChatInterface, { Message, ItineraryDay } from '../components/ChatInterface'
 import TravelViews from '@/components/TravelViews'
@@ -20,6 +21,7 @@ interface DemoGuide {
 }
 
 export default function Home() {
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentItinerary, setCurrentItinerary] = useState<ItineraryDay[]>([])
@@ -297,6 +299,10 @@ export default function Home() {
     handleSendMessage(demoPrompt)
   }, [handleSendMessage])
 
+  const handleShowPopularGuides = useCallback(() => {
+    router.push('/popular')
+  }, [router])
+
   const handleLocationDelete = useCallback(async (dayIndex: number, locationIndex: number) => {
     if (currentItinerary.length === 0 || !currentItinerary[dayIndex]) return
     
@@ -527,7 +533,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-6">
         {/* 页面顶部：Demo攻略卡片 - 始终显示 */}
         <div className="mb-8">
-          <DemoCards onSelectDemo={handleSelectDemo} />
+          <DemoCards onSelectDemo={handleSelectDemo} onShowPopularGuides={handleShowPopularGuides} />
         </div>
 
         {/* 主要内容区域 */}

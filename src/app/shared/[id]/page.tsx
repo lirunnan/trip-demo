@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { ItineraryDay } from '@/components/ChatInterface'
 import TravelViews from '@/components/TravelViews'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
 import PageCustomizer from '@/components/PageCustomizer'
+import TravelCommunity from '@/components/TravelCommunity'
 import { Calendar, MapPin, Clock, Share2, Download, ArrowLeft, Wand2, Star, Users, Camera } from 'lucide-react'
 import Link from 'next/link'
 
@@ -36,6 +37,8 @@ export default function SharedItineraryPage() {
   const [showCustomizer, setShowCustomizer] = useState(false)
   const [renderMode, setRenderMode] = useState<'server' | 'client'>('server')
   const [showShareMenu, setShowShareMenu] = useState(false)
+  const [showCommunity, setShowCommunity] = useState(false)
+  const [addAdoptionFunc, setAddAdoptionFunc] = useState<((title: string, shareUrl: string) => void) | null>(null)
   
   const { loadSharedItinerary, exportAsTextFile, copyShareLink } = useExportFeatures()
 
@@ -135,6 +138,31 @@ export default function SharedItineraryPage() {
   const toggleShareMenu = () => {
     setShowShareMenu(!showShareMenu)
   }
+
+  const handleShowCommunity = useCallback(() => {
+    setShowCommunity(true)
+  }, [])
+
+  const handleApplyTemplate = useCallback((template: any) => {
+    if (addAdoptionFunc) {
+      addAdoptionFunc(template.title, template.shareUrl)
+    }
+    setShowCommunity(false)
+  }, [addAdoptionFunc])
+
+  const handleExitCommunity = useCallback(() => {
+    setShowCommunity(false)
+  }, [])
+
+  const handlePreviewTemplate = useCallback((template: any) => {
+    // 在新窗口打开攻略预览
+    const previewUrl = `http://localhost:3001${template.shareUrl}`
+    window.open(previewUrl, '_blank', 'noopener,noreferrer')
+  }, [])
+
+  const handleAddAdoptionMessage = useCallback((addFunc: (title: string, shareUrl: string) => void) => {
+    setAddAdoptionFunc(() => addFunc)
+  }, [])
 
   // 点击外部关闭菜单
   useEffect(() => {
@@ -754,22 +782,30 @@ export default function SharedItineraryPage() {
                 <PageCustomizer
                   onTemplateChange={setCurrentTemplate}
                   currentTemplate={currentTemplate}
+                  onShowCommunity={handleShowCommunity}
+                  onAddAdoptionMessage={handleAddAdoptionMessage}
                 />
               </div>
             )}
             
-            {/* 右侧服务端HTML内容区域 */}
-            <div className="flex-1 h-[calc(100vh-72px)] overflow-y-auto bg-gray-50 dark:bg-gray-900">
-              <div 
-                dangerouslySetInnerHTML={{ __html: getStyledServerContent() }}
-                className={`server-rendered-content template-${currentTemplate}`}
-                style={{
-                  padding: '20px',
-                  maxWidth: '100%',
-                  wordWrap: 'break-word',
-                  overflowWrap: 'break-word'
-                }}
-              />
+            {/* 右侧内容区域 - 显示分享页或攻略社区 */}
+            <div className="flex-1 h-[calc(100vh-72px)] overflow-hidden bg-gray-50 dark:bg-gray-900">
+              {showCommunity ? (
+                <TravelCommunity onApplyTemplate={handleApplyTemplate} onExitCommunity={handleExitCommunity} onPreviewTemplate={handlePreviewTemplate} />
+              ) : (
+                <div className="h-full overflow-y-auto">
+                  <div 
+                    dangerouslySetInnerHTML={{ __html: getStyledServerContent() }}
+                    className={`server-rendered-content template-${currentTemplate}`}
+                    style={{
+                      padding: '20px',
+                      maxWidth: '100%',
+                      wordWrap: 'break-word',
+                      overflowWrap: 'break-word'
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -873,13 +909,19 @@ export default function SharedItineraryPage() {
               <PageCustomizer
                 onTemplateChange={setCurrentTemplate}
                 currentTemplate={currentTemplate}
+                onShowCommunity={handleShowCommunity}
+                onAddAdoptionMessage={handleAddAdoptionMessage}
               />
             </div>
           )}
           
           {/* 右侧内容区域 */}
           <div className="flex-1 h-[calc(100vh-72px)] overflow-y-auto">
-            {renderTemplateContent()}
+            {showCommunity ? (
+              <TravelCommunity onApplyTemplate={handleApplyTemplate} onExitCommunity={handleExitCommunity} onPreviewTemplate={handlePreviewTemplate} />
+            ) : (
+              renderTemplateContent()
+            )}
           </div>
         </div>
       </div>

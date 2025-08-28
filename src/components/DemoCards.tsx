@@ -1,6 +1,6 @@
 'use client'
 
-import { MapPin, Clock, Copy } from 'lucide-react'
+import { MapPin, Clock, Copy, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
 interface DemoGuide {
@@ -15,6 +15,7 @@ interface DemoGuide {
 
 interface DemoCardsProps {
   onSelectDemo: (demo: DemoGuide) => void
+  onShowPopularGuides?: () => void
 }
 
 const demoGuides: DemoGuide[] = [
@@ -47,7 +48,7 @@ const demoGuides: DemoGuide[] = [
   }
 ]
 
-export default function DemoCards({ onSelectDemo }: DemoCardsProps) {
+export default function DemoCards({ onSelectDemo, onShowPopularGuides }: DemoCardsProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const handleCopy = async (demo: DemoGuide, e: React.MouseEvent) => {
@@ -65,7 +66,7 @@ export default function DemoCards({ onSelectDemo }: DemoCardsProps) {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {demoGuides.map((demo) => (
           <div
             key={demo.id}
@@ -120,6 +121,24 @@ export default function DemoCards({ onSelectDemo }: DemoCardsProps) {
             </div>
           </div>
         ))}
+        
+        {/* 热门攻略入口卡片 */}
+        <div
+          className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/50 dark:to-red-950/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-orange-200 dark:border-orange-800 group"
+          onClick={onShowPopularGuides}
+        >
+          <div className="p-3 h-full flex flex-col items-center justify-center text-center">
+            <div className="mb-2">
+              <TrendingUp className="w-8 h-8 text-orange-500 group-hover:text-orange-600 transition-colors mx-auto" />
+            </div>
+            <h3 className="text-sm font-semibold text-orange-800 dark:text-orange-300 group-hover:text-orange-900 dark:group-hover:text-orange-200 transition-colors mb-1">
+              热门攻略
+            </h3>
+            <p className="text-xs text-orange-600 dark:text-orange-400">
+              发现更多精彩旅程
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )

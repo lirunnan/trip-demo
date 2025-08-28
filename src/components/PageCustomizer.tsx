@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { MessageCircle, Send, Sparkles, Palette, Layout } from 'lucide-react'
+import React, { useState, useCallback } from 'react'
+import { MessageCircle, Send, Sparkles, Palette, Layout, Users } from 'lucide-react'
 
 interface CustomizationRequest {
   id: string
@@ -14,9 +14,11 @@ interface PageCustomizerProps {
   onTemplateChange: (template: 'original' | 'minimal' | 'detailed') => void
   currentTemplate: 'original' | 'minimal' | 'detailed'
   className?: string
+  onShowCommunity?: () => void
+  onAddAdoptionMessage?: (addAdoptionFunc: (templateTitle: string, shareUrl: string) => void) => void
 }
 
-export default function PageCustomizer({ onTemplateChange, currentTemplate, className = '' }: PageCustomizerProps) {
+export default function PageCustomizer({ onTemplateChange, currentTemplate, className = '', onShowCommunity, onAddAdoptionMessage }: PageCustomizerProps) {
   const [messages, setMessages] = useState<CustomizationRequest[]>([
     {
       id: '1',
@@ -27,6 +29,39 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  // 添加采纳消息的方法
+  const addAdoptionMessage = useCallback((templateTitle: string, shareUrl: string) => {
+    const userMessage = `一键采纳${templateTitle}`
+    const aiResponse = `✅ 已成功采纳攻略模板！
+
+📋 **模板名称**: <a href="http://localhost:3001${shareUrl}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">${templateTitle}</a>
+🔗 **来源**: http://localhost:3001${shareUrl}
+
+这个模板的设计和布局将作为您当前页面的参考。您可以继续和我对话来进一步调整细节，比如：
+
+• 调整颜色搭配
+• 修改布局样式  
+• 优化内容展示
+
+还有什么需要调整的吗？`
+    
+    const newMessage: CustomizationRequest = {
+      id: Date.now().toString(),
+      userMessage,
+      aiResponse,
+      timestamp: new Date()
+    }
+    
+    setMessages(prev => [...prev, newMessage])
+  }, [setMessages])
+
+  // 通过useEffect暴露方法给父组件
+  React.useEffect(() => {
+    if (onAddAdoptionMessage) {
+      onAddAdoptionMessage(addAdoptionMessage)
+    }
+  }, [onAddAdoptionMessage, addAdoptionMessage])
 
   // Mock AI响应逻辑
   const getMockResponse = (userInput: string): { response: string; template: 'original' | 'minimal' | 'detailed' } => {
@@ -123,15 +158,27 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
     <div className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-[calc(100vh-72px)] w-full overflow-hidden ${className}`}>
       {/* 头部 - 固定高度 */}
       <div className="flex-shrink-0 p-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                页面定制
+              </h2>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              页面定制
-            </h2>
-          </div>
+          
+          {/* 社区入口按钮 */}
+          <button
+            onClick={onShowCommunity}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+            title="攻略社区"
+          >
+            <Users className="w-3.5 h-3.5" />
+            社区
+          </button>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400">
           通过自然语言调整页面布局和样式
@@ -157,7 +204,7 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
                     <MessageCircle className="w-3 h-3 text-purple-500" />
                     <span className="text-xs font-medium text-purple-500">AI助手</span>
                   </div>
-                  <div className="text-xs whitespace-pre-line leading-relaxed break-words">{message.aiResponse}</div>
+                  <div className="text-xs whitespace-pre-line leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: message.aiResponse }}></div>
                 </div>
               </div>
             )}

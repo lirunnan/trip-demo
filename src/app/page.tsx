@@ -40,6 +40,7 @@ export default function Home() {
   
   const {
     copyShareLink,
+    generateShareLink,
     exportAsTextFile
   } = useExportFeatures()
 
@@ -372,15 +373,84 @@ export default function Home() {
       setMessages(prev => [...prev, successMessage])
     } catch (error) {
       console.error('分享失败:', error)
+    }
+  }, [currentItinerary, copyShareLink])
+
+  const handleShareServer = useCallback(async () => {
+    if (currentItinerary.length === 0) return
+    
+    try {
+      // 生成唯一ID用于服务端存储
+      const serverId = `server_${Date.now()}`
+      const title = `${currentItinerary.length}天旅行计划`
+      
+      // 向服务端API创建分享内容
+      const response = await fetch(`/api/shared/${serverId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          itinerary: currentItinerary
+        })
+      })
+      
+      if (response.ok) {
+        const shareUrl = `${window.location.origin}/shared/${serverId}`
+        await navigator.clipboard.writeText(shareUrl)
+        
+        const successMessage: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: '🟢 服务端渲染分享链接已复制！这种方式加载速度快，适合快速浏览。',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, successMessage])
+      } else {
+        throw new Error('服务端创建失败')
+      }
+    } catch (error) {
+      console.error('服务端分享失败:', error)
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: '分享失败，请稍后重试。',
+        content: '服务端分享失败，请稍后重试。',
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
     }
-  }, [currentItinerary, copyShareLink])
+  }, [currentItinerary])
+
+  const handleShareClient = useCallback(async () => {
+    if (currentItinerary.length === 0) return
+    
+    try {
+      // 生成客户端渲染分享链接 (使用localStorage，添加render=client参数)
+      const shareUrl = await generateShareLink(currentItinerary, `${currentItinerary.length}天旅行计划`)
+      const clientShareUrl = shareUrl + '?render=client'
+      
+      // 复制修改后的链接
+      await navigator.clipboard.writeText(clientShareUrl)
+      
+      const successMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '🟠 客户端渲染分享链接已复制！这种方式支持定制功能，体验更完整。',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, successMessage])
+    } catch (error) {
+      console.error('客户端分享失败:', error)
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '客户端分享失败，请稍后重试。',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    }
+  }, [currentItinerary, generateShareLink])
 
   const handleExportPDF = useCallback(() => {
     if (currentItinerary.length === 0) return
@@ -484,6 +554,8 @@ export default function Home() {
                   onLocationReorder={handleLocationReorder}
                   onExportPDF={handleExportPDF}
                   onShare={handleShare}
+                  onShareServer={handleShareServer}
+                  onShareClient={handleShareClient}
                 />
               </div>
             </div>

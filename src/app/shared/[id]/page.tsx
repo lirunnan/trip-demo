@@ -35,6 +35,7 @@ export default function SharedItineraryPage() {
   const [currentTemplate, setCurrentTemplate] = useState<'original' | 'minimal' | 'detailed'>('original')
   const [showCustomizer, setShowCustomizer] = useState(false)
   const [renderMode, setRenderMode] = useState<'server' | 'client'>('server')
+  const [showShareMenu, setShowShareMenu] = useState(false)
   
   const { loadSharedItinerary, exportAsTextFile, copyShareLink } = useExportFeatures()
 
@@ -43,22 +44,28 @@ export default function SharedItineraryPage() {
       try {
         setLoading(true)
         
-        // 首先尝试从服务端API获取HTML内容
-        try {
-          const response = await fetch(`/api/shared/${id}`)
-          if (response.ok) {
-            const result = await response.json()
-            if (result.success && result.data) {
-              setServerContent(result.data)
-              setRenderMode('server')
-              return
+        // 检查URL参数，决定渲染模式
+        const urlParams = new URLSearchParams(window.location.search)
+        const forceClientRender = urlParams.get('render') === 'client'
+        
+        if (!forceClientRender) {
+          // 首先尝试从服务端API获取HTML内容
+          try {
+            const response = await fetch(`/api/shared/${id}`)
+            if (response.ok) {
+              const result = await response.json()
+              if (result.success && result.data) {
+                setServerContent(result.data)
+                setRenderMode('server')
+                return
+              }
             }
+          } catch (apiError) {
+            console.log('服务端API获取失败，尝试客户端渲染:', apiError)
           }
-        } catch (apiError) {
-          console.log('服务端API获取失败，尝试客户端渲染:', apiError)
         }
         
-        // 如果服务端API失败，降级到客户端渲染
+        // 如果强制客户端渲染或服务端API失败，使用客户端渲染
         const data = await loadSharedItinerary(id)
         if (data) {
           setItinerary(data)
@@ -82,32 +89,69 @@ export default function SharedItineraryPage() {
 
   const handleExport = () => {
     if (renderMode === 'server' && serverContent) {
-      // 服务端渲染模式：导出HTML内容
-      const blob = new Blob([serverContent.html], { type: 'text/html;charset=utf-8' })
+      // 服务端渲染模式：导出完整页面HTML
+      const exportHtml = generateCompletePageHtml(true)
+      const blob = new Blob([exportHtml], { type: 'text/html;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `${serverContent.title}_${new Date().toISOString().split('T')[0]}.html`
+      link.download = `${serverContent.title}_${currentTemplate}_${new Date().toISOString().split('T')[0]}.html`
       link.style.display = 'none'
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
     } else if (renderMode === 'client' && itinerary) {
-      // 客户端渲染模式：使用原有导出逻辑
-      exportAsTextFile(itinerary.itinerary, itinerary.title)
+      // 客户端渲染模式：导出完整页面HTML
+      const exportHtml = generateCompletePageHtml(false)
+      const blob = new Blob([exportHtml], { type: 'text/html;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${itinerary.title}_${currentTemplate}_${new Date().toISOString().split('T')[0]}.html`
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
     }
   }
 
-  const handleShare = async () => {
+  const handleShare = async (mode: 'server' | 'client') => {
     try {
-      const shareUrl = `${window.location.origin}/shared/${id}`
+      let shareUrl = `${window.location.origin}/shared/${id}`
+      if (mode === 'client') {
+        shareUrl += '?render=client'
+      }
+      
       await navigator.clipboard.writeText(shareUrl)
-      alert('分享链接已复制到剪贴板！')
+      alert(`${mode === 'server' ? '服务端渲染' : '客户端渲染'}分享链接已复制到剪贴板！`)
+      setShowShareMenu(false)
     } catch {
       alert('分享失败，请稍后重试')
     }
   }
+
+  const toggleShareMenu = () => {
+    setShowShareMenu(!showShareMenu)
+  }
+
+  // 点击外部关闭菜单
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showShareMenu) {
+        const target = event.target as HTMLElement
+        if (!target.closest('.share-menu-container')) {
+          setShowShareMenu(false)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showShareMenu])
 
   // 根据模板类型处理服务端HTML内容
   const getStyledServerContent = () => {
@@ -312,6 +356,306 @@ export default function SharedItineraryPage() {
     return styledContent
   }
 
+  // 为客户端模式生成HTML内容
+  const generateClientHtml = () => {
+    if (!itinerary) return ''
+    
+    const title = itinerary.title
+    const totalDays = itinerary.totalDays
+    const totalAttractions = itinerary.totalAttractions
+    
+    // 根据不同模板生成不同样式的HTML
+    let templateClass = ''
+    let headerGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    let borderColor = '#3b82f6'
+    
+    switch (currentTemplate) {
+      case 'minimal':
+        templateClass = 'minimal-template'
+        headerGradient = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+        borderColor = '#6c757d'
+        break
+      case 'detailed':
+        templateClass = 'detailed-template'
+        headerGradient = 'linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%)'
+        borderColor = '#ffd93d'
+        break
+      default:
+        templateClass = 'original-template'
+    }
+    
+    const daysHtml = itinerary.itinerary.map((day: any) => `
+      <div class="day-card">
+        <h2 class="day-title">第${day.day}天 - ${day.date}</h2>
+        <div class="locations">
+          ${day.locations.map((location: any) => `
+            <div class="location-item">
+              <h3>${location.name}</h3>
+              <p>${location.description}</p>
+              <span class="time">${location.duration} • ${location.type}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')
+
+    return `
+      <div class="shared-content ${templateClass}">
+        <div class="header-section">
+          <h1 class="main-title">${title}</h1>
+          <div class="trip-stats">
+            <span class="stat-item">${totalDays}天行程</span>
+            <span class="stat-item">${totalAttractions}个景点</span>
+            <span class="stat-item">客户端渲染 - ${currentTemplate === 'original' ? '原始' : currentTemplate === 'minimal' ? '简洁' : '详细'}模式</span>
+          </div>
+        </div>
+        
+        <div class="itinerary-section">
+          ${daysHtml}
+        </div>
+        
+        <div class="tips-section">
+          <h2>旅行贴士</h2>
+          <ul>
+            <li>建议提前预订门票，避免现场排队</li>
+            <li>注意天气变化，随身携带雨具</li>
+            <li>保持手机电量，随时导航</li>
+            <li>尊重当地文化和习俗</li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <p>由 <strong>行呗AI旅游助手</strong> 精心规划</p>
+          <p>导出时间：${new Date().toLocaleString('zh-CN')}</p>
+          <p>导出模式：客户端渲染 - ${currentTemplate === 'original' ? '原始' : currentTemplate === 'minimal' ? '简洁' : '详细'}模板</p>
+        </div>
+        
+        <style>
+          .shared-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+          }
+          
+          .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: ${headerGradient};
+            color: ${currentTemplate === 'minimal' ? '#495057' : 'white'};
+            border-radius: 12px;
+            ${currentTemplate === 'detailed' ? 'transform: rotate(-1deg); box-shadow: 0 10px 30px rgba(0,0,0,0.2);' : ''}
+          }
+          
+          .main-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: ${currentTemplate === 'minimal' ? 'none' : '2px 2px 4px rgba(0,0,0,0.3)'};
+            ${currentTemplate === 'detailed' ? 'animation: pulse 2s infinite;' : ''}
+          }
+          
+          .trip-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+          }
+          
+          .stat-item {
+            background: ${currentTemplate === 'minimal' ? 'rgba(108, 117, 125, 0.1)' : 'rgba(255,255,255,0.2)'};
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: ${currentTemplate === 'minimal' ? '#6c757d' : 'inherit'};
+            ${currentTemplate === 'detailed' ? 'backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2);' : ''}
+          }
+          
+          .day-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: ${currentTemplate === 'minimal' ? 'none' : currentTemplate === 'detailed' ? '0 15px 35px rgba(0,0,0,0.3)' : '0 4px 6px rgba(0,0,0,0.1)'};
+            border: ${currentTemplate === 'minimal' ? '1px solid #e9ecef' : 'none'};
+            ${currentTemplate === 'detailed' ? `
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              transform: rotate(1deg);
+            ` : ''}
+          }
+          
+          .day-card:nth-child(even) {
+            ${currentTemplate === 'detailed' ? `
+              transform: rotate(-1deg);
+              background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            ` : ''}
+          }
+          
+          .day-title {
+            color: ${currentTemplate === 'detailed' ? 'white' : '#1f2937'};
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid ${currentTemplate === 'detailed' ? 'rgba(255,255,255,0.3)' : '#e5e7eb'};
+          }
+          
+          .location-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: ${currentTemplate === 'minimal' ? '#f8f9fa' : currentTemplate === 'detailed' ? 'rgba(255,255,255,0.15)' : '#f9fafb'};
+            border-radius: ${currentTemplate === 'detailed' ? '15px' : '8px'};
+            border-left: 4px solid ${currentTemplate === 'detailed' ? '#ffd93d' : borderColor};
+            ${currentTemplate === 'detailed' ? 'backdrop-filter: blur(10px);' : ''}
+          }
+          
+          .location-item:last-child {
+            margin-bottom: 0;
+          }
+          
+          .location-item h3 {
+            color: ${currentTemplate === 'detailed' ? 'white' : '#1f2937'};
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+          }
+          
+          .location-item p {
+            color: ${currentTemplate === 'detailed' ? 'rgba(255,255,255,0.9)' : '#6b7280'};
+            margin-bottom: 8px;
+          }
+          
+          .time {
+            color: ${currentTemplate === 'detailed' ? '#ffd93d' : borderColor};
+            font-size: 0.9rem;
+            font-weight: ${currentTemplate === 'detailed' ? 'bold' : '500'};
+          }
+          
+          .tips-section {
+            background: ${currentTemplate === 'minimal' ? '#f8f9fa' : currentTemplate === 'detailed' ? 'linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%)' : '#fffbeb'};
+            border-radius: ${currentTemplate === 'detailed' ? '20px' : '12px'};
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid ${currentTemplate === 'minimal' ? '#dee2e6' : currentTemplate === 'detailed' ? 'none' : '#f59e0b'};
+            color: ${currentTemplate === 'detailed' ? 'white' : 'inherit'};
+            ${currentTemplate === 'detailed' ? 'transform: rotate(-0.5deg); box-shadow: 0 10px 25px rgba(0,0,0,0.2);' : ''}
+          }
+          
+          .tips-section h2 {
+            color: ${currentTemplate === 'minimal' ? '#495057' : currentTemplate === 'detailed' ? 'white' : '#f59e0b'};
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+          }
+          
+          .tips-section ul {
+            list-style: none;
+            padding: 0;
+          }
+          
+          .tips-section li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 20px;
+            color: ${currentTemplate === 'minimal' ? '#6c757d' : currentTemplate === 'detailed' ? 'white' : '#92400e'};
+          }
+          
+          .tips-section li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+          }
+          
+          .footer-section {
+            text-align: center;
+            padding: 20px;
+            color: ${currentTemplate === 'detailed' ? 'white' : '#6b7280'};
+            font-size: 0.9rem;
+            border-top: 1px solid ${currentTemplate === 'detailed' ? 'rgba(255,255,255,0.2)' : '#e5e7eb'};
+            margin-top: 30px;
+            ${currentTemplate === 'detailed' ? 'background: rgba(255,255,255,0.1); border-radius: 15px; border: 1px solid rgba(255,255,255,0.2);' : ''}
+          }
+          
+          .footer-section strong {
+            color: ${currentTemplate === 'detailed' ? 'white' : borderColor};
+          }
+          
+          ${currentTemplate === 'detailed' ? `
+            @keyframes pulse {
+              0% { transform: scale(1); }
+              50% { transform: scale(1.05); }
+              100% { transform: scale(1); }
+            }
+          ` : ''}
+          
+          @media (max-width: 768px) {
+            .shared-content {
+              padding: 15px;
+            }
+            
+            .main-title {
+              font-size: 2rem;
+            }
+            
+            .trip-stats {
+              gap: 10px;
+            }
+            
+            .day-card {
+              padding: 20px;
+            }
+          }
+        </style>
+      </div>
+    `
+  }
+
+  // 生成完整的页面HTML（包含页面布局）
+  const generateCompletePageHtml = (isServer: boolean) => {
+    const title = isServer ? serverContent?.title || '旅行计划' : itinerary?.title || '旅行计划'
+    const contentHtml = isServer ? getStyledServerContent() : generateClientHtml()
+    
+    return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9fafb;
+            padding: 20px;
+        }
+        
+        .page-container {
+            min-height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="${isServer ? `server-rendered-content template-${currentTemplate}` : 'client-rendered-content'}">
+            ${contentHtml}
+        </div>
+    </div>
+</body>
+</html>`
+  }
+
   // 渲染统一布局结构
   const renderTemplate = () => {
     // 服务端渲染模式：直接渲染HTML内容
@@ -351,13 +695,45 @@ export default function SharedItineraryPage() {
                       关闭定制
                     </button>
                   )}
-                  <button
-                    onClick={handleShare}
-                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    分享
-                  </button>
+                  <div className="relative share-menu-container">
+                    <button
+                      onClick={toggleShareMenu}
+                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      分享
+                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {showShareMenu && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                        <div className="py-1">
+                          <button
+                            onClick={() => handleShare('server')}
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                            <div>
+                              <div className="font-medium">服务端渲染</div>
+                              <div className="text-xs text-gray-500">HTML内容，加载快</div>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => handleShare('client')}
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                            <div>
+                              <div className="font-medium">客户端渲染</div>
+                              <div className="text-xs text-gray-500">支持定制，功能完整</div>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={handleExport}
                     className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
@@ -438,13 +814,45 @@ export default function SharedItineraryPage() {
                     关闭定制
                   </button>
                 )}
-                <button
-                  onClick={handleShare}
-                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                >
-                  <Share2 className="w-4 h-4" />
-                  分享
-                </button>
+                <div className="relative share-menu-container">
+                  <button
+                    onClick={toggleShareMenu}
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    分享
+                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {showShareMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                      <div className="py-1">
+                        <button
+                          onClick={() => handleShare('server')}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                          <div>
+                            <div className="font-medium">服务端渲染</div>
+                            <div className="text-xs text-gray-500">HTML内容，加载快</div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => handleShare('client')}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                          <div>
+                            <div className="font-medium">客户端渲染</div>
+                            <div className="text-xs text-gray-500">支持定制，功能完整</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={handleExport}
                   className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"

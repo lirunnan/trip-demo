@@ -120,9 +120,9 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
   ]
 
   return (
-    <div className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full ${className}`}>
-      {/* 头部 */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-[calc(100vh-72px)] w-full overflow-hidden ${className}`}>
+      {/* 头部 - 固定高度 */}
+      <div className="flex-shrink-0 p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
@@ -138,85 +138,85 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
         </p>
       </div>
 
-      {/* 消息区域 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {messages.map((message) => (
-            <div key={message.id}>
-              {message.userMessage && (
-                <div className="flex justify-end mb-2">
-                  <div className="bg-blue-500 text-white rounded-lg rounded-tr-md px-3 py-2 max-w-[85%]">
-                    <p className="text-xs">{message.userMessage}</p>
-                  </div>
-                </div>
-              )}
-              
-              {message.aiResponse && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg rounded-tl-md px-3 py-2 max-w-[85%]">
-                    <div className="flex items-center gap-2 mb-1">
-                      <MessageCircle className="w-3 h-3 text-purple-500" />
-                      <span className="text-xs font-medium text-purple-500">AI助手</span>
-                    </div>
-                    <div className="text-xs whitespace-pre-line leading-relaxed">{message.aiResponse}</div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-          
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg rounded-tl-md px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  </div>
-                  <span className="text-xs text-gray-500">AI正在思考...</span>
+      {/* 消息区域 - 可滚动 */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+        {messages.map((message) => (
+          <div key={message.id}>
+            {message.userMessage && (
+              <div className="flex justify-end mb-2">
+                <div className="bg-blue-500 text-white rounded-lg rounded-tr-md px-3 py-2 max-w-[85%] break-words">
+                  <p className="text-xs break-words">{message.userMessage}</p>
                 </div>
               </div>
+            )}
+            
+            {message.aiResponse && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg rounded-tl-md px-3 py-2 max-w-[85%] break-words">
+                  <div className="flex items-center gap-2 mb-1">
+                    <MessageCircle className="w-3 h-3 text-purple-500" />
+                    <span className="text-xs font-medium text-purple-500">AI助手</span>
+                  </div>
+                  <div className="text-xs whitespace-pre-line leading-relaxed break-words">{message.aiResponse}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg rounded-tl-md px-3 py-2">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                </div>
+                <span className="text-xs text-gray-500">AI正在思考...</span>
+              </div>
             </div>
-          )}
-        </div>
-
-        {/* 快捷操作 */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="space-y-2 mb-3">
-            {quickActions.map((action, index) => (
-              <button
-                key={index}
-                onClick={() => setInput(action.text)}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-xs text-gray-700 dark:text-gray-300 transition-colors"
-              >
-                <action.icon className="w-3 h-3" />
-                <span>{action.text}</span>
-              </button>
-            ))}
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* 输入区域 */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="space-y-2">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="描述您想要的页面效果..."
-              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg border-none focus:ring-2 focus:ring-purple-500 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500"
-              disabled={isLoading}
-            />
+      {/* 快捷操作 - 固定在底部 */}
+      <div className="flex-shrink-0 p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="space-y-2 mb-3">
+          {quickActions.map((action, index) => (
             <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm"
+              key={index}
+              onClick={() => setInput(action.text)}
+              className="w-full flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-xs text-gray-700 dark:text-gray-300 transition-colors truncate"
             >
-              <Send className="w-4 h-4" />
-              <span>发送</span>
+              <action.icon className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{action.text}</span>
             </button>
-          </div>
+          ))}
         </div>
       </div>
+
+      {/* 输入区域 - 固定在底部 */}
+      <div className="flex-shrink-0 p-4 border-t border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="space-y-2">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="描述您想要的页面效果..."
+            className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg border-none focus:ring-2 focus:ring-purple-500 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500 min-w-0"
+            disabled={isLoading}
+          />
+          <button
+            onClick={handleSend}
+            disabled={isLoading || !input.trim()}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm"
+          >
+            <Send className="w-4 h-4 flex-shrink-0" />
+            <span>发送</span>
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

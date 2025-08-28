@@ -132,13 +132,12 @@ export default function SharedItineraryPage() {
               <PageCustomizer
                 onTemplateChange={setCurrentTemplate}
                 currentTemplate={currentTemplate}
-                className="h-full"
               />
             </div>
           )}
           
           {/* 右侧内容区域 */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 h-[calc(100vh-72px)] overflow-y-auto">
             {renderTemplateContent()}
           </div>
         </div>
@@ -152,7 +151,7 @@ export default function SharedItineraryPage() {
       case 'minimal':
         return renderMinimalContent()
       case 'detailed':
-        return renderDetailedContent()
+        return renderDetailedContent(showCustomizer)
       default:
         return renderOriginalContent()
     }
@@ -160,7 +159,7 @@ export default function SharedItineraryPage() {
 
   // 渲染原始模式内容
   const renderOriginalContent = () => (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-full flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* 标题区域 */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-6">
         <div className="text-center">
@@ -203,7 +202,7 @@ export default function SharedItineraryPage() {
 
   // 渲染简洁模式内容
   const renderMinimalContent = () => (
-    <div className="h-full overflow-y-auto bg-white">
+    <div className="min-h-full bg-white">
       <div className="container mx-auto px-6 py-12">
         <div className="max-w-4xl mx-auto">
           {/* 标题区域 */}
@@ -265,7 +264,7 @@ export default function SharedItineraryPage() {
   )
 
   // 渲染详细模式内容
-  const renderDetailedContent = () => {
+  const renderDetailedContent = (hasCustomizer: boolean = false) => {
     // 计算总预计时间
     const totalHours = itinerary!.itinerary.reduce((dayTotal, day) => {
       return dayTotal + day.locations.reduce((locationTotal, location) => {
@@ -275,7 +274,7 @@ export default function SharedItineraryPage() {
     }, 0)
 
     return (
-      <div className="h-full overflow-y-auto bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-full bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="container mx-auto px-4 py-6">
           {/* 豪华版标题区域 */}
           <div className="text-center bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl p-8 mb-6">
@@ -287,7 +286,7 @@ export default function SharedItineraryPage() {
             </p>
             
             {/* 统计卡片 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className={`grid gap-4 ${hasCustomizer ? 'grid-cols-2 lg:grid-cols-2' : 'grid-cols-2 md:grid-cols-4'}`}>
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Calendar className="w-5 h-5" />
@@ -320,7 +319,7 @@ export default function SharedItineraryPage() {
           </div>
 
           {/* 行程概览卡片 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className={`grid gap-6 mb-8 ${hasCustomizer ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -385,7 +384,7 @@ export default function SharedItineraryPage() {
           {/* 行程亮点 */}
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">行程亮点</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${hasCustomizer ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
               {itinerary!.itinerary.slice(0, 3).map((day, index) => (
                 <div key={index} className="relative">
                   <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-6 text-white">

@@ -66,7 +66,7 @@ export default function DemoCards({ onSelectDemo, onShowPopularGuides }: DemoCar
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_0.33fr] gap-4">
         {demoGuides.map((demo) => (
           <div
             key={demo.id}
@@ -127,16 +127,13 @@ export default function DemoCards({ onSelectDemo, onShowPopularGuides }: DemoCar
           className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/50 dark:to-red-950/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-orange-200 dark:border-orange-800 group"
           onClick={onShowPopularGuides}
         >
-          <div className="p-3 h-full flex flex-col items-center justify-center text-center">
-            <div className="mb-2">
-              <TrendingUp className="w-8 h-8 text-orange-500 group-hover:text-orange-600 transition-colors mx-auto" />
+          <div className="p-2 flex flex-col items-center justify-center text-center">
+            <div className="mb-1">
+              <TrendingUp className="w-6 h-6 text-orange-500 group-hover:text-orange-600 transition-colors mx-auto" />
             </div>
-            <h3 className="text-sm font-semibold text-orange-800 dark:text-orange-300 group-hover:text-orange-900 dark:group-hover:text-orange-200 transition-colors mb-1">
+            <h3 className="text-xs font-semibold text-orange-800 dark:text-orange-300 group-hover:text-orange-900 dark:group-hover:text-orange-200 transition-colors">
               热门攻略
             </h3>
-            <p className="text-xs text-orange-600 dark:text-orange-400">
-              发现更多精彩旅程
-            </p>
           </div>
         </div>
       </div>

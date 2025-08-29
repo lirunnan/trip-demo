@@ -181,7 +181,7 @@ export default function PopularGuidesPage() {
               onClick={() => handleGuideClick(guide)}
             >
               {/* 缩略图 */}
-              <div className="relative h-48 bg-gradient-to-br from-blue-400 to-purple-500 overflow-hidden">
+              <div className="relative h-36 bg-gradient-to-br from-blue-400 to-purple-500 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 opacity-80"></div>
                 <div className="absolute inset-0 flex items-center justify-center text-white text-4xl">
                   {guide.destination.split('·')[0].charAt(0)}
@@ -204,39 +204,39 @@ export default function PopularGuidesPage() {
               </div>
 
               {/* 内容区域 */}
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <div className="p-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-sm">
                   {guide.title}
                 </h3>
                 
-                <div className="flex items-center gap-2 mb-3 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-2 mb-1 text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
+                    <MapPin className="w-3 h-3" />
                     <span>{guide.destination}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
+                    <Clock className="w-3 h-3" />
                     <span>{guide.duration}</span>
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 line-clamp-1">
                   {guide.preview}
                 </p>
 
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {guide.tags.slice(0, 3).map((tag) => (
+                <div className="flex flex-wrap gap-1 mb-1">
+                  {guide.tags.slice(0, 2).map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full"
+                      className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                  <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <span className="px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs rounded-full">
                     {guide.theme}
                   </span>
                   <div className="text-xs">

@@ -158,7 +158,7 @@ export default function TravelCommunity({ onApplyTemplate, onExitCommunity, onPr
 
       {/* 攻略网格 - 可滚动区域 */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4">
           {currentTemplates.map((template) => (
             <div
               key={template.id}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -27,6 +27,7 @@ export default function GuideDetailPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentItinerary, setCurrentItinerary] = useState<ItineraryDay[]>([])
+  const hasInitialized = useRef(false)
   
   const { 
     context, 
@@ -47,14 +48,6 @@ export default function GuideDetailPage() {
     generateShareLink,
     exportAsTextFile
   } = useExportFeatures()
-
-  // 初始化页面时自动发送攻略请求
-  useEffect(() => {
-    if (title && destination && messages.length === 0) {
-      const initialMessage = `我想了解关于"${title}"的详细攻略。目的地：${destination}，时长：${duration}，主题：${theme}。${preview}`
-      handleSendMessage(initialMessage)
-    }
-  }, [title, destination, duration, theme, preview])
 
   // 模拟AI响应
   const simulateAIResponse = useCallback(async (userMessage: string): Promise<{ content: string; itinerary?: ItineraryDay[] }> => {
@@ -95,11 +88,70 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     }
   }, [buildPromptContext, parseUserInput, guideId, title, destination, duration, theme, preview])
 
+  // 初始化页面时自动发送攻略请求
+  useEffect(() => {
+    if (title && destination && !hasInitialized.current) {
+      hasInitialized.current = true
+      const initialMessage = `我想了解关于"${title}"的详细攻略。目的地：${destination}，时长：${duration}，主题：${theme}。${preview}`
+      
+      // 直接调用消息发送逻辑，避免循环依赖
+      const sendInitialMessage = async () => {
+        addUserRequest(initialMessage)
+        
+        const userMessageId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        const userMessage: Message = {
+          id: userMessageId,
+          role: 'user',
+          content: initialMessage,
+          timestamp: new Date()
+        }
+        
+        setMessages([userMessage])
+        setIsLoading(true)
+
+        try {
+          const aiResponse = await simulateAIResponse(initialMessage)
+          
+          const assistantMessageId = `assistant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          const assistantMessage: Message = {
+            id: assistantMessageId,
+            role: 'assistant',
+            content: aiResponse.content,
+            timestamp: new Date(),
+            itinerary: aiResponse.itinerary
+          }
+          
+          setMessages([userMessage, assistantMessage])
+          
+          if (aiResponse.itinerary) {
+            setCurrentItinerary(aiResponse.itinerary)
+            updateItinerary(aiResponse.itinerary)
+          }
+        } catch (error) {
+          console.error('发送消息失败:', error)
+          const errorMessageId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          const errorMessage: Message = {
+            id: errorMessageId,
+            role: 'assistant',
+            content: '抱歉，生成攻略时出现了问题，请稍后再试。',
+            timestamp: new Date()
+          }
+          setMessages([userMessage, errorMessage])
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      
+      sendInitialMessage()
+    }
+  }, [title, destination, duration, theme, preview, addUserRequest, simulateAIResponse, updateItinerary])
+
   const handleSendMessage = useCallback(async (content: string) => {
     addUserRequest(content)
     
+    const userMessageId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: userMessageId,
       role: 'user',
       content,
       timestamp: new Date()
@@ -111,8 +163,9 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     try {
       const aiResponse = await simulateAIResponse(content)
       
+      const assistantMessageId = `assistant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: assistantMessageId,
         role: 'assistant',
         content: aiResponse.content,
         timestamp: new Date(),
@@ -127,8 +180,9 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
       }
     } catch (error) {
       console.error('发送消息失败:', error)
+      const errorMessageId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: errorMessageId,
         role: 'assistant',
         content: '抱歉，生成攻略时出现了问题，请稍后再试。',
         timestamp: new Date()
@@ -152,8 +206,9 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     updateItinerary(updatedItinerary)
     
     const adjustmentMessage = generateRouteAdjustmentMessage('delete', locationToDelete.name)
+    const aiMessageId = `adjustment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     const aiMessage: Message = {
-      id: Date.now().toString(),
+      id: aiMessageId,
       role: 'assistant',
       content: adjustmentMessage,
       timestamp: new Date(),
@@ -175,8 +230,9 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     setCurrentItinerary(newItinerary)
     updateItinerary(newItinerary)
     
+    const reorderMessageId = `reorder_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     const reorderMessage: Message = {
-      id: Date.now().toString(),
+      id: reorderMessageId,
       role: 'assistant',
       content: `🔄 行程顺序已更新！我已重新计算了时间安排和路线规划。
 
@@ -198,8 +254,9 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     try {
       await copyShareLink(currentItinerary, title)
       
+      const successMessageId = `share_success_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       const successMessage: Message = {
-        id: Date.now().toString(),
+        id: successMessageId,
         role: 'assistant',
         content: '🔗 分享链接已复制到剪贴板！您可以将链接发送给朋友，让他们查看您的旅行计划。',
         timestamp: new Date()
@@ -216,8 +273,9 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     try {
       exportAsTextFile(currentItinerary, title)
       
+      const successMessageId = `export_success_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       const successMessage: Message = {
-        id: Date.now().toString(),
+        id: successMessageId,
         role: 'assistant',
         content: '📄 行程文件已导出！文件包含完整的行程安排、时间表和旅行贴士。',
         timestamp: new Date()
@@ -234,7 +292,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950"></div>
       
       {/* 头部导航 */}
-      <div className="relative z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 sticky top-0">
+      <div className="relative z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 sticky top-0">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Link

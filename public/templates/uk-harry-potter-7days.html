@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧙‍♂️ 英国哈利波特七日魔法之旅 - 基础版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #8b1538 0%, #2c1810 100%);
+            color: #f4d03f;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border: 2px solid #f4d03f;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            font-family: 'Georgia', serif;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .day-card {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            border: 1px solid #f4d03f;
+            color: white;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        
+        .day-title {
+            color: #f4d03f;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(244, 208, 63, 0.3);
+            padding-bottom: 10px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .location {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(244, 208, 63, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #f4d03f;
+            backdrop-filter: blur(5px);
+        }
+        
+        .location:last-child {
+            margin-bottom: 0;
+        }
+        
+        .location h4 {
+            color: #f4d03f;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .location p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .magic-tips {
+            background: linear-gradient(135deg, #8b1538 0%, #2c1810 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            color: white;
+            border: 2px solid #f4d03f;
+        }
+        
+        .magic-tips h3 {
+            color: #f4d03f;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Georgia', serif;
+        }
+        
+        .magic-tips ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .magic-tips li {
+            padding: 12px 15px;
+            background: rgba(244, 208, 63, 0.15);
+            border-radius: 8px;
+            position: relative;
+            padding-left: 40px;
+            border-left: 3px solid #f4d03f;
+        }
+        
+        .magic-tips li:before {
+            content: "⚡";
+            position: absolute;
+            left: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .upgrade-banner {
+            background: linear-gradient(135deg, #f4d03f 0%, #f39c12 100%);
+            color: #2c1810;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 10px 25px rgba(244, 208, 63, 0.3);
+            border: 2px solid #8b1538;
+        }
+        
+        .upgrade-banner h3 {
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .upgrade-banner p {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+        
+        .hogwarts-crest {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #f4d03f, #e67e22);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(244, 208, 63, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .day-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .magic-tips ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="hogwarts-crest">🏰</div>
+            <h1>🧙‍♂️ 英国哈利波特七日魔法之旅</h1>
+            <p class="subtitle">踏上霍格沃茨的足迹 · 探索真实的魔法世界</p>
+        </div>
+        
+        <div class="day-grid">
+            <div class="day-card">
+                <h3 class="day-title">第1天 - 抵达伦敦</h3>
+                <div class="location">
+                    <h4>✈️ 希思罗机场</h4>
+                    <p>抵达魔法之都伦敦，开启您的霍格沃茨冒险</p>
+                </div>
+                <div class="location">
+                    <h4>🚂 国王十字车站9¾站台</h4>
+                    <p>寻找通往霍格沃茨的神秘站台，体验哈利的第一次魔法之旅</p>
+                </div>
+                <div class="location">
+                    <h4>🏛️ 大英博物馆</h4>
+                    <p>探索古老的魔法文物和神秘的历史收藏</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第2天 - 对角巷购物</h3>
+                <div class="location">
+                    <h4>🏪 利德贺市场</h4>
+                    <p>电影中对角巷的拍摄地，感受魔法商店街的神奇氛围</p>
+                </div>
+                <div class="location">
+                    <h4>🏦 澳大利亚大厦</h4>
+                    <p>古灵阁巫师银行的外景拍摄地</p>
+                </div>
+                <div class="location">
+                    <h4>🎭 伦敦西区</h4>
+                    <p>观看《哈利波特与被诅咒的孩子》舞台剧</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第3天 - 华纳制片厂</h3>
+                <div class="location">
+                    <h4>🎬 华纳兄弟制片厂</h4>
+                    <p>哈利波特电影的诞生地，真实的魔法道具和场景</p>
+                </div>
+                <div class="location">
+                    <h4>🍺 黄油啤酒体验</h4>
+                    <p>品尝电影中的经典魔法饮品</p>
+                </div>
+                <div class="location">
+                    <h4>🧙‍♂️ 魔法袍试穿</h4>
+                    <p>穿上各学院的魔法袍，拍摄专属魔法照片</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第4天 - 前往牛津</h3>
+                <div class="location">
+                    <h4>🏛️ 牛津大学基督教会学院</h4>
+                    <p>霍格沃茨大礼堂的真实拍摄地</p>
+                </div>
+                <div class="location">
+                    <h4>📚 博德利图书馆</h4>
+                    <p>霍格沃茨图书馆的取景地</p>
+                </div>
+                <div class="location">
+                    <h4>🌉 叹息桥</h4>
+                    <p>牛津的标志性建筑，魔法学院的经典场景</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第5天 - 格洛斯特大教堂</h3>
+                <div class="location">
+                    <h4>⛪ 格洛斯特大教堂</h4>
+                    <p>霍格沃茨走廊和教室的主要拍摄地</p>
+                </div>
+                <div class="location">
+                    <h4>👻 血腥男爵走廊</h4>
+                    <p>电影中幽灵出没的神秘走廊</p>
+                </div>
+                <div class="location">
+                    <h4>🦉 猫头鹰邮件塔</h4>
+                    <p>海德薇送信的经典场景拍摄地</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第6天 - 拉科克村</h3>
+                <div class="location">
+                    <h4>🏘️ 拉科克村</h4>
+                    <p>哈利童年时期女贞路的拍摄地</p>
+                </div>
+                <div class="location">
+                    <h4>🏠 哈利的童年故居</h4>
+                    <p>德思礼一家居住的房子</p>
+                </div>
+                <div class="location">
+                    <h4>🐍 蛇怪事件现场</h4>
+                    <p>《密室》中关键场景的拍摄地</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第7天 - 告别伦敦</h3>
+                <div class="location">
+                    <h4>🌉 千禧桥</h4>
+                    <p>《混血王子》中被摧毁的伦敦大桥</p>
+                </div>
+                <div class="location">
+                    <h4>🏛️ 伦敦市政厅</h4>
+                    <p>魔法部入口的外景拍摄地</p>
+                </div>
+                <div class="location">
+                    <h4>✈️ 希思罗机场</h4>
+                    <p>带着满满的魔法回忆踏上归程</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="magic-tips">
+            <h3>🔮 魔法旅行贴士</h3>
+            <ul>
+                <li>提前预订华纳制片厂门票，门票经常售罄</li>
+                <li>携带相机记录每一个魔法瞬间</li>
+                <li>购买魔法纪念品前货比三家</li>
+                <li>学习几句魔法咒语增加互动乐趣</li>
+                <li>关注天气变化，英国天气多变</li>
+                <li>尊重拍摄场地的规定和限制</li>
+            </ul>
+        </div>
+        
+        <div class="upgrade-banner">
+            <h3>✨ 想要更丰富的展示？</h3>
+            <p>在定制面板中输入"我要更丰富的展示"，获得交互式魔法体验和更多详细信息！</p>
+        </div>
+    </div>
+</body>
+</html>

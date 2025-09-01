@@ -10,6 +10,7 @@ import { useConversationMemory } from '@/hooks/useConversationMemory'
 import { useItineraryActions } from '@/hooks/useItineraryActions'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
 import { addTimeInfoToItinerary } from '@/utils/timeCalculator'
+import { hasWebUrl } from '@/utils/webUrls'
 
 export default function GuideDetailPage() {
   const params = useParams()
@@ -254,9 +255,9 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     try {
       await copyShareLink(currentItinerary, title)
       
-      const successMessageId = `share_success_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      // 显示成功消息
       const successMessage: Message = {
-        id: successMessageId,
+        id: Date.now().toString(),
         role: 'assistant',
         content: '🔗 分享链接已复制到剪贴板！您可以将链接发送给朋友，让他们查看您的旅行计划。',
         timestamp: new Date()
@@ -266,6 +267,89 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
       console.error('分享失败:', error)
     }
   }, [currentItinerary, title, copyShareLink])
+
+  const handleShareServer = useCallback(async () => {
+    if (currentItinerary.length === 0) return
+    
+    try {
+      // 生成唯一ID用于服务端存储
+      const serverId = `server_${Date.now()}`
+      const serverTitle = title
+      
+      // 向服务端API创建分享内容
+      const response = await fetch(`/api/shared/${serverId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: serverTitle,
+          itinerary: currentItinerary,
+          guideId: guideId
+        })
+      })
+      
+      if (response.ok) {
+        let shareUrl = `${window.location.origin}/shared/${serverId}`
+        
+        // 如果该攻略有对应的web展示页面，添加type=web参数显示嵌入网页
+        if (hasWebUrl(guideId)) {
+          shareUrl += '?type=web'
+        }
+        
+        await navigator.clipboard.writeText(shareUrl)
+        
+        const successMessage: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: '🟢 服务端渲染分享链接已复制！这种方式加载速度快，适合快速浏览。',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, successMessage])
+      } else {
+        throw new Error('服务端创建失败')
+      }
+    } catch (error) {
+      console.error('服务端分享失败:', error)
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '服务端分享失败，请稍后重试。',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    }
+  }, [currentItinerary, title, guideId])
+
+  const handleShareClient = useCallback(async () => {
+    if (currentItinerary.length === 0) return
+    
+    try {
+      // 生成客户端渲染分享链接 (使用localStorage，添加render=client参数)
+      const shareUrl = await generateShareLink(currentItinerary, title)
+      const clientShareUrl = shareUrl + '?render=client'
+      
+      // 复制修改后的链接
+      await navigator.clipboard.writeText(clientShareUrl)
+      
+      const successMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '🟠 客户端渲染分享链接已复制！这种方式支持定制功能，体验更完整。',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, successMessage])
+    } catch (error) {
+      console.error('客户端分享失败:', error)
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '客户端分享失败，请稍后重试。',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    }
+  }, [currentItinerary, generateShareLink, title])
 
   const handleExportPDF = useCallback(() => {
     if (currentItinerary.length === 0) return
@@ -338,6 +422,8 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
                   onLocationReorder={handleLocationReorder}
                   onExportPDF={handleExportPDF}
                   onShare={handleShare}
+                  onShareServer={handleShareServer}
+                  onShareClient={handleShareClient}
                 />
               </div>
             </div>
@@ -428,6 +514,77 @@ function generateItineraryByGuideId(guideId: string): ItineraryDay[] {
               coordinates: [98.987, 18.786],
               description: '清迈最重要的寺庙，大佛塔震撼人心',
               duration: '2小时'
+            }
+          ]
+        }
+      ]
+    
+    case 'uk-harry-potter-7days':
+      return [
+        {
+          day: 1,
+          date: '2024-06-01',
+          locations: [
+            {
+              name: '伦敦希思罗机场',
+              type: '交通枢纽',
+              coordinates: [-0.4614, 51.4700],
+              description: '抵达英国，开启魔法之旅',
+              duration: '2小时'
+            },
+            {
+              name: '国王十字车站9¾站台',
+              type: '魔法景点',
+              coordinates: [-0.1240, 51.5308],
+              description: '哈利波特登上霍格沃茨特快列车的地方',
+              duration: '1小时'
+            },
+            {
+              name: '利德贺市场',
+              type: '魔法景点',
+              coordinates: [-0.0869, 51.5142],
+              description: '对角巷的拍摄地，体验魔法世界的购物街',
+              duration: '2小时'
+            }
+          ]
+        },
+        {
+          day: 2,
+          date: '2024-06-02',
+          locations: [
+            {
+              name: '华纳兄弟制片厂',
+              type: '电影景点',
+              coordinates: [-0.4180, 51.6906],
+              description: '哈利波特电影的拍摄基地，真实的魔法道具展览',
+              duration: '4小时'
+            },
+            {
+              name: '牛津大学基督教会学院',
+              type: '历史景点',
+              coordinates: [-1.2556, 51.7509],
+              description: '霍格沃茨大礼堂的拍摄地',
+              duration: '3小时'
+            }
+          ]
+        },
+        {
+          day: 3,
+          date: '2024-06-03',
+          locations: [
+            {
+              name: '格洛斯特大教堂',
+              type: '历史景点',
+              coordinates: [-2.2464, 51.8678],
+              description: '霍格沃茨走廊的拍摄地',
+              duration: '2小时'
+            },
+            {
+              name: '拉科克村',
+              type: '村庄景点',
+              coordinates: [-2.1181, 51.4148],
+              description: '哈利波特童年时期的拍摄地',
+              duration: '3小时'
             }
           ]
         }

@@ -5,6 +5,7 @@ interface SharedItineraryData {
   title: string
   html: string
   createdAt: string
+  guideId?: string // 添加原始攻略ID
 }
 
 // Mock数据，模拟服务端返回的HTML内容
@@ -489,10 +490,10 @@ const mockSharedData: Record<string, SharedItineraryData> = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     
     // 模拟API延迟
     await new Promise(resolve => setTimeout(resolve, 500))
@@ -524,12 +525,12 @@ export async function GET(
 // 处理创建新的服务端渲染内容
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
-    const { title, itinerary } = body
+    const { title, itinerary, guideId } = body
     
     // 生成HTML内容
     const html = generateHTMLFromItinerary(title, itinerary)
@@ -538,7 +539,8 @@ export async function POST(
       id,
       title,
       html,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      guideId
     }
     
     // 在实际应用中，这里会保存到数据库

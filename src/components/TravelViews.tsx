@@ -16,6 +16,9 @@ interface TravelViewsProps {
   onShare?: () => void
   onShareServer?: () => void
   onShareClient?: () => void
+  isWebMode?: boolean
+  webUrl?: string
+  guideId?: string
 }
 
 type ViewType = 'map' | 'schedule'
@@ -29,7 +32,10 @@ export default function TravelViews({
   onExportPDF,
   onShare,
   onShareServer,
-  onShareClient
+  onShareClient,
+  isWebMode = false,
+  webUrl = '',
+  guideId
 }: TravelViewsProps) {
   const [activeView, setActiveView] = useState<ViewType>('map')
   const [showShareMenu, setShowShareMenu] = useState(false)
@@ -47,6 +53,16 @@ export default function TravelViews({
       onShareClient()
     } else if (onShare) {
       onShare()
+    }
+  }
+
+  const handleWebModeShare = async () => {
+    try {
+      await navigator.clipboard.writeText(webUrl)
+      // 可以添加成功提示，但这里简化处理
+      console.log('Web URL已复制到剪贴板:', webUrl)
+    } catch (error) {
+      console.error('复制失败:', error)
     }
   }
 
@@ -156,14 +172,25 @@ export default function TravelViews({
                   分享
                 </button>
               )}
-              <button
-                onClick={onExportPDF}
-                className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-                title="导出PDF"
-              >
-                <Download className="w-4 h-4" />
-                导出
-              </button>
+              {isWebMode ? (
+                <button
+                  onClick={handleWebModeShare}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-purple-500 hover:bg-purple-600 rounded-lg transition-colors"
+                  title="分享行程URL"
+                >
+                  <Share2 className="w-4 h-4" />
+                  分享行程
+                </button>
+              ) : (
+                <button
+                  onClick={onExportPDF}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+                  title="导出PDF"
+                >
+                  <Download className="w-4 h-4" />
+                  导出
+                </button>
+              )}
             </div>
           </div>
         </div>

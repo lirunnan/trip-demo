@@ -9,6 +9,8 @@ import PageCustomizer from '@/components/PageCustomizer'
 import TravelCommunity from '@/components/TravelCommunity'
 import { Calendar, MapPin, Clock, Share2, Download, ArrowLeft, Wand2, Star, Users, Camera } from 'lucide-react'
 import Link from 'next/link'
+import { getBaseUrl } from '@/utils/config'
+import { getWebUrlByGuideId } from '@/utils/webUrls'
 
 interface ShareableItinerary {
   id: string
@@ -39,8 +41,18 @@ export default function SharedItineraryPage() {
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [showCommunity, setShowCommunity] = useState(false)
   const [addAdoptionFunc, setAddAdoptionFunc] = useState<((title: string, shareUrl: string) => void) | null>(null)
+  const [addShareMessageFunc, setAddShareMessageFunc] = useState<((actionType: 'trip' | 'page', url: string) => void) | null>(null)
   
-  const { loadSharedItinerary, exportAsTextFile, copyShareLink } = useExportFeatures()
+  // 检测是否为web类型显示
+  const [isWebType, setIsWebType] = useState(false)
+  const [originalGuideId, setOriginalGuideId] = useState<string | null>(null)
+  const [isUpgraded, setIsUpgraded] = useState(false)
+  const [isUpgrading, setIsUpgrading] = useState(false)
+  const [isUpgradeComplete, setIsUpgradeComplete] = useState(false)
+  
+  const webUrl = originalGuideId ? getWebUrlByGuideId(originalGuideId, isUpgraded) : ''
+  
+  const { loadSharedItinerary } = useExportFeatures()
 
   useEffect(() => {
     const loadContent = async () => {
@@ -51,6 +63,7 @@ export default function SharedItineraryPage() {
         const urlParams = new URLSearchParams(window.location.search)
         const forceClientRender = urlParams.get('render') === 'client'
         
+        
         if (!forceClientRender) {
           // 首先尝试从服务端API获取HTML内容
           try {
@@ -60,6 +73,10 @@ export default function SharedItineraryPage() {
               if (result.success && result.data) {
                 setServerContent(result.data)
                 setRenderMode('server')
+                // 提取原始的guideId
+                if (result.data.guideId) {
+                  setOriginalGuideId(result.data.guideId)
+                }
                 return
               }
             }
@@ -89,6 +106,16 @@ export default function SharedItineraryPage() {
       loadContent()
     }
   }, [id, loadSharedItinerary])
+
+  // 监听webUrl变化，设置web模式
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const displayType = urlParams.get('type')
+    
+    if (displayType === 'web' && webUrl) {
+      setIsWebType(true)
+    }
+  }, [webUrl])
 
   const handleExport = () => {
     if (renderMode === 'server' && serverContent) {
@@ -120,20 +147,6 @@ export default function SharedItineraryPage() {
     }
   }
 
-  const handleShare = async (mode: 'server' | 'client') => {
-    try {
-      let shareUrl = `${window.location.origin}/shared/${id}`
-      if (mode === 'client') {
-        shareUrl += '?render=client'
-      }
-      
-      await navigator.clipboard.writeText(shareUrl)
-      alert(`${mode === 'server' ? '服务端渲染' : '客户端渲染'}分享链接已复制到剪贴板！`)
-      setShowShareMenu(false)
-    } catch {
-      alert('分享失败，请稍后重试')
-    }
-  }
 
   const toggleShareMenu = () => {
     setShowShareMenu(!showShareMenu)
@@ -143,6 +156,16 @@ export default function SharedItineraryPage() {
     setShowCommunity(true)
   }, [])
 
+  const handleExitCommunity = useCallback(() => {
+    setShowCommunity(false)
+  }, [])
+
+  const handlePreviewTemplate = useCallback((template: any) => {
+    // 在新窗口打开攻略预览
+    const previewUrl = `${getBaseUrl()}${template.shareUrl}`
+    window.open(previewUrl, '_blank', 'noopener,noreferrer')
+  }, [])
+
   const handleApplyTemplate = useCallback((template: any) => {
     if (addAdoptionFunc) {
       addAdoptionFunc(template.title, template.shareUrl)
@@ -150,19 +173,88 @@ export default function SharedItineraryPage() {
     setShowCommunity(false)
   }, [addAdoptionFunc])
 
-  const handleExitCommunity = useCallback(() => {
-    setShowCommunity(false)
-  }, [])
-
-  const handlePreviewTemplate = useCallback((template: any) => {
-    // 在新窗口打开攻略预览
-    const previewUrl = `http://localhost:3001${template.shareUrl}`
-    window.open(previewUrl, '_blank', 'noopener,noreferrer')
-  }, [])
-
   const handleAddAdoptionMessage = useCallback((addFunc: (title: string, shareUrl: string) => void) => {
     setAddAdoptionFunc(() => addFunc)
   }, [])
+
+  // 添加分享消息的回调
+  const handleAddShareMessage = useCallback((addFunc: (actionType: 'trip' | 'page', url: string) => void) => {
+    setAddShareMessageFunc(() => addFunc)
+  }, [])
+
+  // 处理升级请求
+  const handleUpgradeRequest = useCallback(async () => {
+    if (originalGuideId !== 'japan-sakura-7days' && originalGuideId !== 'uk-harry-potter-7days') return
+    
+    setIsUpgrading(true)
+    
+    // 随机3-10秒的延迟
+    const delay = Math.floor(Math.random() * 7000) + 3000
+    
+    setTimeout(() => {
+      setIsUpgraded(true)
+      // 注意：这里先不关闭加载界面，等外部页面加载完成后再关闭
+      
+      // 如果有分享消息函数，添加升级完成的消息
+      if (addShareMessageFunc) {
+        setTimeout(() => {
+          const upgradeMessage = originalGuideId === 'japan-sakura-7days' 
+            ? '✅ 升级完成！现在您可以享受更加丰富和交互式的日本旅游体验了！'
+            : '✅ 升级完成！现在您可以享受更加丰富和交互式的魔法世界体验了！'
+          console.log('升级完成消息:', upgradeMessage)
+        }, 1000)
+      }
+    }, delay)
+  }, [originalGuideId, addShareMessageFunc])
+
+  // 处理iframe加载完成
+  const handleIframeLoad = useCallback(() => {
+    if (isUpgraded && isUpgrading && (originalGuideId === 'japan-sakura-7days' || originalGuideId === 'uk-harry-potter-7days')) {
+      // 外部页面加载完成后，关闭加载界面
+      setTimeout(() => {
+        setIsUpgrading(false)
+        setIsUpgradeComplete(true)
+      }, 500) // 给一个小的延迟，让页面完全渲染
+    }
+  }, [isUpgraded, isUpgrading, originalGuideId])
+
+  // 分享行程功能 - 复制内容链接（与定制面板中的分享行程功能相同）
+  const handleShareTrip = useCallback(async () => {
+    try {
+      const contentUrl = isWebType ? webUrl : window.location.href.split('?')[0]
+      await navigator.clipboard.writeText(contentUrl)
+      setShowShareMenu(false)
+      
+      // 如果显示定制面板且有分享消息函数，在其对话框中添加提示消息
+      if (showCustomizer && addShareMessageFunc) {
+        addShareMessageFunc('trip', contentUrl)
+      } else {
+        alert('行程链接已复制到剪贴板！')
+      }
+    } catch (error) {
+      console.error('复制失败:', error)
+      alert('复制失败，请稍后重试')
+    }
+  }, [isWebType, webUrl, showCustomizer, addShareMessageFunc])
+
+  // 定制分享页功能 - 复制当前页面URL
+  const handleShareCurrentPage = useCallback(async () => {
+    try {
+      const currentUrl = window.location.href
+      await navigator.clipboard.writeText(currentUrl)
+      setShowShareMenu(false)
+      
+      // 如果显示定制面板且有分享消息函数，在其对话框中添加提示消息
+      if (showCustomizer && addShareMessageFunc) {
+        addShareMessageFunc('page', currentUrl)
+      } else {
+        alert('定制分享页链接已复制到剪贴板！')
+      }
+    } catch (error) {
+      console.error('复制失败:', error)
+      alert('复制失败，请稍后重试')
+    }
+  }, [showCustomizer, addShareMessageFunc])
 
   // 点击外部关闭菜单
   useEffect(() => {
@@ -686,8 +778,8 @@ export default function SharedItineraryPage() {
 
   // 渲染统一布局结构
   const renderTemplate = () => {
-    // 服务端渲染模式：直接渲染HTML内容
-    if (renderMode === 'server' && serverContent) {
+    // 服务端渲染模式：直接渲染HTML内容或web嵌入模式
+    if (renderMode === 'server' && (serverContent || isWebType)) {
       return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
           {/* 统一的顶部导航 */}
@@ -703,8 +795,8 @@ export default function SharedItineraryPage() {
                 </Link>
                 
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                    服务端渲染
+                  <span className={`px-3 py-1 text-xs rounded-full ${isWebType ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
+                    {isWebType ? 'Web嵌入模式' : '服务端渲染'}
                   </span>
                   {!showCustomizer ? (
                     <button
@@ -736,38 +828,38 @@ export default function SharedItineraryPage() {
                     </button>
                     
                     {showShareMenu && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
-                        <div className="py-1">
-                          <button
-                            onClick={() => handleShare('server')}
-                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                          >
-                            <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                            <div>
-                              <div className="font-medium">服务端渲染</div>
-                              <div className="text-xs text-gray-500">HTML内容，加载快</div>
-                            </div>
-                          </button>
-                          <button
-                            onClick={() => handleShare('client')}
-                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                          >
-                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
-                            <div>
-                              <div className="font-medium">客户端渲染</div>
-                              <div className="text-xs text-gray-500">支持定制，功能完整</div>
-                            </div>
-                          </button>
-                        </div>
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                      <div className="py-1">
+                        <button
+                          onClick={() => handleShareTrip()}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                          <div>
+                            <div className="font-medium">分享行程</div>
+                            <div className="text-xs text-gray-500">复制内容链接到剪贴板</div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => handleShareCurrentPage()}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                          <div>
+                            <div className="font-medium">定制分享页</div>
+                            <div className="text-xs text-gray-500">复制本页面URL到剪贴板</div>
+                          </div>
+                        </button>
                       </div>
-                    )}
+                    </div>
+                  )}
                   </div>
                   <button
                     onClick={handleExport}
                     className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    导出HTML
+                    导出
                   </button>
                 </div>
               </div>
@@ -784,14 +876,45 @@ export default function SharedItineraryPage() {
                   currentTemplate={currentTemplate}
                   onShowCommunity={handleShowCommunity}
                   onAddAdoptionMessage={handleAddAdoptionMessage}
+                  onAddShareMessage={handleAddShareMessage}
+                  onUpgradeRequest={handleUpgradeRequest}
+                  isWebMode={isWebType}
+                  webUrl={webUrl}
+                  guideId={originalGuideId || id}
                 />
               </div>
             )}
             
-            {/* 右侧内容区域 - 显示分享页或攻略社区 */}
+            {/* 右侧内容区域 - 显示分享页、攻略社区 */}
             <div className="flex-1 h-[calc(100vh-72px)] overflow-hidden bg-gray-50 dark:bg-gray-900">
               {showCommunity ? (
                 <TravelCommunity onApplyTemplate={handleApplyTemplate} onExitCommunity={handleExitCommunity} onPreviewTemplate={handlePreviewTemplate} />
+              ) : isWebType ? (
+                <div className="h-full overflow-hidden relative">
+                  {isUpgrading && (
+                    <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">🌟 正在升级体验</h3>
+                        <p className="text-gray-600">{isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...'}</p>
+                        <div className="mt-4">
+                          <div className="bg-gray-200 rounded-full h-2 w-64 mx-auto overflow-hidden">
+                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full animate-pulse"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <iframe
+                    key={webUrl} // 使用key来强制重新加载iframe
+                    src={webUrl}
+                    className="w-full h-full border-0"
+                    title="嵌入网页内容"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    onLoad={handleIframeLoad}
+                  />
+                </div>
               ) : (
                 <div className="h-full overflow-y-auto">
                   <div 
@@ -866,23 +989,23 @@ export default function SharedItineraryPage() {
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                       <div className="py-1">
                         <button
-                          onClick={() => handleShare('server')}
+                          onClick={() => handleShareTrip()}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
-                          <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                           <div>
-                            <div className="font-medium">服务端渲染</div>
-                            <div className="text-xs text-gray-500">HTML内容，加载快</div>
+                            <div className="font-medium">分享行程</div>
+                            <div className="text-xs text-gray-500">复制内容链接到剪贴板</div>
                           </div>
                         </button>
                         <button
-                          onClick={() => handleShare('client')}
+                          onClick={() => handleShareCurrentPage()}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
-                          <div className="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
                           <div>
-                            <div className="font-medium">客户端渲染</div>
-                            <div className="text-xs text-gray-500">支持定制，功能完整</div>
+                            <div className="font-medium">定制分享页</div>
+                            <div className="text-xs text-gray-500">复制本页面URL到剪贴板</div>
                           </div>
                         </button>
                       </div>
@@ -911,6 +1034,11 @@ export default function SharedItineraryPage() {
                 currentTemplate={currentTemplate}
                 onShowCommunity={handleShowCommunity}
                 onAddAdoptionMessage={handleAddAdoptionMessage}
+                onAddShareMessage={handleAddShareMessage}
+                onUpgradeRequest={handleUpgradeRequest}
+                isWebMode={isWebType}
+                webUrl={webUrl}
+                guideId={originalGuideId || id}
               />
             </div>
           )}
@@ -919,6 +1047,32 @@ export default function SharedItineraryPage() {
           <div className="flex-1 h-[calc(100vh-72px)] overflow-y-auto">
             {showCommunity ? (
               <TravelCommunity onApplyTemplate={handleApplyTemplate} onExitCommunity={handleExitCommunity} onPreviewTemplate={handlePreviewTemplate} />
+            ) : isWebType ? (
+              <div className="h-full overflow-hidden relative">
+                {isUpgrading && (
+                  <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+                      <h3 className="text-lg font-medium text-gray-800 mb-2">🌟 正在升级体验</h3>
+                      <p className="text-gray-600">{isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...'}</p>
+                      <div className="mt-4">
+                        <div className="bg-gray-200 rounded-full h-2 w-64 mx-auto overflow-hidden">
+                          <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <iframe
+                  key={webUrl} // 使用key来强制重新加载iframe
+                  src={webUrl}
+                  className="w-full h-full border-0"
+                  title="嵌入网页内容"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  onLoad={handleIframeLoad}
+                />
+              </div>
             ) : (
               renderTemplateContent()
             )}

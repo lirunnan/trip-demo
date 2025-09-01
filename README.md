@@ -1,5 +1,23 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment Configuration
+
+Before running the project, copy the environment example file and configure your base URL:
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` and set your base URL:
+
+```bash
+# For development
+NEXT_PUBLIC_BASE_URL=http://localhost:3030
+
+# For production deployment
+NEXT_PUBLIC_BASE_URL=http://10.41.92.12:8888
+```
+
 ## Getting Started
 
 First, run the development server:
@@ -14,7 +32,14 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3030](http://localhost:3030) with your browser to see the result.
+
+For production build:
+
+```bash
+npm run build:prod
+npm run start:prod
+```
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

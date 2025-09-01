@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
-import { MessageCircle, Send, Sparkles, Palette, Layout, Users } from 'lucide-react'
+import React, { useState, useCallback, useEffect } from 'react'
+import { MessageCircle, Send, Sparkles, Palette, Layout, Users, Share2 } from 'lucide-react'
+import { getBaseUrl } from '@/utils/config'
 
 interface CustomizationRequest {
   id: string
@@ -16,9 +17,25 @@ interface PageCustomizerProps {
   className?: string
   onShowCommunity?: () => void
   onAddAdoptionMessage?: (addAdoptionFunc: (templateTitle: string, shareUrl: string) => void) => void
+  isWebMode?: boolean
+  webUrl?: string
+  onAddShareMessage?: (messageFunc: (actionType: 'trip' | 'page', url: string) => void) => void
+  guideId?: string
+  onUpgradeRequest?: () => void
 }
 
-export default function PageCustomizer({ onTemplateChange, currentTemplate, className = '', onShowCommunity, onAddAdoptionMessage }: PageCustomizerProps) {
+export default function PageCustomizer({ 
+  onTemplateChange, 
+  currentTemplate, 
+  className = '', 
+  onShowCommunity, 
+  onAddAdoptionMessage,
+  isWebMode = false,
+  webUrl = '',
+  onAddShareMessage,
+  guideId,
+  onUpgradeRequest
+}: PageCustomizerProps) {
   const [messages, setMessages] = useState<CustomizationRequest[]>([
     {
       id: '1',
@@ -30,13 +47,76 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
+  // 分享Web行程URL
+  const handleShareWebUrl = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(webUrl)
+      
+      // 添加成功提示消息
+      const successMessage: CustomizationRequest = {
+        id: Date.now().toString(),
+        userMessage: '分享行程URL',
+        aiResponse: `✅ 行程URL已复制到剪贴板！
+        
+🔗 **链接地址**: ${webUrl}
+
+您可以将此链接发送给朋友，让他们直接访问这个精彩的魔法之旅页面！`,
+        timestamp: new Date()
+      }
+      
+      setMessages(prev => [...prev, successMessage])
+    } catch (error) {
+      console.error('复制失败:', error)
+      
+      // 添加失败提示消息
+      const errorMessage: CustomizationRequest = {
+        id: Date.now().toString(),
+        userMessage: '分享行程URL',
+        aiResponse: '抱歉，复制链接时出现了问题，请稍后再试。',
+        timestamp: new Date()
+      }
+      
+      setMessages(prev => [...prev, errorMessage])
+    }
+  }, [webUrl])
+
+  // 添加分享消息的方法
+  const addShareMessage = useCallback((actionType: 'trip' | 'page', url: string) => {
+    const actionText = actionType === 'trip' ? '分享行程' : '定制分享页'
+    const userMessage = actionText
+    const aiResponse = `✅ ${actionText}链接已复制到剪贴板！
+
+🔗 **链接地址**: ${url}
+
+${actionType === 'trip' 
+  ? '您可以将此链接发送给朋友，让他们直接查看精彩的旅行内容！'
+  : '您可以将此定制分享页链接发送给朋友，他们可以看到完整的定制界面和所有功能！'
+}`
+    
+    const newMessage: CustomizationRequest = {
+      id: Date.now().toString(),
+      userMessage,
+      aiResponse,
+      timestamp: new Date()
+    }
+    
+    setMessages(prev => [...prev, newMessage])
+  }, [])
+
+  // 注册分享消息函数
+  useEffect(() => {
+    if (onAddShareMessage) {
+      onAddShareMessage(addShareMessage)
+    }
+  }, [onAddShareMessage, addShareMessage])
+
   // 添加采纳消息的方法
   const addAdoptionMessage = useCallback((templateTitle: string, shareUrl: string) => {
     const userMessage = `一键采纳${templateTitle}`
     const aiResponse = `✅ 已成功采纳攻略模板！
 
-📋 **模板名称**: <a href="http://localhost:3001${shareUrl}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">${templateTitle}</a>
-🔗 **来源**: http://localhost:3001${shareUrl}
+📋 **模板名称**: <a href="${getBaseUrl()}${shareUrl}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">${templateTitle}</a>
+🔗 **来源**: ${getBaseUrl()}${shareUrl}
 
 这个模板的设计和布局将作为您当前页面的参考。您可以继续和我对话来进一步调整细节，比如：
 
@@ -64,8 +144,32 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
   }, [onAddAdoptionMessage, addAdoptionMessage])
 
   // Mock AI响应逻辑
-  const getMockResponse = (userInput: string): { response: string; template: 'original' | 'minimal' | 'detailed' } => {
+  const getMockResponse = (userInput: string): { response: string; template: 'original' | 'minimal' | 'detailed'; shouldUpgrade?: boolean } => {
     const lowerInput = userInput.toLowerCase()
+    
+    // 检测升级请求 - 针对日本攻略的特殊处理
+    if ((lowerInput.includes('更丰富') || lowerInput.includes('丰富')) && lowerInput.includes('展示') && guideId === 'japan-sakura-7days') {
+      if (onUpgradeRequest) {
+        onUpgradeRequest()
+      }
+      return {
+        response: '🌟 正在为您升级到更丰富的展示版本...\n\n⏳ 升级中，请稍候...\n\n🎌 即将为您呈现更加精美的交互式日本旅游体验！',
+        template: currentTemplate,
+        shouldUpgrade: true
+      }
+    }
+    
+    // 检测升级请求 - 针对英国哈利波特攻略的特殊处理
+    if ((lowerInput.includes('更丰富') || lowerInput.includes('丰富')) && lowerInput.includes('展示') && guideId === 'uk-harry-potter-7days') {
+      if (onUpgradeRequest) {
+        onUpgradeRequest()
+      }
+      return {
+        response: '🌟 正在为您升级到更丰富的展示版本...\n\n⏳ 升级中，请稍候...\n\n🧙‍♂️ 即将为您呈现更加精美的交互式魔法世界体验！',
+        template: currentTemplate,
+        shouldUpgrade: true
+      }
+    }
     
     if (lowerInput.includes('简洁') || lowerInput.includes('简单') || lowerInput.includes('清爽') || lowerInput.includes('极简')) {
       return {
@@ -121,7 +225,7 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
 
     // 模拟AI处理时间
     setTimeout(() => {
-      const { response, template } = getMockResponse(userMessage)
+      const { response, template, shouldUpgrade } = getMockResponse(userMessage)
       
       const aiMessage: CustomizationRequest = {
         id: (Date.now() + 1).toString(),
@@ -170,15 +274,29 @@ export default function PageCustomizer({ onTemplateChange, currentTemplate, clas
             </div>
           </div>
           
-          {/* 社区入口按钮 */}
-          <button
-            onClick={onShowCommunity}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-            title="攻略社区"
-          >
-            <Users className="w-3.5 h-3.5" />
-            社区
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Web模式下的分享行程按钮 */}
+            {isWebMode && webUrl && (
+              <button
+                onClick={handleShareWebUrl}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                title="复制行程URL到剪贴板"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                分享行程
+              </button>
+            )}
+            
+            {/* 社区入口按钮 */}
+            <button
+              onClick={onShowCommunity}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+              title="攻略社区"
+            >
+              <Users className="w-3.5 h-3.5" />
+              社区
+            </button>
+          </div>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400">
           通过自然语言调整页面布局和样式

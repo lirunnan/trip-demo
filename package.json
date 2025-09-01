@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "dev:legacy": "next dev",
+    "dev": "next dev --turbopack -p 3030",
+    "dev:legacy": "next dev -p 3030",
     "dev:clean": "rm -rf .next && npm run dev",
     "build": "next build --turbopack",
-    "start": "next start",
+    "build:prod": "NODE_ENV=production next build --turbopack",
+    "start": "next start -p 3030",
+    "start:prod": "NODE_ENV=production next start -p 3030",
     "lint": "eslint"
   },
   "dependencies": {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, MapPin, Clock, Star, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface PopularGuide {
   id: string
@@ -22,16 +23,29 @@ interface PopularGuide {
 // Mock热门攻略数据
 const popularGuides: PopularGuide[] = [
   {
+    id: 'uk-harry-potter-7days',
+    title: '🏰 英国七日魔法之旅 🏰',
+    destination: '伦敦·爱丁堡·牛津',
+    duration: '7天6夜',
+    theme: '魔法文化',
+    rating: 4.9,
+    views: 25680,
+    likes: 1456,
+    preview: '探索英伦三岛的古堡、自然与历史奇迹',
+    thumbnail: '/images/london-preview.png',
+    tags: ['魔法', '文化', '电影', '探险']
+  },
+  {
     id: 'japan-sakura-7days',
-    title: '日本樱花季7日深度游',
+    title: '🗾 日本七日游攻略',
     destination: '东京·京都·大阪',
     duration: '7天6夜',
     theme: '樱花季',
     rating: 4.8,
     views: 15420,
     likes: 892,
-    preview: '完美的樱花季行程，涵盖东京、京都、大阪三地最佳赏樱地点，包含温泉体验和传统文化感受',
-    thumbnail: '/api/placeholder/300/200',
+    preview: '东京 + 关西黄金路线 · 探索日本的传统与现代',
+    thumbnail: '/images/japan-preview.png',
     tags: ['樱花', '温泉', '文化', '美食']
   },
   {
@@ -44,7 +58,7 @@ const popularGuides: PopularGuide[] = [
     views: 8965,
     likes: 534,
     preview: '远离喧嚣的古城之旅，体验泰北文化与美食，包含寺庙参观和夜市体验',
-    thumbnail: '/api/placeholder/300/200',
+    thumbnail: '/images/placeholder.png',
     tags: ['古城', '文化', '美食', '寺庙']
   },
   {
@@ -57,7 +71,7 @@ const popularGuides: PopularGuide[] = [
     views: 12350,
     likes: 721,
     preview: '专业摄影师带队，深入天山腹地捕捉绝美风光，适合摄影爱好者',
-    thumbnail: '/api/placeholder/300/200',
+    thumbnail: '/images/placeholder.png',
     tags: ['摄影', '自然', '探险', '风光']
   },
   {
@@ -70,7 +84,7 @@ const popularGuides: PopularGuide[] = [
     views: 20145,
     likes: 1203,
     preview: '川西环线自驾，稻城亚丁、色达、新都桥一网打尽，高原美景震撼心灵',
-    thumbnail: '/api/placeholder/300/200',
+    thumbnail: '/images/placeholder.png',
     tags: ['自驾', '高原', '秘境', '寺庙']
   },
   {
@@ -83,7 +97,7 @@ const popularGuides: PopularGuide[] = [
     views: 9876,
     likes: 654,
     preview: '精心设计的蜜月行程，海滩、SPA、美食一应俱全，完美的二人世界',
-    thumbnail: '/api/placeholder/300/200',
+    thumbnail: '/images/placeholder.png',
     tags: ['蜜月', '海滩', 'SPA', '浪漫']
   },
   {
@@ -96,7 +110,7 @@ const popularGuides: PopularGuide[] = [
     views: 16789,
     likes: 987,
     preview: '高原朝圣之路，感受藏地文化的深厚底蕴，净化心灵的神圣之旅',
-    thumbnail: '/api/placeholder/300/200',
+    thumbnail: '/images/placeholder.png',
     tags: ['朝圣', '文化', '心灵', '高原']
   },
   {
@@ -109,7 +123,7 @@ const popularGuides: PopularGuide[] = [
     views: 11234,
     likes: 678,
     preview: '漫步古城石板路，体验白族纳西族文化，享受慢生活节奏',
-    thumbnail: '/api/placeholder/300/200',
+    thumbnail: '/images/placeholder.png',
     tags: ['古城', '民族', '慢生活', '文化']
   },
   {
@@ -122,7 +136,7 @@ const popularGuides: PopularGuide[] = [
     views: 7856,
     likes: 423,
     preview: '热带海滨风情，椰林沙滩与碧海蓝天，完美的度假胜地',
-    thumbnail: '/api/placeholder/300/200',
+    thumbnail: '/images/placeholder.png',
     tags: ['海滩', '度假', '热带', '椰林']
   }
 ]
@@ -181,10 +195,17 @@ export default function PopularGuidesPage() {
               onClick={() => handleGuideClick(guide)}
             >
               {/* 缩略图 */}
-              <div className="relative h-36 bg-gradient-to-br from-blue-400 to-purple-500 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 opacity-80"></div>
-                <div className="absolute inset-0 flex items-center justify-center text-white text-4xl">
-                  {guide.destination.split('·')[0].charAt(0)}
+              <div className="relative h-36 bg-gray-200 overflow-hidden">
+                <Image 
+                  src={guide.thumbnail} 
+                  alt={guide.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <div className="absolute bottom-2 left-2 text-white text-sm font-medium">
+                  {guide.destination.split('·')[0]}
                 </div>
                 
                 {/* 悬浮效果 */}

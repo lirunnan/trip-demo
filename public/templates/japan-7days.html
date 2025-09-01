@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗾 日本七日游攻略 - 基础版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .day-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .day-title {
+            color: #667eea;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .location {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .location:last-child {
+            margin-bottom: 0;
+        }
+        
+        .location h4 {
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .location p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .tips {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tips h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .tips ul {
+            list-style: none;
+        }
+        
+        .tips li {
+            margin-bottom: 8px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .tips li:before {
+            content: "🌸";
+            position: absolute;
+            left: 0;
+        }
+        
+        .upgrade-banner {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #2d3436;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .upgrade-banner h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .upgrade-banner p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .day-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗾 日本七日游攻略</h1>
+            <p class="subtitle">东京 + 关西黄金路线 · 探索日本的传统与现代</p>
+        </div>
+        
+        <div class="day-grid">
+            <div class="day-card">
+                <h3 class="day-title">第1天 - 抵达东京</h3>
+                <div class="location">
+                    <h4>🛫 成田机场</h4>
+                    <p>抵达东京，乘坐Skyliner前往市区</p>
+                </div>
+                <div class="location">
+                    <h4>🏨 浅草地区</h4>
+                    <p>入住酒店，体验传统江户风情</p>
+                </div>
+                <div class="location">
+                    <h4>⛩️ 浅草寺</h4>
+                    <p>东京最古老的寺庙，感受历史文化</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第2天 - 东京经典</h3>
+                <div class="location">
+                    <h4>🗼 东京塔</h4>
+                    <p>俯瞰东京全景，经典地标建筑</p>
+                </div>
+                <div class="location">
+                    <h4>🛍️ 银座</h4>
+                    <p>高端购物区，感受东京时尚</p>
+                </div>
+                <div class="location">
+                    <h4>🍣 筑地外市场</h4>
+                    <p>品尝最新鲜的海鲜美食</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第3天 - 现代东京</h3>
+                <div class="location">
+                    <h4>🌸 新宿御苑</h4>
+                    <p>都市中的绿洲，樱花胜地</p>
+                </div>
+                <div class="location">
+                    <h4>🏙️ 涩谷十字路口</h4>
+                    <p>世界最繁忙的十字路口</p>
+                </div>
+                <div class="location">
+                    <h4>🎌 明治神宫</h4>
+                    <p>参拜日本最重要的神社</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第4天 - 前往京都</h3>
+                <div class="location">
+                    <h4>🚄 新干线</h4>
+                    <p>体验世界最快的子弹头列车</p>
+                </div>
+                <div class="location">
+                    <h4>🏯 清水寺</h4>
+                    <p>京都最著名的木造寺庙</p>
+                </div>
+                <div class="location">
+                    <h4>🎋 祇园</h4>
+                    <p>传统艺伎区，感受古都风情</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第5天 - 京都文化</h3>
+                <div class="location">
+                    <h4>⛩️ 伏见稻荷大社</h4>
+                    <p>千本鸟居，壮观的朱红色隧道</p>
+                </div>
+                <div class="location">
+                    <h4>🎋 竹林之道</h4>
+                    <p>嵯峨野的天然绿色隧道</p>
+                </div>
+                <div class="location">
+                    <h4>🏛️ 金阁寺</h4>
+                    <p>京都的象征，金色的美丽寺庙</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第6天 - 奈良一日游</h3>
+                <div class="location">
+                    <h4>🦌 奈良公园</h4>
+                    <p>与温顺的梅花鹿近距离接触</p>
+                </div>
+                <div class="location">
+                    <h4>🏛️ 东大寺</h4>
+                    <p>世界最大的木造建筑，巨大佛像</p>
+                </div>
+                <div class="location">
+                    <h4>🏯 春日大社</h4>
+                    <p>数千个石灯笼的神秘之地</p>
+                </div>
+            </div>
+            
+            <div class="day-card">
+                <h3 class="day-title">第7天 - 大阪告别</h3>
+                <div class="location">
+                    <h4>🏯 大阪城</h4>
+                    <p>日本三大名城之一，历史名胜</p>
+                </div>
+                <div class="location">
+                    <h4>🐙 道顿堀</h4>
+                    <p>大阪美食天堂，品尝章鱼烧</p>
+                </div>
+                <div class="location">
+                    <h4>✈️ 关西机场</h4>
+                    <p>踏上归程，带着美好回忆</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tips">
+            <h3>🌸 旅行贴士</h3>
+            <ul>
+                <li>JR Pass是游览日本的最佳选择</li>
+                <li>春季樱花盛开，是最美的旅游季节</li>
+                <li>提前预订热门餐厅和景点门票</li>
+                <li>学习基本的日语礼貌用语</li>
+                <li>随身携带现金，很多地方不接受信用卡</li>
+            </ul>
+        </div>
+        
+        <div class="upgrade-banner">
+            <h3>💡 想要更丰富的展示？</h3>
+            <p>在定制面板中输入"我要更丰富的展示"，获得交互式体验和更多详细信息！</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -167,85 +167,109 @@ export default function MapDisplay({
           return
         }
         
-        const points: any[] = []
+        const myGeo = new window.BMap.Geocoder();
+        const locationResults: { index: number, point: any, location: any }[] = []
+        let completedCount = 0
+        const totalLocations = currentDayData.locations.length
         
-        // 添加标记点
+        // 使用异步处理所有地点
         currentDayData.locations.forEach((location, index) => {
-          const point = new window.BMap.Point(location.coordinates[0], location.coordinates[1])
-          points.push(point)
-          
-          // 创建自定义标记图标
-          const iconSize = new window.BMap.Size(24, 24)
-          const iconOffset = new window.BMap.Size(12, 12) // 图标中心偏移
-          const customIcon = new window.BMap.Icon(
-            `data:image/svg+xml;base64,${btoa(`
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="#1890ff" stroke="white" stroke-width="2"/>
-                <text x="12" y="16" text-anchor="middle" fill="white" font-size="10" font-weight="bold">${index + 1}</text>
-              </svg>
-            `)}`, 
-            iconSize, 
-            { offset: iconOffset }
-          )
-          
-          // 创建标记
-          const marker = new window.BMap.Marker(point, { icon: customIcon })
-          map.addOverlay(marker)
-          
-          // 构建信息窗口内容
-          let infoWindowContent = `
-            <div style="padding: 8px; max-width: 200px;">
-              <h4 style="margin: 0 0 8px 0; font-weight: bold; color: #333;">${location.name}</h4>
-              <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
-                📍 ${location.type}
-              </p>
-              <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
-                ⏰ ${location.duration}
-              </p>
-              <p style="margin: 0 0 8px 0; color: #666; font-size: 12px;">${location.description}</p>`
-          
-          if (interactive) {
-            infoWindowContent += `
-              <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button 
-                  onclick="window.editLocation(${selectedDay - 1}, ${index})" 
-                  style="flex: 1; padding: 4px 8px; background: #1890ff; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;"
-                >
-                  编辑
-                </button>
-                <button 
-                  onclick="window.deleteLocation(${selectedDay - 1}, ${index})" 
-                  style="flex: 1; padding: 4px 8px; background: #ff4d4f; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;"
-                >
-                  删除
-                </button>
-              </div>`
-          }
-          
-          infoWindowContent += '</div>'
-          
-          const infoWindow = new window.BMap.InfoWindow(infoWindowContent)
-          
-          marker.addEventListener('click', () => {
-            map.openInfoWindow(infoWindow, point)
+          console.log(location.name, 'getting geocode')
+          myGeo.getPoint(location.name, (pt: any) => {
+            completedCount++
+            if (pt) {
+              const point = new window.BMap.Point(pt.lng, pt.lat)
+              
+              // 保存结果，保持原始顺序
+              locationResults[index] = { index, point, location }
+              
+              // 创建自定义标记图标
+              const iconSize = new window.BMap.Size(24, 24)
+              const iconOffset = new window.BMap.Size(12, 12)
+              const customIcon = new window.BMap.Icon(
+                `data:image/svg+xml;base64,${btoa(`
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" fill="#1890ff" stroke="white" stroke-width="2"/>
+                    <text x="12" y="16" text-anchor="middle" fill="white" font-size="10" font-weight="bold">${index + 1}</text>
+                  </svg>
+                `)}`, 
+                iconSize, 
+                { offset: iconOffset }
+              )
+              
+              // 创建标记
+              const marker = new window.BMap.Marker(point, { icon: customIcon })
+              map.addOverlay(marker)
+              
+              // 构建信息窗口内容
+              let infoWindowContent = `
+                <div style="padding: 8px; max-width: 200px;">
+                  <h4 style="margin: 0 0 8px 0; font-weight: bold; color: #333;">${location.name}</h4>
+                  <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
+                    📍 ${location.type}
+                  </p>
+                  <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
+                    ⏰ ${location.duration}
+                  </p>
+                  <p style="margin: 0 0 8px 0; color: #666; font-size: 12px;">${location.description}</p>`
+              
+              if (interactive) {
+                infoWindowContent += `
+                  <div style="display: flex; gap: 8px; margin-top: 8px;">
+                    <button 
+                      onclick="window.editLocation(${selectedDay - 1}, ${index})" 
+                      style="flex: 1; padding: 4px 8px; background: #1890ff; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;"
+                    >
+                      编辑
+                    </button>
+                    <button 
+                      onclick="window.deleteLocation(${selectedDay - 1}, ${index})" 
+                      style="flex: 1; padding: 4px 8px; background: #ff4d4f; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;"
+                    >
+                      删除
+                    </button>
+                  </div>`
+              }
+              
+              infoWindowContent += '</div>'
+              
+              const infoWindow = new window.BMap.InfoWindow(infoWindowContent)
+              
+              marker.addEventListener('click', () => {
+                map.openInfoWindow(infoWindow, point)
+              })
+            }
+            
+            // 当所有地理编码完成后，按顺序绘制路线
+            if (completedCount === totalLocations) {
+              // 过滤出有效的点，并按原始顺序排列
+              const validPoints = locationResults
+                .filter(result => result && result.point)
+                .map(result => result.point)
+              
+              console.log('所有地点处理完成，绘制路线，点数:', validPoints.length)
+              
+              // 绘制路线
+              if (validPoints.length > 1) {
+                const polyline = new window.BMap.Polyline(validPoints, {
+                  strokeColor: '#1890ff',
+                  strokeWeight: 3,
+                  strokeOpacity: 0.8
+                })
+                map.addOverlay(polyline)
+                console.log('路线绘制完成')
+              }
+
+              // 调整视野
+              if (validPoints.length > 0) {
+                const viewport = map.getViewport(validPoints)
+                map.centerAndZoom(viewport.center, Math.max(viewport.zoom - 1, 10))
+                console.log('视野调整完成')
+              }
+            }
           })
         })
         
-        // 绘制路线
-        if (points.length > 1) {
-          const polyline = new window.BMap.Polyline(points, {
-            strokeColor: '#1890ff',
-            strokeWeight: 3,
-            strokeOpacity: 0.8
-          })
-          map.addOverlay(polyline)
-        }
-        
-        // 调整视野
-        if (points.length > 0) {
-          const viewport = map.getViewport(points)
-          map.centerAndZoom(viewport.center, Math.max(viewport.zoom - 1, 10))
-        }
       } catch (error) {
         console.error('更新地图标记失败:', error)
       }

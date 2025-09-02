@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { ItineraryDay } from '@/components/ChatInterface'
 import TravelViews from '@/components/TravelViews'
@@ -49,6 +49,9 @@ export default function SharedItineraryPage() {
   const [isUpgraded, setIsUpgraded] = useState(false)
   const [isUpgrading, setIsUpgrading] = useState(false)
   const [isUpgradeComplete, setIsUpgradeComplete] = useState(false)
+  const [streamingCode, setStreamingCode] = useState('')
+  const streamingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const codeContainerRef = useRef<HTMLDivElement | null>(null)
   
   const webUrl = originalGuideId ? getWebUrlByGuideId(originalGuideId, isUpgraded) : ''
   
@@ -182,30 +185,134 @@ export default function SharedItineraryPage() {
     setAddShareMessageFunc(() => addFunc)
   }, [])
 
+  // 流式代码生成逻辑
+  const startStreamingCode = useCallback(() => {
+    const codeTemplate = `// 🚀 升级体验组件生成中...
+import React, { useState, useEffect, useCallback } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { AnimatedBackground, InteractiveElements } from '@/components/enhanced'
+interface UpgradedExperienceProps {
+  mode: 'immersive' | 'interactive'
+  quality: 'ultra' | 'high' | 'standard'
+  features: string[]
+}
+const EnhancedExperienceRenderer: React.FC<UpgradedExperienceProps> = ({
+  mode = 'immersive',
+  quality = 'ultra',
+  features = []
+}) => {
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [renderQuality, setRenderQuality] = useState(1.0)
+  const [animationState, setAnimationState] = useState('loading')
+  useEffect(() => {
+    const initializeExperience = async () => {
+      console.log('Initializing enhanced experience...')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setIsInitialized(true)
+      setAnimationState('ready')
+    }
+    initializeExperience()
+  }, [])
+  const handleQualityChange = useCallback((newQuality: number) => {
+    setRenderQuality(Math.min(Math.max(newQuality, 0.1), 2.0))
+  }, [])
+  return (
+    &lt;div className="enhanced-experience-container"&gt;
+      &lt;Canvas camera=&#123;&#123; position: [0, 0, 5], fov: 75 &#125;&#125; style=&#123;&#123; width: '100%', height: '100vh' &#125;&#125;&gt;
+        &lt;ambientLight intensity=&#123;0.5&#125; /&gt;
+        &lt;pointLight position=&#123;[10, 10, 10]&#125; /&gt;
+        &lt;AnimatedBackground quality=&#123;renderQuality&#125; animationState=&#123;animationState&#125; /&gt;
+        &lt;InteractiveElements features=&#123;features&#125; onInteraction=&#123;(type) =&gt; console.log(\`Interaction: \$&#123;type&#125;\`)&#125; /&gt;
+      &lt;/Canvas&gt;
+      &#123;!isInitialized && (
+        &lt;div className="loading-overlay"&gt;
+          &lt;div className="loading-spinner" /&gt;
+          &lt;p&gt;Loading enhanced experience...&lt;/p&gt;
+        &lt;/div&gt;
+      )&#125;
+      &lt;div className="experience-controls"&gt;
+        &lt;button onClick=&#123;() =&gt; handleQualityChange(renderQuality + 0.1)&#125;&gt;Increase Quality&lt;/button&gt;
+        &lt;button onClick=&#123;() =&gt; setAnimationState(animationState === 'paused' ? 'playing' : 'paused')&#125;&gt;
+          &#123;animationState === 'paused' ? 'Resume' : 'Pause'&#125; Animation
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+}
+export default EnhancedExperienceRenderer
+// 🎯 优化配置
+const config = {
+  defaultProps: { mode: 'immersive', quality: 'ultra', features: ['3d-graphics', 'animations', 'responsive'] },
+  optimizations: { enableGPUAcceleration: true, useWebGL2: true, enableAntialiasing: true }
+}
+// ✨ 升级完成 - 准备加载增强体验...`
+
+    let currentIndex = 0
+    setStreamingCode('')
+    
+    const streamInterval = setInterval(() => {
+      if (currentIndex < codeTemplate.length) {
+        // 一次添加多个字符以减少闪烁，但保持打字效果
+        let charsToAdd = 1
+        const currentChar = codeTemplate[currentIndex]
+        
+        // 对于空白字符，可以一次添加更多
+        if (currentChar === ' ' || currentChar === '\n') {
+          charsToAdd = Math.min(3, codeTemplate.length - currentIndex)
+        }
+        
+        const nextChars = codeTemplate.substring(currentIndex, currentIndex + charsToAdd)
+        setStreamingCode(prev => {
+          const newCode = prev + nextChars
+          // 延迟滚动到底部，确保DOM已更新
+          setTimeout(() => {
+            if (codeContainerRef.current) {
+              codeContainerRef.current.scrollTop = codeContainerRef.current.scrollHeight
+            }
+          }, 0)
+          return newCode
+        })
+        currentIndex += charsToAdd
+      } else {
+        clearInterval(streamInterval)
+        // 代码生成完成后，开始真正的升级
+        setTimeout(() => {
+          setIsUpgraded(true)
+        }, 1000)
+      }
+    }, 25) // 25ms间隔，稍快一些
+    
+    streamingIntervalRef.current = streamInterval
+  }, [])
+
   // 处理升级请求
   const handleUpgradeRequest = useCallback(async () => {
     if (originalGuideId !== 'japan-sakura-7days' && originalGuideId !== 'uk-harry-potter-7days') return
     
     setIsUpgrading(true)
+    setStreamingCode('')
     
-    // 随机3-10秒的延迟
-    const delay = Math.floor(Math.random() * 7000) + 3000
+    // 开始流式代码生成
+    startStreamingCode()
     
-    setTimeout(() => {
-      setIsUpgraded(true)
-      // 注意：这里先不关闭加载界面，等外部页面加载完成后再关闭
-      
-      // 如果有分享消息函数，添加升级完成的消息
-      if (addShareMessageFunc) {
-        setTimeout(() => {
-          const upgradeMessage = originalGuideId === 'japan-sakura-7days' 
-            ? '✅ 升级完成！现在您可以享受更加丰富和交互式的日本旅游体验了！'
-            : '✅ 升级完成！现在您可以享受更加丰富和交互式的魔法世界体验了！'
-          console.log('升级完成消息:', upgradeMessage)
-        }, 1000)
+    // 如果有分享消息函数，添加升级完成的消息
+    if (addShareMessageFunc) {
+      setTimeout(() => {
+        const upgradeMessage = originalGuideId === 'japan-sakura-7days' 
+          ? '✅ 升级完成！现在您可以享受更加丰富和交互式的日本旅游体验了！'
+          : '✅ 升级完成！现在您可以享受更加丰富和交互式的魔法世界体验了！'
+        console.log('升级完成消息:', upgradeMessage)
+      }, 8000) // 给代码生成留出时间
+    }
+  }, [originalGuideId, addShareMessageFunc, startStreamingCode])
+
+  // 清理定时器
+  useEffect(() => {
+    return () => {
+      if (streamingIntervalRef.current) {
+        clearInterval(streamingIntervalRef.current)
       }
-    }, delay)
-  }, [originalGuideId, addShareMessageFunc])
+    }
+  }, [])
 
   // 处理iframe加载完成
   const handleIframeLoad = useCallback(() => {
@@ -893,15 +1000,59 @@ export default function SharedItineraryPage() {
                 <div className="h-full overflow-hidden relative">
                   {isUpgrading && (
                     <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+                      <div className="text-center max-w-md">
+                        {/* IDE编码效果 - 流式代码生成 */}
+                        <div className="bg-gray-900 rounded-lg p-4 mb-6 text-left font-mono text-xs shadow-xl">
+                          <div className="flex items-center gap-2 pb-2 border-b border-gray-700 mb-3">
+                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-400 text-xs ml-2">
+                              EnhancedExperienceRenderer.tsx
+                            </span>
+                          </div>
+                          <div 
+                            ref={codeContainerRef}
+                            className="relative max-h-64 overflow-y-auto scroll-smooth"
+                            style={{ 
+                              scrollbarWidth: 'thin',
+                              scrollbarColor: '#4a5568 #2d3748'
+                            }}
+                          >
+                            <pre className="text-gray-300 whitespace-pre-wrap leading-5 pb-4">
+                              <code 
+                                className="streaming-code"
+                                dangerouslySetInnerHTML={{
+                                  __html: (() => {
+                                    let highlightedCode = streamingCode
+                                    // 3. 处理关键词 (使用单词边界确保精确匹配)
+                                    highlightedCode = highlightedCode.replace(/\b(import|from|export|default|const|let|var|interface|type|return|function)\b/g, '<span class="text-purple-400 font-semibold">$1</span>')
+                                    highlightedCode = highlightedCode.replace(/\b(useState|useEffect|useCallback|useRef|useMemo)\b/g, '<span class="text-yellow-400 font-semibold">$1</span>')
+                                    highlightedCode = highlightedCode.replace(/\b(React\.FC|React)\b/g, '<span class="text-blue-400 font-semibold">$1</span>')
+                                    // 6. 处理括号
+                                    highlightedCode = highlightedCode.replace(/([{}()])/g, '<span class="text-gray-300 font-semibold">$1</span>')
+                                    highlightedCode = highlightedCode.replace(/&#123;/g, '<span class="text-gray-300 font-semibold">&#123;</span>')
+                                    highlightedCode = highlightedCode.replace(/&#125;/g, '<span class="text-gray-300 font-semibold">&#125;</span>')
+                                    highlightedCode = highlightedCode.replace(/(\[|\])/g, '<span class="text-cyan-400 font-semibold">$1</span>')
+                                    return highlightedCode
+                                  })()
+                                }}
+                              />
+                              {streamingCode && <span className="text-green-400 ml-1 animate-pulse">|</span>}
+                            </pre>
+                          </div>
+                        </div>
+                        
                         <h3 className="text-lg font-medium text-gray-800 mb-2">🌟 正在升级体验</h3>
                         <p className="text-gray-600">{isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...'}</p>
+                        
+                        {/* 进度条保持原样 */}
                         <div className="mt-4">
                           <div className="bg-gray-200 rounded-full h-2 w-64 mx-auto overflow-hidden">
                             <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full animate-pulse"></div>
                           </div>
                         </div>
+                        
                       </div>
                     </div>
                   )}
@@ -1051,15 +1202,80 @@ export default function SharedItineraryPage() {
               <div className="h-full overflow-hidden relative">
                 {isUpgrading && (
                   <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+                    <div className="text-center max-w-md">
+                      {/* IDE编码效果 - 流式代码生成 */}
+                      <div className="bg-gray-900 rounded-lg p-4 mb-6 text-left font-mono text-xs shadow-xl">
+                        <div className="flex items-center gap-2 pb-2 border-b border-gray-700 mb-3">
+                          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          <span className="text-gray-400 text-xs ml-2">
+                            EnhancedExperienceRenderer.tsx
+                          </span>
+                        </div>
+                        <div 
+                          ref={codeContainerRef}
+                          className="relative max-h-64 overflow-y-auto scroll-smooth"
+                          style={{ 
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: '#4a5568 #2d3748'
+                          }}
+                        >
+                          <pre className="text-gray-300 whitespace-pre-wrap leading-5 pb-4">
+                            <code 
+                              className="streaming-code"
+                              dangerouslySetInnerHTML={{
+                                __html: (() => {
+                                  let highlightedCode = streamingCode
+                                  
+                                  // 1. 首先处理注释 (避免注释内容被进一步处理)
+                                  highlightedCode = highlightedCode.replace(/\/\/ (.*)$/gm, '<span class="text-gray-500 italic">// $1</span>')
+                                  
+                                  // 2. 处理字符串 (避免字符串内的关键词被高亮)
+                                  highlightedCode = highlightedCode.replace(/'([^']*)'/g, '<span class="text-green-400">\'$1\'</span>')
+                                  highlightedCode = highlightedCode.replace(/"([^"]*)"/g, '<span class="text-green-400">"$1"</span>')
+                                  
+                                  // 3. 处理关键词 (使用单词边界确保精确匹配)
+                                  highlightedCode = highlightedCode.replace(/\b(import|from|export|default|const|let|var|interface|type|return|function)\b/g, '<span class="text-purple-400 font-semibold">$1</span>')
+                                  highlightedCode = highlightedCode.replace(/\b(useState|useEffect|useCallback|useRef|useMemo)\b/g, '<span class="text-yellow-400 font-semibold">$1</span>')
+                                  highlightedCode = highlightedCode.replace(/\b(React\.FC|React)\b/g, '<span class="text-blue-400 font-semibold">$1</span>')
+                                  
+                                  // 4. 处理 JSX 标签
+                                  highlightedCode = highlightedCode.replace(/&lt;([a-zA-Z][a-zA-Z0-9]*)/g, '<span class="text-red-400 font-semibold">&lt;$1</span>')
+                                  highlightedCode = highlightedCode.replace(/&lt;\/([a-zA-Z][a-zA-Z0-9]*)/g, '<span class="text-red-400 font-semibold">&lt;/$1</span>')
+                                  highlightedCode = highlightedCode.replace(/&gt;/g, '<span class="text-red-400 font-semibold">&gt;</span>')
+                                  
+                                  // 5. 处理数字
+                                  highlightedCode = highlightedCode.replace(/\b(\d+\.?\d*)\b/g, '<span class="text-orange-400">$1</span>')
+                                  
+                                  // 6. 处理括号
+                                  highlightedCode = highlightedCode.replace(/([{}()])/g, '<span class="text-gray-300 font-semibold">$1</span>')
+                                  highlightedCode = highlightedCode.replace(/&#123;/g, '<span class="text-gray-300 font-semibold">&#123;</span>')
+                                  highlightedCode = highlightedCode.replace(/&#125;/g, '<span class="text-gray-300 font-semibold">&#125;</span>')
+                                  highlightedCode = highlightedCode.replace(/(\[|\])/g, '<span class="text-cyan-400 font-semibold">$1</span>')
+                                  
+                                  // 7. 处理操作符
+                                  highlightedCode = highlightedCode.replace(/(\=\>|===|!==|==|!=|=)/g, '<span class="text-cyan-400">$1</span>')
+                                  
+                                  return highlightedCode
+                                })()
+                              }}
+                            />
+                            {streamingCode && <span className="text-green-400 ml-1 animate-pulse">|</span>}
+                          </pre>
+                        </div>
+                      </div>
+                      
                       <h3 className="text-lg font-medium text-gray-800 mb-2">🌟 正在升级体验</h3>
                       <p className="text-gray-600">{isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...'}</p>
+                      
+                      {/* 进度条保持原样 */}
                       <div className="mt-4">
                         <div className="bg-gray-200 rounded-full h-2 w-64 mx-auto overflow-hidden">
                           <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full animate-pulse"></div>
                         </div>
                       </div>
+                      
                     </div>
                   </div>
                 )}

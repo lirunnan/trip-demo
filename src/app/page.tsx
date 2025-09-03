@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import DemoCards from '../components/DemoCards'
 import ChatInterface, { Message, ItineraryDay } from '../components/ChatInterface'
 import TravelViews from '@/components/TravelViews'
+import XiaohongshuExtractor from '@/components/XiaohongshuExtractor'
 import { useConversationMemory } from '@/hooks/useConversationMemory'
 import { useItineraryActions } from '@/hooks/useItineraryActions'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
@@ -299,6 +300,11 @@ export default function Home() {
     handleSendMessage(demoPrompt)
   }, [handleSendMessage])
 
+  const handleXiaohongshuExtract = useCallback((prompt: string, originalContent: any) => {
+    // 当小红书内容提取成功时，自动发送生成的prompt
+    handleSendMessage(prompt)
+  }, [handleSendMessage])
+
   const handleShowPopularGuides = useCallback(() => {
     router.push('/popular')
   }, [router])
@@ -545,6 +551,12 @@ export default function Home() {
               onSendMessage={handleSendMessage}
               isLoading={isLoading}
               isInitialState={isInitialState}
+              xiaohongshuExtractor={
+                <XiaohongshuExtractor 
+                  onExtractSuccess={handleXiaohongshuExtract}
+                  isLoading={isLoading}
+                />
+              }
             />
           </div>
 

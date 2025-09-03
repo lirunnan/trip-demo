@@ -35,13 +35,15 @@ interface ChatInterfaceProps {
   onSendMessage: (content: string, themePrompt?: string) => void
   isLoading: boolean
   isInitialState: boolean
+  xiaohongshuExtractor?: React.ReactNode
 }
 
 export default function ChatInterface({ 
   messages, 
   onSendMessage, 
   isLoading, 
-  isInitialState 
+  isInitialState,
+  xiaohongshuExtractor
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -162,7 +164,7 @@ export default function ChatInterface({
             </div>
           </div>
           
-          <div className="w-full max-w-2xl">
+          <div className="w-full max-w-2xl space-y-4">
             <ThemeTagsInput
               selectedThemes={selectedThemes}
               onThemeAdd={addTheme}
@@ -178,6 +180,24 @@ export default function ChatInterface({
               isLoading={isLoading}
               submitButtonText="开始规划"
             />
+            
+            {/* 输入方式选择 */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="h-px bg-gray-200 dark:bg-gray-600 flex-1"></div>
+                <span>或选择其他方式</span>
+                <div className="h-px bg-gray-200 dark:bg-gray-600 flex-1"></div>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {xiaohongshuExtractor && xiaohongshuExtractor}
+                {/* 可以添加更多输入方式 */}
+                <button className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer opacity-50 cursor-not-allowed">
+                  <span className="text-blue-600 dark:text-blue-400 text-sm font-bold">📝</span>
+                  <span className="text-gray-400 text-sm font-medium">模板导入</span>
+                  <span className="text-xs text-gray-400">(即将上线)</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* 装饰性行程路线 */}

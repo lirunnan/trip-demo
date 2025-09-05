@@ -170,7 +170,7 @@ export default function ChatInterface({
   
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto">
       {isInitialState ? (
         // 初始状态：居中的输入框
         <div className="flex flex-col items-center justify-center min-h-[400px] px-4">
@@ -251,7 +251,7 @@ export default function ChatInterface({
           </div>
 
           {/* 装饰性行程路线 */}
-          <div className="w-full max-w-4xl relative">
+          <div className="w-full max-w-6xl relative">
             {/* 主路线 */}
             <div className="relative h-24">
               {/* 背景路径 */}

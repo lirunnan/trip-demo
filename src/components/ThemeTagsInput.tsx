@@ -183,13 +183,6 @@ export default function ThemeTagsInput({
           </div>
         </div>
       )}
-
-      {/* 使用提示 */}
-      {selectedThemes.length === 0 && (
-        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-          💡 输入 # 可选择主题模式，如 #亲子 #美食 #背包
-        </div>
-      )}
     </div>
   )
 }

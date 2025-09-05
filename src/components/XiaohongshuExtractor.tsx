@@ -63,29 +63,45 @@ export default function XiaohongshuExtractor({ onExtractSuccess, isLoading = fal
         throw new Error(result.error || '抓取失败')
       }
 
-      if (result.success) {
-        setSuccess(true)
-        
-        // 显示处理信息
-        const metadata = result.data.metadata
-        console.log('处理完成:', {
-          aiAnalyzed: metadata.aiAnalyzed,
-          processor: metadata.processor
-        })
-        
-        setTimeout(() => {
-          // 传递更丰富的数据给父组件
-          onExtractSuccess(result.data.travelPrompt, {
-            ...result.data.originalContent,
-            metadata: metadata,
-            analysisResult: result.data.analysisResult
-          })
-          setUrl('')
-          setSuccess(false)
-        }, 1500)
-      } else {
-        throw new Error(result.error || '抓取失败')
+      // 严格验证：必须AI分析成功才进入对话
+      if (!result.success) {
+        throw new Error(result.error || 'API调用失败')
       }
+      
+      if (!result.data) {
+        throw new Error('API返回数据为空')
+      }
+      
+      if (!result.data.analysisResult) {
+        throw new Error('AI模型分析失败，请检查API密钥配置或尝试其他模型')
+      }
+      
+      if (!result.data.travelPrompt) {
+        throw new Error('旅行提示词生成失败')
+      }
+      
+      // AI分析完全成功，显示成功状态
+      setSuccess(true)
+      
+      console.log('✅ [UI] AI分析完全成功，准备进入对话:', {
+        title: result.data.analysisResult.title,
+        destination: result.data.analysisResult.destination,
+        theme: result.data.analysisResult.theme,
+        modelUsed: result.data.metadata?.processor
+      })
+      
+      setTimeout(() => {
+        // 只有AI分析成功才传递给对话组件
+        console.log('📤 [UI] AI分析成功，传递结果给对话组件');
+        onExtractSuccess(result.data.travelPrompt, {
+          originalContent: result.data.originalContent,
+          metadata: result.data.metadata || {},
+          analysisResult: result.data.analysisResult
+        })
+        setUrl('')
+        setSuccess(false)
+        setIsExpanded(false)
+      }, 1500)
     } catch (error) {
       console.error('抓取失败:', error)
       

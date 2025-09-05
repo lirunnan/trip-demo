@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { scrapeXiaohongshuContent, validateXiaohongshuUrl } from '@/utils/xiaohongshu-scraper';
-import { analyzeXiaohongshuContent, convertAnalysisToTravelPrompt } from '@/utils/claude';
+import { analyzeXiaohongshuContent, convertAnalysisToTravelPrompt } from '@/utils/openrouter';
 
 interface XiaohongshuContent {
   title: string;
@@ -24,26 +24,46 @@ async function extractAndAnalyzeXiaohongshuContent(url: string): Promise<{
     const originalContent = await scrapeXiaohongshuContent(url);
     console.log('原始内容抓取完成:', originalContent.title);
     
-    // 第二步：使用Claude分析内容
+    // 第二步：使用OpenRouter分析内容 - 必须成功才继续
+    console.log('🎯 [API] 开始OpenRouter AI分析...');
     const analysisResult = await analyzeXiaohongshuContent(originalContent.content, url);
-    console.log('Claude分析完成:', analysisResult.success ? '成功' : '失败');
     
-    // 第三步：生成旅行提示词
-    let travelPrompt: string;
-    
-    if (analysisResult.success && analysisResult.data) {
-      // 使用Claude分析结果生成提示词
-      travelPrompt = convertAnalysisToTravelPrompt(analysisResult.data);
-      console.log('基于AI分析生成提示词');
-    } else {
-      // 如果Claude分析失败，使用原始内容生成基础提示词
-      travelPrompt = generateFallbackPrompt(originalContent);
-      console.log('使用备用方案生成提示词');
+    // 检查AI分析是否成功
+    if (!analysisResult.success) {
+      console.error('❌ [API] OpenRouter AI分析失败，终止处理');
+      console.error('❌ [API] 失败原因:', analysisResult.error);
+      
+      // AI分析失败，直接返回错误，不进入对话流程
+      throw new Error(`AI模型分析失败: ${analysisResult.error}`);
     }
+    
+    // AI分析成功，记录详细信息
+    console.log('✅ [API] OpenRouter AI分析成功！');
+    if (analysisResult.modelUsed) {
+      console.log('📊 [API] 使用模型:', analysisResult.modelUsed);
+      console.log('💰 [API] 调用成本:', analysisResult.cost ? `$${analysisResult.cost.toFixed(6)}` : '免费');
+    }
+    
+    // 验证分析结果的完整性
+    if (!analysisResult.data) {
+      console.error('❌ [API] AI分析结果为空，终止处理');
+      throw new Error('AI分析结果为空');
+    }
+    
+    console.log('📋 [API] AI分析结果预览:', {
+      title: analysisResult.data.title,
+      destination: analysisResult.data.destination,
+      theme: analysisResult.data.theme
+    });
+    
+    // 第三步：基于成功的AI分析结果生成旅行提示词
+    console.log('📝 [API] 基于AI分析结果生成旅行提示词...');
+    const travelPrompt = convertAnalysisToTravelPrompt(analysisResult.data);
+    console.log('✅ [API] 旅行提示词生成完成');
     
     return {
       originalContent,
-      analysisResult: analysisResult.success ? analysisResult.data : null,
+      analysisResult: analysisResult.data,
       travelPrompt
     };
     
@@ -80,11 +100,13 @@ ${content.content}
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { url: string } }
+  { params }: { params: Promise<{ url: string }> }
 ) {
   try {
+    // Next.js 15 要求先await params
+    const resolvedParams = await params;
     // 解码URL参数
-    const decodedUrl = decodeURIComponent(params.url);
+    const decodedUrl = decodeURIComponent(resolvedParams.url);
     console.log(`处理GET请求，URL: ${decodedUrl}`);
     
     // 验证是否为小红书链接
@@ -109,7 +131,7 @@ export async function GET(
           source: 'xiaohongshu',
           url: decodedUrl,
           aiAnalyzed: !!result.analysisResult,
-          processor: result.analysisResult ? 'claude-4-sonnet' : 'fallback'
+          processor: result.analysisResult ? 'openrouter-ai' : 'fallback'
         }
       }
     });
@@ -185,7 +207,7 @@ export async function POST(request: NextRequest) {
           source: 'xiaohongshu',
           url: url,
           aiAnalyzed: !!result.analysisResult,
-          processor: result.analysisResult ? 'claude-4-sonnet' : 'fallback'
+          processor: result.analysisResult ? 'openrouter-ai' : 'fallback'
         }
       }
     });

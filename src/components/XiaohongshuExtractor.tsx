@@ -52,8 +52,12 @@ export default function XiaohongshuExtractor({ onExtractSuccess, isLoading = fal
     setSuccess(false)
 
     try {
+      console.log('开始抓取小红书内容:', url)
+      
       const response = await fetch('/api/xiaohongshu/' + encodeURIComponent(url))
       const result = await response.json()
+
+      console.log('API响应:', result)
 
       if (!response.ok) {
         throw new Error(result.error || '抓取失败')
@@ -61,17 +65,48 @@ export default function XiaohongshuExtractor({ onExtractSuccess, isLoading = fal
 
       if (result.success) {
         setSuccess(true)
+        
+        // 显示处理信息
+        const metadata = result.data.metadata
+        console.log('处理完成:', {
+          aiAnalyzed: metadata.aiAnalyzed,
+          processor: metadata.processor
+        })
+        
         setTimeout(() => {
-          onExtractSuccess(result.data.travelPrompt, result.data.originalContent)
+          // 传递更丰富的数据给父组件
+          onExtractSuccess(result.data.travelPrompt, {
+            ...result.data.originalContent,
+            metadata: metadata,
+            analysisResult: result.data.analysisResult
+          })
           setUrl('')
           setSuccess(false)
-        }, 1000)
+        }, 1500)
       } else {
         throw new Error(result.error || '抓取失败')
       }
     } catch (error) {
       console.error('抓取失败:', error)
-      setError(error instanceof Error ? error.message : '抓取失败，请稍后重试')
+      
+      // 根据错误类型设置不同的错误消息
+      let errorMessage = '抓取失败，请稍后重试'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('AI分析服务配置异常')) {
+          errorMessage = 'AI分析服务暂时不可用，已使用基础解析'
+        } else if (error.message.includes('AI分析服务忙碌中')) {
+          errorMessage = 'AI服务忙碌中，请稍后重试'
+        } else if (error.message.includes('网络连接异常')) {
+          errorMessage = '网络连接异常，请检查网络后重试'
+        } else if (error.message.includes('链接格式不正确')) {
+          errorMessage = '链接格式不正确，请检查后重试'
+        } else {
+          errorMessage = error.message
+        }
+      }
+      
+      setError(errorMessage)
     } finally {
       setExtracting(false)
     }
@@ -185,7 +220,13 @@ export default function XiaohongshuExtractor({ onExtractSuccess, isLoading = fal
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
               </div>
-              <span className="text-green-700 dark:text-green-300 text-sm font-medium">解析成功！正在生成旅行攻略...</span>
+              <div className="flex-1">
+                <div className="text-green-700 dark:text-green-300 text-sm font-medium">解析成功！正在生成旅行攻略...</div>
+                <div className="text-green-600 dark:text-green-400 text-xs mt-1 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  <span>Claude-4-Sonnet AI智能分析中</span>
+                </div>
+              </div>
             </div>
           )}
 

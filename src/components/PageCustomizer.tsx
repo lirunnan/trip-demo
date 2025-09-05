@@ -255,7 +255,7 @@ ${actionType === 'trip'
   const quickActions = [
     { text: '让页面更简洁', icon: Layout },
     { text: '我要详细展示', icon: Sparkles },
-    { text: '调整颜色主题', icon: Palette },
+    { text: '更丰富的展示', icon: Palette },
   ]
 
   return (

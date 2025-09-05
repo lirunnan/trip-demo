@@ -279,7 +279,7 @@ const config = {
           setIsUpgraded(true)
         }, 1000)
       }
-    }, 25) // 25ms间隔，稍快一些
+    }, 10) // 25ms间隔，稍快一些
     
     streamingIntervalRef.current = streamInterval
   }, [])

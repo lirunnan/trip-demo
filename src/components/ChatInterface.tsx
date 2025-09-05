@@ -106,7 +106,7 @@ function CoreFeaturesShowcase() {
       </div>
 
       {/* 下部分：轮播图片区域 */}
-      <div className="relative h-[478px] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-2xl border-2 border-gray-200/50 dark:border-gray-600/50 overflow-hidden">
+      <div className="relative h-[calc(var(--spacing)*111)] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-2xl border-2 border-gray-200/50 dark:border-gray-600/50 overflow-hidden">
         {/* 背景装饰 */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent"></div>
         <div className={`absolute inset-0 bg-gradient-to-br ${coreFeatures[activeCard].gradient} opacity-10`}></div>

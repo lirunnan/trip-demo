@@ -5,6 +5,162 @@ import { useState, useRef, useEffect } from 'react'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import ThemeTagsInput from './ThemeTagsInput'
 
+// 优秀攻略创作展示组件
+function ExcellentGuideShowcase() {
+  const [activeGuide, setActiveGuide] = useState(0)
+
+  const guides = [
+    {
+      id: 0,
+      title: '日本7日深度游',
+      description: '东京-京都-大阪经典路线',
+      url: 'https://v0-japan-travel-website-six.vercel.app/',
+      preview: '/images/japan-preview.png'
+    },
+    {
+      id: 1,
+      title: '英国哈利波特之旅',
+      description: '魔法世界沉浸式体验',
+      url: 'https://v0-japan-travel-website-six.vercel.app/',
+      preview: '/images/london-preview.png'
+    },
+    {
+      id: 2,
+      title: '东南亚海岛跳跃',
+      description: '泰国-马来西亚-新加坡',
+      url: 'https://v0-japan-travel-website-six.vercel.app/',
+      preview: '/images/placeholder.png'
+    },
+    {
+      id: 3,
+      title: '欧洲艺术之旅',
+      description: '巴黎-罗马-维也纳文化体验',
+      url: 'https://v0-japan-travel-website-six.vercel.app/',
+      preview: '/images/placeholder.png'
+    }
+  ]
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveGuide((prev) => (prev + 1) % guides.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleCardClick = (url: string) => {
+    window.open(url, '_blank')
+  }
+
+  return (
+    <div className="w-full max-w-5xl mt-16 mb-8">
+      {/* 标题 */}
+      <div className="text-center mb-8">
+        <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+          <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            优秀攻略创作
+          </span>
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 text-lg">
+          探索由AI生成的精彩旅行攻略，为你的下次旅行寻找灵感
+        </p>
+      </div>
+
+      {/* 轮播卡片区域 */}
+      <div className="relative">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {guides.map((guide, index) => (
+            <div
+              key={guide.id}
+              className={`relative group cursor-pointer transition-all duration-500 transform ${
+                activeGuide === index
+                  ? 'scale-105 z-10'
+                  : 'hover:scale-102'
+              }`}
+              onClick={() => handleCardClick(guide.url)}
+            >
+              {/* 卡片容器 */}
+              <div className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border-2 transition-all duration-500 ${
+                activeGuide === index
+                  ? 'border-purple-500 shadow-2xl shadow-purple-500/25'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-xl'
+              }`}>
+                {/* iframe 预览区域 */}
+                <div className="relative h-48 bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                  <iframe
+                    src={guide.url}
+                    className="w-full h-full transform scale-50 origin-top-left"
+                    style={{ 
+                      width: '200%', 
+                      height: '200%',
+                      pointerEvents: 'none'
+                    }}
+                    title={guide.title}
+                  />
+                  
+                  {/* 悬停遮罩 */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                        <span className="text-sm font-medium">点击查看详情</span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 激活指示器 */}
+                  {activeGuide === index && (
+                    <div className="absolute top-3 right-3">
+                      <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse shadow-lg"></div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 卡片内容 */}
+                <div className="p-4">
+                  <h4 className="font-bold text-lg text-gray-800 dark:text-gray-100 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    {guide.title}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                    {guide.description}
+                  </p>
+                  
+                  {/* 底部装饰 */}
+                  <div className={`mt-4 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-opacity duration-300 ${
+                    activeGuide === index ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'
+                  }`}></div>
+                </div>
+              </div>
+
+              {/* 卡片光晕效果 */}
+              {activeGuide === index && (
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur-xl -z-10 animate-pulse"></div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* 导航指示器 */}
+        <div className="flex justify-center gap-3 mt-8">
+          {guides.map((_, index) => (
+            <button
+              key={index}
+              className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 ${
+                activeGuide === index
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg'
+                  : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+              }`}
+              onClick={() => setActiveGuide(index)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // 核心功能展示组件
 function CoreFeaturesShowcase() {
   const [activeCard, setActiveCard] = useState(0)
@@ -637,6 +793,9 @@ export default function ChatInterface({
             
             {/* 核心功能展示组件 */}
             <CoreFeaturesShowcase />
+            
+            {/* 优秀攻略创作展示组件 */}
+            <ExcellentGuideShowcase />
             
             {/* 底部提示文字 */}
             <div className="mt-3 text-center">

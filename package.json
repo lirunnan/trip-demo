@@ -13,6 +13,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/jsdom": "^21.1.7",
+    "cheerio": "^1.0.0",
+    "jsdom": "^24.1.0",
     "lucide-react": "^0.541.0",
     "next": "15.5.0",
     "react": "19.1.0",

@@ -10,6 +10,8 @@ import { useConversationMemory } from '@/hooks/useConversationMemory'
 import { useItineraryActions } from '@/hooks/useItineraryActions'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
 import { addTimeInfoToItinerary } from '@/utils/timeCalculator'
+import { generateConversationId, postConversations } from './api/conversation'
+import { callAI, callAIWithAutoModel } from '@/utils/openrouter'
 
 interface DemoGuide {
   id: string
@@ -27,6 +29,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
   const [currentItinerary, setCurrentItinerary] = useState<ItineraryDay[]>([])
   const [isInitialState, setIsInitialState] = useState(true)
+  const [convId, setConvId] = useState('');
   const { 
     context, 
     addUserRequest, 
@@ -246,7 +249,7 @@ export default function Home() {
   const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
     // 记录用户请求到上下文
     addUserRequest(content)
-    
+    // console.log(content);
     // 添加用户消息
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -260,24 +263,30 @@ export default function Home() {
     setIsInitialState(false)
 
     try {
-      // 模拟AI响应，使用主题增强的提示词
-      const aiResponse = await simulateAIResponse(themePrompt || content)
+      // 确保有conversationId
+      let currentConvId = convId;
+      if (!currentConvId) {
+        currentConvId = generateConversationId();
+        setConvId(currentConvId);
+      }
       
+      const gRes = await postConversations(currentConvId, content);
+      console.log('asdf', gRes);
       // 添加AI响应
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: aiResponse.content,
+        content: '',
         timestamp: new Date(),
-        itinerary: aiResponse.itinerary
+        itinerary: gRes?.data?.plan?.itinerary
       }
-      
+      console.log(assistantMessage)
       setMessages(prev => [...prev, assistantMessage])
       
       // 更新当前行程数据
-      if (aiResponse.itinerary) {
-        setCurrentItinerary(aiResponse.itinerary)
-        updateItinerary(aiResponse.itinerary)
+      if (gRes?.data?.plan?.itinerary) {
+        setCurrentItinerary(gRes?.data?.plan?.itinerary)
+        updateItinerary(gRes?.data?.plan?.itinerary)
       }
     } catch (error) {
       console.error('发送消息失败:', error)
@@ -292,7 +301,7 @@ export default function Home() {
     } finally {
       setIsLoading(false)
     }
-  }, [simulateAIResponse, addUserRequest, updateItinerary])
+  }, [addUserRequest, convId, updateItinerary])
 
   const handleSelectDemo = useCallback((demo: DemoGuide) => {
     // 当选择Demo攻略时，自动填入相关内容并触发AI响应
@@ -393,9 +402,21 @@ export default function Home() {
     
     try {
       // 生成唯一ID用于服务端存储
-      const serverId = `server_${Date.now()}`
+      const serverId = `server_${convId}`
       const title = `${currentItinerary.length}天旅行计划`
-      
+      const html = callAI(
+            {
+              prompt: `使用以下信息生成一个HTML格式的文本，要求内容完整且美观：
+      - 标题: ${title}
+      - 行程概要: ${currentItinerary}
+      - HTML格式要求: 
+        - 整体宽度900px，左右padding共60px
+        - 背景色#f8f9fa，内容区域白色背景，阴影效果
+        - 
+      `,
+            }
+          );
+          console.log(html);
       // 向服务端API创建分享内容
       const response = await fetch(`/api/shared/${serverId}`, {
         method: 'POST',
@@ -432,7 +453,7 @@ export default function Home() {
       }
       setMessages(prev => [...prev, errorMessage])
     }
-  }, [currentItinerary])
+  }, [convId, currentItinerary])
 
   const handleShareClient = useCallback(async () => {
     if (currentItinerary.length === 0) return

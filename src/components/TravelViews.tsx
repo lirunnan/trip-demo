@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { ItineraryDay } from './ChatInterface'
 import MapDisplay from './MapDisplay'
 import ScheduleDisplay from './ScheduleDisplay'
-import { Map, Calendar, Download, Share2 } from 'lucide-react'
+import { Map, Calendar, Download, Share2, Home } from 'lucide-react'
 
 interface TravelViewsProps {
   itinerary: ItineraryDay[]
@@ -16,6 +16,8 @@ interface TravelViewsProps {
   onShare?: () => void
   onShareServer?: () => void
   onShareClient?: () => void
+  onSendMessage: (content: string, themePrompt?: string) => Promise<void>
+  onReturnHome?: () => void
   isWebMode?: boolean
   webUrl?: string
   guideId?: string
@@ -33,6 +35,8 @@ export default function TravelViews({
   onShare,
   onShareServer,
   onShareClient,
+  onSendMessage,
+  onReturnHome,
   isWebMode = false,
   webUrl = '',
   guideId
@@ -117,6 +121,16 @@ export default function TravelViews({
 
             {/* 右侧操作按钮 */}
             <div className="flex items-center gap-2">
+              {onReturnHome && (
+                <button
+                  onClick={onReturnHome}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                  title="返回首页"
+                >
+                  <Home className="w-4 h-4" />
+                  返回首页
+                </button>
+              )}
               {(onShareServer || onShareClient) ? (
                 <div className="relative share-menu-container">
                   <button
@@ -198,7 +212,8 @@ export default function TravelViews({
         {/* 内容区域 */}
         <div className="flex-1 overflow-hidden">
           {activeView === 'map' ? (
-            <MapDisplay 
+            <MapDisplay
+              onSendMessage={onSendMessage} 
               itinerary={itinerary}
               className="h-full"
               interactive={true}

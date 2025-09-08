@@ -1,6 +1,6 @@
 'use client'
 
-import { User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X } from 'lucide-react'
+import { User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import ThemeTagsInput from './ThemeTagsInput'
@@ -28,6 +28,9 @@ export interface Location {
   coordinates: [number, number] // [lng, lat]
   description: string
   duration: string
+  country: string
+  province: string
+  city: string
   startTime?: string // 开始时间
   endTime?: string   // 结束时间
   timeSlot?: string  // 时间段显示
@@ -39,6 +42,7 @@ interface ChatInterfaceProps {
   isLoading: boolean
   isInitialState: boolean
   xiaohongshuExtractor?: React.ReactNode
+  onShowHistory?: () => void
 }
 
 export default function ChatInterface({ 
@@ -46,7 +50,8 @@ export default function ChatInterface({
   onSendMessage, 
   isLoading, 
   isInitialState,
-  xiaohongshuExtractor
+  xiaohongshuExtractor,
+  onShowHistory
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -247,6 +252,15 @@ export default function ChatInterface({
                   <span className="text-gray-400 text-sm font-medium">模板导入</span>
                   <span className="text-xs text-gray-400">(即将上线)</span>
                 </button>
+                {onShowHistory && (
+                  <button 
+                    onClick={onShowHistory}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+                  >
+                    <History className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-gray-700 dark:text-gray-300 text-sm font-medium">历史记录</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -50,201 +50,6 @@ export default function Home() {
     exportAsTextFile
   } = useExportFeatures()
 
-  // 模拟AI响应 - 在实际项目中这里会调用真实的AI API
-  const simulateAIResponse = useCallback(async (userMessage: string): Promise<{ content: string; itinerary?: ItineraryDay[] }> => {
-    // 模拟API延迟
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // 构建带上下文的完整提示词（现在userMessage可能已经包含主题信息）
-    const fullPrompt = buildPromptContext(userMessage)
-    console.log('完整提示词:', fullPrompt)
-    
-    // 解析用户输入，更新上下文
-    parseUserInput(userMessage)
-    
-    // 检测是否包含主题模式信息
-    const isThemeEnhanced = userMessage.includes('主题偏好：')
-    console.log('是否包含主题模式:', isThemeEnhanced)
-
-    // 模拟AI生成的攻略内容和行程数据（不含时间信息）
-    const mockItineraryBase: ItineraryDay[] = [
-      {
-        day: 1,
-        date: '2024-03-15',
-        locations: [
-          {
-            name: '天安门广场',
-            type: '历史景点',
-            coordinates: [116.397128, 39.903119],
-            description: '中华人民共和国的象征，感受历史的庄严',
-            duration: '2小时'
-          },
-          {
-            name: '故宫博物院',
-            type: '文化景点',
-            coordinates: [116.397024, 39.918058],
-            description: '明清皇宫，中华文明的瑰宝',
-            duration: '3小时'
-          },
-          {
-            name: '王府井大街',
-            type: '商业街',
-            coordinates: [116.408005, 39.913423],
-            description: '北京著名商业街，品尝地道小吃',
-            duration: '2小时'
-          }
-        ]
-      },
-      {
-        day: 2,
-        date: '2024-03-16',
-        locations: [
-          {
-            name: '颐和园',
-            type: '园林景点',
-            coordinates: [116.275, 39.996],
-            description: '清代皇家园林，湖光山色美不胜收',
-            duration: '4小时'
-          },
-          {
-            name: '清华大学',
-            type: '高等学府',
-            coordinates: [116.326, 40.003],
-            description: '中国顶尖学府，感受学术氛围',
-            duration: '2小时'
-          }
-        ]
-      }
-    ]
-
-    // 为模拟数据添加时间信息
-    const mockItinerary = addTimeInfoToItinerary(mockItineraryBase)
-    
-    // 根据上下文生成不同回复
-    let responseContent = ''
-    let updatedItinerary = mockItinerary
-
-    if (userMessage.includes('加一天') || userMessage.includes('再加')) {
-      if (context.currentItinerary.length > 0) {
-        // 基于现有行程添加新一天
-        const newDay = {
-          day: context.currentItinerary.length + 1,
-          date: `2024-03-${17 + context.currentItinerary.length - 1}`,
-          locations: [
-            {
-              name: '北海公园',
-              type: '园林景点',
-              coordinates: [116.388, 39.928] as [number, number],
-              description: '皇家园林，白塔倒影美如画',
-              duration: '3小时'
-            },
-            {
-              name: '什刹海',
-              type: '历史街区',
-              coordinates: [116.391, 39.940] as [number, number],
-              description: '老北京风情，酒吧街夜生活',
-              duration: '2小时'
-            }
-          ]
-        }
-        // 为新添加的一天添加时间信息
-        const newDayWithTime = addTimeInfoToItinerary([newDay])[0]
-        updatedItinerary = [...context.currentItinerary, newDayWithTime]
-        responseContent = `好的！已为您增加第${updatedItinerary.length}天的行程安排：
-
-🗓️ **第${updatedItinerary.length}天新增内容**
-• 北海公园 - 感受皇家园林的宁静美景
-• 什刹海 - 体验老北京的胡同文化
-
-💡 **调整建议**
-• 可以在什刹海租自行车游览胡同
-• 晚上可以在什刹海酒吧街体验夜生活
-• 北海公园的白塔是经典拍照点
-
-已更新地图显示，您觉得这样安排如何？`
-      } else {
-        responseContent = `根据您的需求，我为您制定了一份精彩的旅行攻略！
-
-🎯 **行程概览**
-• 目的地：北京
-• 天数：2天1夜
-• 主题：历史文化 + 现代体验
-• 预算：适中
-
-🗓️ **详细安排**
-第1天：天安门广场 → 故宫博物院 → 王府井大街
-第2天：颐和园 → 清华大学
-
-💡 **贴心提示**
-1. 建议购买故宫门票提前预约
-2. 王府井可以尝试北京烤鸭和豆汁
-3. 颐和园适合清晨游览，空气清新人少
-4. 准备舒适的步行鞋
-
-地图上已标出所有景点位置和建议路线，点击标记可查看详细信息。如有任何问题或需要调整，随时告诉我！`
-      }
-    } else if (userMessage.includes('美食') || userMessage.includes('吃')) {
-      if (context.currentItinerary.length > 0) {
-        responseContent = `我来为您推荐一些当地特色美食！结合您现有的行程：
-
-🍽️ **美食推荐**
-• 天安门附近：全聚德烤鸭、东来顺涮肉
-• 王府井：小吃街各种北京小食
-• 颐和园周边：宫廷菜、素食餐厅
-
-🥟 **必尝小吃**
-• 豆汁焦圈、驴打滚、艾窝窝
-• 糖葫芦、煎饼果子、炸酱面
-
-要我为您在行程中具体安排美食时间和地点吗？`
-      } else {
-        responseContent = `根据您的需求，我为您制定了一份精彩的旅行攻略！
-
-🎯 **行程概览**
-• 目的地：北京
-• 天数：2天1夜
-• 主题：历史文化 + 现代体验
-• 预算：适中
-
-🗓️ **详细安排**
-第1天：天安门广场 → 故宫博物院 → 王府井大街
-第2天：颐和园 → 清华大学
-
-💡 **贴心提示**
-1. 建议购买故宫门票提前预约
-2. 王府井可以尝试北京烤鸭和豆汁
-3. 颐和园适合清晨游览，空气清新人少
-4. 准备舒适的步行鞋
-
-地图上已标出所有景点位置和建议路线，点击标记可查看详细信息。如有任何问题或需要调整，随时告诉我！`
-      }
-    } else {
-      responseContent = `根据您的需求，我为您制定了一份精彩的旅行攻略！
-
-🎯 **行程概览**
-• 目的地：北京
-• 天数：2天1夜
-• 主题：历史文化 + 现代体验
-• 预算：适中
-
-🗓️ **详细安排**
-第1天：天安门广场 → 故宫博物院 → 王府井大街
-第2天：颐和园 → 清华大学
-
-💡 **贴心提示**
-1. 建议购买故宫门票提前预约
-2. 王府井可以尝试北京烤鸭和豆汁
-3. 颐和园适合清晨游览，空气清新人少
-4. 准备舒适的步行鞋
-
-地图上已标出所有景点位置和建议路线，点击标记可查看详细信息。如有任何问题或需要调整，随时告诉我！`
-    }
-
-    return {
-      content: responseContent,
-      itinerary: updatedItinerary
-    }
-  }, [buildPromptContext, parseUserInput, context.currentItinerary])
 
   const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
     // 记录用户请求到上下文
@@ -511,6 +316,18 @@ export default function Home() {
     }
   }, [currentItinerary, exportAsTextFile])
 
+  const handleReturnHome = useCallback(() => {
+    // 重置到初始状态
+    setIsInitialState(true)
+    setMessages([])
+    setCurrentItinerary([])
+    setConvId('')
+  }, [])
+
+  const handleShowHistory = useCallback(() => {
+    router.push('/history')
+  }, [router])
+
   return (
     <div className="min-h-screen relative">
       {/* 动态背景层 */}
@@ -578,6 +395,7 @@ export default function Home() {
                   isLoading={isLoading}
                 />
               }
+              onShowHistory={handleShowHistory}
             />
           </div>
 
@@ -592,9 +410,11 @@ export default function Home() {
                   onLocationEdit={handleLocationEdit}
                   onLocationReorder={handleLocationReorder}
                   onExportPDF={handleExportPDF}
+                  onSendMessage={handleSendMessage}
                   onShare={handleShare}
                   onShareServer={handleShareServer}
                   onShareClient={handleShareClient}
+                  onReturnHome={handleReturnHome}
                 />
               </div>
             </div>

@@ -27,3 +27,10 @@ export const postConversations = (conversationId: string, query: string) => {
         }
     )
 }
+
+export const getConversations = () => {
+    return fetchApi<ConversationResponse>(
+        `${BASE_URL}/conversations`, 
+        'GET'
+    )
+}

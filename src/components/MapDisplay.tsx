@@ -9,6 +9,7 @@ interface MapDisplayProps {
   onLocationDelete?: (dayIndex: number, locationIndex: number) => void
   onLocationEdit?: (dayIndex: number, locationIndex: number) => void
   interactive?: boolean
+  onSendMessage: (content: string, themePrompt?: string) => Promise<void>
 }
 
 interface MapCenter {
@@ -27,7 +28,8 @@ export default function MapDisplay({
   className = '', 
   onLocationDelete,
   onLocationEdit,
-  interactive = false 
+  interactive = false,
+  onSendMessage
 }: MapDisplayProps) {
   const [selectedDay, setSelectedDay] = useState<number>(1)
   const mapRef = useRef<HTMLDivElement>(null)
@@ -141,7 +143,8 @@ export default function MapDisplay({
         onLocationEdit?.(dayIndex, locationIndex)
       };
       (window as any).deleteLocation = (dayIndex: number, locationIndex: number) => {
-        onLocationDelete?.(dayIndex, locationIndex)
+        // onLocationDelete?.(dayIndex, locationIndex)
+        onSendMessage(`不想去第${dayIndex+1}天行程中的${currentDayData?.locations[locationIndex].name}了`)
       }
     }
     
@@ -151,7 +154,7 @@ export default function MapDisplay({
         delete (window as any).deleteLocation
       }
     }
-  }, [interactive, onLocationEdit, onLocationDelete])
+  }, [interactive, onLocationEdit, onLocationDelete, onSendMessage, currentDayData?.locations])
 
   // 更新地图标记
   useEffect(() => {
@@ -174,8 +177,8 @@ export default function MapDisplay({
         
         // 使用异步处理所有地点
         currentDayData.locations.forEach((location, index) => {
-          console.log(location.name, 'getting geocode')
-          myGeo.getPoint(location.name, (pt: any) => {
+          console.log(location.city + location.name, 'getting geocode')
+          myGeo.getPoint(location.province + location.city + location.name, (pt: any) => {
             completedCount++
             if (pt) {
               const point = new window.BMap.Point(pt.lng, pt.lat)
@@ -226,7 +229,7 @@ export default function MapDisplay({
                       onclick="window.deleteLocation(${selectedDay - 1}, ${index})" 
                       style="flex: 1; padding: 4px 8px; background: #ff4d4f; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;"
                     >
-                      删除
+                      不想去了
                     </button>
                   </div>`
               }

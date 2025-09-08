@@ -1000,9 +1000,9 @@ const config = {
                 <div className="h-full overflow-hidden relative">
                   {isUpgrading && (
                     <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
-                      <div className="text-center max-w-md">
+                      <div className="text-center max-w-2xl">
                         {/* IDE编码效果 - 流式代码生成 */}
-                        <div className="bg-gray-900 rounded-lg p-4 mb-6 text-left font-mono text-xs shadow-xl">
+                        <div className="bg-gray-900 rounded-lg p-6 mb-6 text-left font-mono text-sm shadow-xl">
                           <div className="flex items-center gap-2 pb-2 border-b border-gray-700 mb-3">
                             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -1013,7 +1013,7 @@ const config = {
                           </div>
                           <div 
                             ref={codeContainerRef}
-                            className="relative max-h-64 overflow-y-auto scroll-smooth"
+                            className="relative max-h-80 overflow-y-auto scroll-smooth"
                             style={{ 
                               scrollbarWidth: 'thin',
                               scrollbarColor: '#4a5568 #2d3748'
@@ -1202,9 +1202,9 @@ const config = {
               <div className="h-full overflow-hidden relative">
                 {isUpgrading && (
                   <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
-                    <div className="text-center max-w-md">
+                    <div className="text-center max-w-2xl">
                       {/* IDE编码效果 - 流式代码生成 */}
-                      <div className="bg-gray-900 rounded-lg p-4 mb-6 text-left font-mono text-xs shadow-xl">
+                      <div className="bg-gray-900 rounded-lg p-6 mb-6 text-left font-mono text-sm shadow-xl">
                         <div className="flex items-center gap-2 pb-2 border-b border-gray-700 mb-3">
                           <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -1215,7 +1215,7 @@ const config = {
                         </div>
                         <div 
                           ref={codeContainerRef}
-                          className="relative max-h-64 overflow-y-auto scroll-smooth"
+                          className="relative max-h-80 overflow-y-auto scroll-smooth"
                           style={{ 
                             scrollbarWidth: 'thin',
                             scrollbarColor: '#4a5568 #2d3748'
@@ -1310,6 +1310,10 @@ const config = {
     }
   }
 
+    const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
+      
+    }, [])
+
   // 渲染原始模式内容
   const renderOriginalContent = () => (
     <div className="min-h-full flex flex-col bg-gray-50 dark:bg-gray-900">
@@ -1338,7 +1342,8 @@ const config = {
 
       {/* 行程内容 */}
       <div className="flex-1 overflow-hidden p-6">
-        <TravelViews 
+        <TravelViews
+          onSendMessage={handleSendMessage} 
           itinerary={itinerary!.itinerary}
           className="h-full"
         />
@@ -1528,6 +1533,7 @@ const config = {
             
             <div className="p-6">
               <TravelViews 
+                onSendMessage={handleSendMessage}
                 itinerary={itinerary!.itinerary}
                 className="h-[600px]"
               />

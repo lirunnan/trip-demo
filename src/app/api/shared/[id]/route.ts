@@ -1,3 +1,4 @@
+import { callAIWithAutoModel } from '@/utils/openrouter'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAIWithAutoModel } from '@/utils/openrouter'
 

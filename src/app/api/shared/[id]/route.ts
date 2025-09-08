@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { callAIWithAutoModel } from '@/utils/openrouter'
 
 interface SharedItineraryData {
   id: string
@@ -547,7 +548,7 @@ export async function POST(
     const { title, itinerary, guideId } = body
     
     // 生成HTML内容
-    const html = generateHTMLFromItinerary(title, itinerary)
+    const html = await generateHTMLFromItinerary(title, itinerary)
     
     const newData: SharedItineraryData = {
       id,
@@ -575,20 +576,102 @@ export async function POST(
   }
 }
 
-// 生成HTML内容的辅助函数
-function generateHTMLFromItinerary(title: string, itinerary: any[]): string {
+// 使用AI生成炫酷网页的函数
+async function generateHTMLFromItinerary(title: string, itinerary: any[]): Promise<string> {
+  try {
+    console.log('🎨 开始使用AI生成炫酷网页...')
+    
+    // 准备行程数据
+    const totalDays = itinerary.length
+    const totalAttractions = itinerary.reduce((total: number, day: any) => total + day.locations.length, 0)
+    
+    // 构建详细的行程信息
+    const itineraryDetails = itinerary.map((day: any) => ({
+      day: day.day,
+      date: day.date,
+      locations: day.locations.map((location: any) => ({
+        name: location.name,
+        description: location.description,
+        duration: location.duration,
+        type: location.type
+      }))
+    }))
+    
+    const prompt = `你是一个专业的前端设计师和旅游专家。请为以下旅游行程生成一个极其炫酷、现代化的HTML页面。
+
+**行程标题**: ${title}
+**总天数**: ${totalDays}天
+**总景点数**: ${totalAttractions}个
+
+**详细行程**:
+${JSON.stringify(itineraryDetails, null, 2)}
+
+**设计要求**:
+1. 使用现代化的CSS设计，包含渐变背景、阴影效果、动画过渡
+2. 采用响应式设计，支持手机和桌面端
+3. 使用炫酷的配色方案（可以根据目的地特色选择主题色）
+4. 添加图标和emoji让页面更生动
+5. 使用现代字体和排版
+6. 添加悬停效果和微动画
+7. 包含玻璃拟态效果、渐变边框等现代设计元素
+8. 使用CSS Grid或Flexbox进行布局
+9. 添加loading动画和过渡效果
+10. 确保文字清晰易读，对比度良好
+
+**页面结构应包含**:
+- 炫酷的标题区域（带背景渐变和统计信息）
+- 每日行程卡片（带阴影和悬停效果）
+- 旅行贴士区域
+- 页脚信息
+- 完整的CSS样式（包含在<style>标签中）
+
+**重要**:
+- 请生成完整的HTML代码，包含所有样式
+- 确保代码可以直接在浏览器中运行
+- 使用中文内容
+- 样式要比普通网页更加炫酷和现代化
+- 根据目的地特色选择合适的主题色彩
+
+请直接输出完整的HTML代码，不需要任何解释文字。`
+
+    const response = await callAIWithAutoModel({
+      prompt,
+      systemPrompt: '你是专业的前端设计师，擅长创建炫酷现代化的网页设计',
+      temperature: 0.8, // 提高创造性
+      maxTokens: 4000
+    })
+    
+    if (response.success && response.data?.content) {
+      console.log('✅ AI生成网页成功!')
+      return response.data.content
+    } else {
+      console.warn('⚠️ AI生成失败，使用降级方案:', response.error)
+      return generateFallbackHTML(title, itinerary)
+    }
+    
+  } catch (error) {
+    console.error('❌ AI生成网页出错:', error)
+    return generateFallbackHTML(title, itinerary)
+  }
+}
+
+// 降级方案：如果AI调用失败，使用改进版的静态模板
+function generateFallbackHTML(title: string, itinerary: any[]): string {
   const totalDays = itinerary.length
   const totalAttractions = itinerary.reduce((total: number, day: any) => total + day.locations.length, 0)
   
   const daysHtml = itinerary.map((day: any, dayIndex: number) => `
-    <div class="day-card">
+    <div class="day-card" style="animation-delay: ${dayIndex * 0.1}s">
       <h2 class="day-title">第${day.day}天 - ${day.date}</h2>
       <div class="locations">
-        ${day.locations.map((location: any) => `
-          <div class="location-item">
-            <h3>${location.name}</h3>
+        ${day.locations.map((location: any, locationIndex: number) => `
+          <div class="location-item" style="animation-delay: ${(dayIndex * 0.1) + (locationIndex * 0.05)}s">
+            <div class="location-header">
+              <h3>${location.name}</h3>
+              <span class="location-type">${location.type}</span>
+            </div>
             <p>${location.description}</p>
-            <span class="time">${location.duration} • ${location.type}</span>
+            <span class="time">⏱️ ${location.duration}</span>
           </div>
         `).join('')}
       </div>
@@ -598,11 +681,23 @@ function generateHTMLFromItinerary(title: string, itinerary: any[]): string {
   return `
     <div class="shared-content">
       <div class="header-section">
-        <h1 class="main-title">${title}</h1>
-        <div class="trip-stats">
-          <span class="stat-item">${totalDays}天行程</span>
-          <span class="stat-item">${totalAttractions}个景点</span>
-          <span class="stat-item">AI定制</span>
+        <div class="header-bg"></div>
+        <div class="header-content">
+          <h1 class="main-title">${title}</h1>
+          <div class="trip-stats">
+            <div class="stat-item">
+              <span class="stat-number">${totalDays}</span>
+              <span class="stat-label">天行程</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${totalAttractions}</span>
+              <span class="stat-label">个景点</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">✨</span>
+              <span class="stat-label">AI定制</span>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -611,153 +706,326 @@ function generateHTMLFromItinerary(title: string, itinerary: any[]): string {
       </div>
       
       <div class="tips-section">
-        <h2>旅行贴士</h2>
-        <ul>
-          <li>建议提前预订门票，避免现场排队</li>
-          <li>注意天气变化，随身携带雨具</li>
-          <li>保持手机电量，随时导航</li>
-          <li>尊重当地文化和习俗</li>
-        </ul>
+        <h2>🎯 旅行贴士</h2>
+        <div class="tips-grid">
+          <div class="tip-item">💎 建议提前预订门票，避免现场排队</div>
+          <div class="tip-item">🌦️ 注意天气变化，随身携带雨具</div>
+          <div class="tip-item">📱 保持手机电量，随时导航</div>
+          <div class="tip-item">🙏 尊重当地文化和习俗</div>
+        </div>
       </div>
       
       <div class="footer-section">
-        <p>由 <strong>行呗AI旅游助手</strong> 精心规划</p>
+        <p>由 <strong>行呗AI旅游助手</strong> 精心规划 ✨</p>
         <p>生成时间：${new Date().toLocaleDateString('zh-CN')}</p>
       </div>
       
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
         .shared-content {
-          max-width: 800px;
+          max-width: 900px;
           margin: 0 auto;
           padding: 20px;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           line-height: 1.6;
-          color: #333;
+          color: #1a1a1a;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
         }
         
         .header-section {
+          position: relative;
           text-align: center;
-          margin-bottom: 40px;
-          padding: 30px 20px;
-          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-          color: white;
-          border-radius: 12px;
+          margin-bottom: 50px;
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .header-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+          opacity: 0.95;
+        }
+        
+        .header-bg::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+        
+        .header-content {
+          position: relative;
+          padding: 50px 30px;
+          z-index: 1;
         }
         
         .main-title {
-          font-size: 2.5rem;
-          font-weight: bold;
-          margin-bottom: 15px;
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+          font-size: clamp(2rem, 5vw, 3.5rem);
+          font-weight: 700;
+          margin-bottom: 25px;
+          color: white;
+          text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          letter-spacing: -0.02em;
+          animation: titleSlideIn 1s ease-out;
+        }
+        
+        @keyframes titleSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         
         .trip-stats {
           display: flex;
           justify-content: center;
-          gap: 20px;
+          gap: 30px;
           flex-wrap: wrap;
+          animation: statsSlideIn 1s ease-out 0.3s both;
+        }
+        
+        @keyframes statsSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         
         .stat-item {
           background: rgba(255,255,255,0.2);
-          padding: 8px 16px;
-          border-radius: 20px;
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.3);
+          padding: 20px 25px;
+          border-radius: 15px;
+          text-align: center;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+        
+        .stat-item:hover {
+          transform: translateY(-5px);
+          background: rgba(255,255,255,0.3);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .stat-number {
+          display: block;
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: white;
+          margin-bottom: 5px;
+        }
+        
+        .stat-label {
           font-size: 0.9rem;
-          backdrop-filter: blur(10px);
+          color: rgba(255,255,255,0.9);
+          font-weight: 500;
+        }
+        
+        .itinerary-section {
+          margin-bottom: 50px;
         }
         
         .day-card {
-          background: white;
-          border-radius: 12px;
-          padding: 25px;
-          margin-bottom: 25px;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-          border: 1px solid #e5e7eb;
+          background: rgba(255,255,255,0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 20px;
+          padding: 35px;
+          margin-bottom: 30px;
+          box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+          border: 1px solid rgba(255,255,255,0.5);
+          animation: cardSlideIn 0.8s ease-out both;
+          transition: all 0.3s ease;
+        }
+        
+        .day-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 25px 70px rgba(0,0,0,0.15);
+        }
+        
+        @keyframes cardSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         
         .day-title {
-          color: #1f2937;
-          font-size: 1.5rem;
+          color: #2d3748;
+          font-size: 1.8rem;
           font-weight: 600;
-          margin-bottom: 20px;
-          padding-bottom: 10px;
-          border-bottom: 2px solid #e5e7eb;
+          margin-bottom: 25px;
+          padding-bottom: 15px;
+          border-bottom: 3px solid #667eea;
+          position: relative;
+        }
+        
+        .day-title::after {
+          content: '';
+          position: absolute;
+          bottom: -3px;
+          left: 0;
+          width: 60px;
+          height: 3px;
+          background: linear-gradient(90deg, #667eea, #764ba2);
+          border-radius: 2px;
         }
         
         .location-item {
-          margin-bottom: 20px;
-          padding: 15px;
-          background: #f9fafb;
-          border-radius: 8px;
-          border-left: 4px solid #4f46e5;
+          margin-bottom: 25px;
+          padding: 25px;
+          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+          border-radius: 15px;
+          border-left: 5px solid #667eea;
+          transition: all 0.3s ease;
+          animation: locationSlideIn 0.6s ease-out both;
+        }
+        
+        .location-item:hover {
+          transform: translateX(10px);
+          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+          border-left-color: #764ba2;
+        }
+        
+        @keyframes locationSlideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
         
         .location-item:last-child {
           margin-bottom: 0;
         }
         
+        .location-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        
         .location-item h3 {
-          color: #1f2937;
-          font-size: 1.2rem;
+          color: #2d3748;
+          font-size: 1.3rem;
           font-weight: 600;
-          margin-bottom: 8px;
+          margin: 0;
         }
         
-        .location-item p {
-          color: #6b7280;
-          margin-bottom: 8px;
-        }
-        
-        .time {
-          color: #4f46e5;
-          font-size: 0.9rem;
+        .location-type {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 0.8rem;
           font-weight: 500;
         }
         
+        .location-item p {
+          color: #4a5568;
+          margin-bottom: 15px;
+          line-height: 1.7;
+        }
+        
+        .time {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          color: #667eea;
+          font-size: 0.95rem;
+          font-weight: 500;
+          background: rgba(102, 126, 234, 0.1);
+          padding: 8px 15px;
+          border-radius: 25px;
+        }
+        
         .tips-section {
-          background: #f0f9ff;
-          border-radius: 12px;
-          padding: 25px;
-          margin: 30px 0;
-          border: 1px solid #0284c7;
+          background: rgba(255,255,255,0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 20px;
+          padding: 40px;
+          margin: 40px 0;
+          border: 1px solid rgba(255,255,255,0.5);
+          box-shadow: 0 15px 50px rgba(0,0,0,0.1);
         }
         
         .tips-section h2 {
-          color: #0284c7;
-          font-size: 1.3rem;
+          color: #2d3748;
+          font-size: 1.5rem;
           font-weight: 600;
-          margin-bottom: 15px;
+          margin-bottom: 25px;
+          text-align: center;
         }
         
-        .tips-section ul {
-          list-style: none;
-          padding: 0;
+        .tips-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
         }
         
-        .tips-section li {
-          padding: 8px 0;
-          position: relative;
-          padding-left: 20px;
-          color: #0369a1;
+        .tip-item {
+          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+          padding: 20px;
+          border-radius: 12px;
+          border-left: 4px solid #0284c7;
+          color: #0c4a6e;
+          font-weight: 500;
+          transition: all 0.3s ease;
         }
         
-        .tips-section li:before {
-          content: "💡";
-          position: absolute;
-          left: 0;
+        .tip-item:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(2, 132, 199, 0.2);
         }
         
         .footer-section {
           text-align: center;
-          padding: 20px;
-          color: #6b7280;
-          font-size: 0.9rem;
-          border-top: 1px solid #e5e7eb;
-          margin-top: 30px;
+          padding: 30px;
+          color: rgba(255,255,255,0.9);
+          font-size: 0.95rem;
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(20px);
+          border-radius: 15px;
+          border: 1px solid rgba(255,255,255,0.2);
         }
         
         .footer-section strong {
-          color: #4f46e5;
+          color: white;
+          font-weight: 600;
         }
         
         @media (max-width: 768px) {
@@ -765,16 +1033,29 @@ function generateHTMLFromItinerary(title: string, itinerary: any[]): string {
             padding: 15px;
           }
           
-          .main-title {
-            font-size: 2rem;
+          .header-content {
+            padding: 40px 20px;
           }
           
           .trip-stats {
-            gap: 10px;
+            gap: 15px;
+          }
+          
+          .stat-item {
+            padding: 15px 20px;
           }
           
           .day-card {
-            padding: 20px;
+            padding: 25px;
+          }
+          
+          .location-header {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          
+          .tips-grid {
+            grid-template-columns: 1fr;
           }
         }
       </style>

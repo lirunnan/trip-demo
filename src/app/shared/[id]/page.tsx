@@ -1319,7 +1319,8 @@ const config = {
   }
 
     const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
-      
+      // 这里可以添加发送消息的逻辑，目前为空实现
+      console.log('Send message:', content, themePrompt)
     }, [])
 
   // 渲染原始模式内容

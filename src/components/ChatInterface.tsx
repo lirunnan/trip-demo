@@ -1,6 +1,6 @@
 'use client'
 
-import { User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History } from 'lucide-react'
+import { User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History, Share2 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import ThemeTagsInput from './ThemeTagsInput'
@@ -10,7 +10,7 @@ import { postConversations } from '@/app/api/conversation'
 
 export interface Message {
   id: string
-  role: 'user' | 'assistant'
+  role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: Date
   itinerary?: ItineraryDay[]
@@ -43,6 +43,8 @@ interface ChatInterfaceProps {
   isInitialState: boolean
   xiaohongshuExtractor?: React.ReactNode
   onShowHistory?: () => void
+  onGenerateFinalItinerary?: () => void // 新增：生成最终攻略的回调
+  onSendSystemMessage?: (content: string) => void // 新增：发送系统消息的回调
 }
 
 export default function ChatInterface({ 
@@ -51,7 +53,9 @@ export default function ChatInterface({
   isLoading, 
   isInitialState,
   xiaohongshuExtractor,
-  onShowHistory
+  onShowHistory,
+  onGenerateFinalItinerary,
+  onSendSystemMessage
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -449,39 +453,72 @@ export default function ChatInterface({
         // 对话状态：显示消息历史和底部输入框
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex items-start gap-3 ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
-                )}
+            {messages.map((message) => {
+              // 处理系统消息 - 居中显示，且只显示最后一个系统消息
+              if (message.role === 'system') {
+                const isLastSystemMessage = messages.filter(m => m.role === 'system').pop()?.id === message.id
+                const shouldHideSystemMessage = message.content.toLowerCase() === 'done'
                 
+                // 如果消息是 "done" 或不是最后一个系统消息，则不显示
+                if (shouldHideSystemMessage || !isLastSystemMessage) {
+                  return null
+                }
+                
+                return (
+                  <div key={message.id} className="flex justify-center">
+                    <div className="bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-full text-sm border border-amber-200 dark:border-amber-700 animate-pulse">
+                      {message.content}
+                    </div>
+                  </div>
+                )
+              }
+              
+              // 处理普通消息（用户和助手）
+              return (
                 <div
-                  className={`max-w-[80%] p-4 rounded-2xl ${
-                    message.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
+                  key={message.id}
+                  className={`flex items-start gap-3 ${
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
                   }`}
                 >
-                  <div className="whitespace-pre-wrap">{message.content}</div>
-                  {message.itinerary && renderItinerary(message.itinerary)}
-                </div>
-
-                {message.role === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-white" />
+                  {message.role === 'assistant' && (
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                      <Bot className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  
+                  <div
+                    className={`max-w-[80%] p-4 rounded-2xl ${
+                      message.role === 'user'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
+                    }`}
+                  >
+                    <div className="whitespace-pre-wrap">{message.content}</div>
+                    {message.itinerary && renderItinerary(message.itinerary)}
+                    {
+                      message.itinerary && (
+                        <button
+                          onClick={onGenerateFinalItinerary}
+                          className="self-start flex w-full justify-center items-center gap-2 px-4 py-2 mt-5 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                        >
+                          <Share2 className="w-4 h-4" />
+                          生成最终旅游攻略
+                        </button>
+                      )
+                    }
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {message.role === 'user' && (
+                    <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+              )
+            })}
             
-            {isLoading && (
+            {/* {isLoading && (
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
                   <Bot className="w-4 h-4 text-white" />
@@ -493,7 +530,7 @@ export default function ChatInterface({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
             
             <div ref={messagesEndRef} />
           </div>

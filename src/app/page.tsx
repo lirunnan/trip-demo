@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import DemoCards from '../components/DemoCards'
 import ChatInterface, { Message, ItineraryDay } from '../components/ChatInterface'
 import TravelViews from '@/components/TravelViews'
 import XiaohongshuExtractor from '@/components/XiaohongshuExtractor'
+import { registerSystemMessageSender } from '@/utils/systemMessage'
 import { useConversationMemory } from '@/hooks/useConversationMemory'
 import { useItineraryActions } from '@/hooks/useItineraryActions'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
@@ -75,9 +76,8 @@ export default function Home() {
         currentConvId = generateConversationId();
         setConvId(currentConvId);
       }
-      
+      handleSendSystemMessage('正在思考中')
       const gRes = await postConversations(currentConvId, content);
-      console.log('asdf', gRes);
       // 添加AI响应
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -87,6 +87,8 @@ export default function Home() {
         itinerary: gRes?.data?.plan?.itinerary
       }
       console.log(assistantMessage)
+      handleSendSystemMessage('done')
+
       setMessages(prev => [...prev, assistantMessage])
       
       // 更新当前行程数据
@@ -215,7 +217,7 @@ export default function Home() {
       const id = `server_${convId}`
       const title = `${currentItinerary.length}天旅行计划`
       
-      console.log('🔄 正在生成并保存HTML攻略...')
+      handleSendSystemMessage('🔄 正在生成并保存HTML攻略...')
       
       // 向服务端API创建分享内容
       const response = await fetch(`/api/shared/${id}`, {
@@ -231,7 +233,7 @@ export default function Home() {
       })
       
       const result = await response.json()
-      
+      handleSendSystemMessage('页面生成成功！页面渲染中...')
       if (result.success && result.data) {
         // 保存到IndexedDB
         await indexedDBManager.saveHTMLPage({
@@ -242,8 +244,10 @@ export default function Home() {
           guideId: convId
         })
         await saveAsStaticFile(id);
+        handleSendSystemMessage('页面渲染成功！')
+        handleSendSystemMessage('done')
         // 生成可访问的URL
-        const savedPageUrl = `${window.location.origin}/shared/${id}`
+        const savedPageUrl = `${window.location.origin}/shared/${id}?type=web`
         
         // 复制链接到剪贴板（使用现代工具）
         const { copyToClipboard } = await import('@/utils/clipboard')
@@ -340,6 +344,27 @@ export default function Home() {
     router.push('/history')
   }, [router])
 
+  // 发送系统消息的函数
+  const handleSendSystemMessage = useCallback((content: string) => {
+    const systemMessage: Message = {
+      id: Date.now().toString(),
+      role: 'system',
+      content,
+      timestamp: new Date()
+    }
+    
+    setMessages(prev => {
+      // 移除之前的系统消息，只保留最新的一个
+      const nonSystemMessages = prev.filter(msg => msg.role !== 'system')
+      return [...nonSystemMessages, systemMessage]
+    })
+  }, [])
+
+  // 注册系统消息发送器到全局工具类
+  React.useEffect(() => {
+    registerSystemMessageSender(handleSendSystemMessage)
+  }, [handleSendSystemMessage])
+
   return (
     <div className="min-h-screen relative">
       {/* 动态背景层 */}
@@ -408,6 +433,8 @@ export default function Home() {
                 />
               }
               onShowHistory={handleShowHistory}
+              onGenerateFinalItinerary={handleShareServer}
+              onSendSystemMessage={handleSendSystemMessage}
             />
           </div>
 

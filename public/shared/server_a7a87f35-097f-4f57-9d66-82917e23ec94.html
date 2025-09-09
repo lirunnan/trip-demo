@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2天旅行计划 - 行呗旅游攻略</title>
+    <meta name="description" content="2天旅行计划 - 由行呗AI生成的个性化旅游攻略">
+    <meta property="og:title" content="2天旅行计划">
+    <meta property="og:description" content="个性化AI旅游攻略">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔都探索之旅</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.1) 50%, transparent 52%);
+            z-index: 1;
+            background-size: 200% 200%;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .day-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .location-item {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .location-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .location-type {
+            display: inline-block;
+            padding: 5px 10px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+
+        .duration {
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .tips {
+            background: linear-gradient(135deg, var(--secondary) 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--dark);
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>魔都探索之旅 🌆</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <i class="fas fa-calendar"></i> 总天数：2天
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-map-marker-alt"></i> 景点数：8个
+                </div>
+            </div>
+        </header>
+
+        <div class="day-card">
+            <div class="day-header">
+                <h2>Day 1 - 2025年3月15日</h2>
+                <span>经典上海</span>
+            </div>
+            <div class="location-grid">
+                <div class="location-item">
+                    <span class="location-type">城市景观</span>
+                    <h3>🌃 外滩</h3>
+                    <p>上海标志性滨江景观带，欣赏黄浦江两岸的万国建筑博览群和现代摩天大楼</p>
+                    <div class="duration">⏱️ 2小时</div>
+                </div>
+                <!-- 其他景点以相同结构重复 -->
+            </div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-header">
+                <h2>Day 2 - 2025年3月16日</h2>
+                <span>现代魔都</span>
+            </div>
+            <div class="location-grid">
+                <div class="location-item">
+                    <span class="location-type">观光塔</span>
+                    <h3>🗼 东方明珠塔</h3>
+                    <p>上海地标性建筑，可登上观光层俯瞰整个上海城市风貌</p>
+                    <div class="duration">⏱️ 2小时</div>
+                </div>
+                <!-- 其他景点以相同结构重复 -->
+            </div>
+        </div>
+
+        <div class="tips">
+            <h2>🌟 旅行贴士</h2>
+            <ul>
+                <li>建议提前预订热门景点门票</li>
+                <li>准备舒适的步行鞋</li>
+                <li>携带充足现金和移动支付工具</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            <p>©2024 魔都探索之旅 | 设计制作</p>
+        </footer>
+    </div>
+</body>
+</html>
+    
+    <script>
+        // 添加返回按钮（根据URL参数判断是否显示）
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查URL参数是否包含iframe=true
+            const urlParams = new URLSearchParams(window.location.search);
+            const isIframe = urlParams.get('iframe') === 'true';
+            
+            // 如果是iframe模式，则不显示返回按钮
+            if (isIframe) {
+                return;
+            }
+            
+            const backButton = document.createElement('div');
+            backButton.innerHTML = '← 返回首页';
+            backButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                font-weight: 500;
+                color: #333;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.5);
+                z-index: 1000;
+                transition: all 0.3s ease;
+            `;
+            
+            backButton.onmouseover = function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            };
+            
+            backButton.onmouseout = function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            };
+            
+            backButton.onclick = function() {
+                window.location.href = '/';
+            };
+            
+            document.body.appendChild(backButton);
+        });
+    </script>
+</body>
+</html>

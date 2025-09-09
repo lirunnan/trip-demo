@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1天旅行计划 - 行呗旅游攻略</title>
+    <meta name="description" content="1天旅行计划 - 由行呗AI生成的个性化旅游攻略">
+    <meta property="og:title" content="1天旅行计划">
+    <meta property="og:description" content="个性化AI旅游攻略">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海南一日游</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00b4db;
+            --secondary: #0083b0;
+            --accent: #ff6b6b;
+            --text: #2d3436;
+            --light: #f5f6fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f6f9fc 0%, #e3eeff 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.2);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .locations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .location-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+
+        .location-type {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .location-name {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .location-duration {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--secondary);
+            margin-top: 1rem;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeOut 1s ease 2s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="loader"></div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🌴 海南一日游</h1>
+            <p>探索热带海岛的精彩</p>
+            <div class="stats">
+                <div class="stat">📅 1天行程</div>
+                <div class="stat">🎯 4个景点</div>
+                <div class="stat">📆 2025-03-15</div>
+            </div>
+        </header>
+
+        <div class="locations">
+            <div class="location-card">
+                <span class="location-type">历史文化街区</span>
+                <h2 class="location-name">🏘️ 海口骑楼老街</h2>
+                <p>海口最具特色的历史文化街区，南洋建筑风格，充满浓郁的海南风情</p>
+                <div class="location-duration">⏱️ 2小时</div>
+            </div>
+
+            <div class="location-card">
+                <span class="location-type">城市公园</span>
+                <h2 class="location-name">🌳 万绿园</h2>
+                <p>海口市最大的海滨生态公园，绿树成荫，海景优美</p>
+                <div class="location-duration">⏱️ 1.5小时</div>
+            </div>
+
+            <div class="location-card">
+                <span class="location-type">科普教育基地</span>
+                <h2 class="location-name">🚀 文昌航天科普中心</h2>
+                <p>中国唯一的滨海航天发射场，可了解中国航天事业发展历程</p>
+                <div class="location-duration">⏱️ 2小时</div>
+            </div>
+
+            <div class="location-card">
+                <span class="location-type">自然景观</span>
+                <h2 class="location-name">🌴 东郊椰林</h2>
+                <p>海南最大的椰林景观区，椰风海韵，景色宜人</p>
+                <div class="location-duration">⏱️ 1.5小时</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+    
+    <script>
+        // 添加返回按钮
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.createElement('div');
+            backButton.innerHTML = '← 返回首页';
+            backButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                font-weight: 500;
+                color: #333;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.5);
+                z-index: 1000;
+                transition: all 0.3s ease;
+            `;
+            
+            backButton.onmouseover = function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            };
+            
+            backButton.onmouseout = function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            };
+            
+            backButton.onclick = function() {
+                window.location.href = '/';
+            };
+            
+            document.body.appendChild(backButton);
+        });
+    </script>
+</body>
+</html>

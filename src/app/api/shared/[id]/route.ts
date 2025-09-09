@@ -1,6 +1,6 @@
 import { callAIWithAutoModel } from '@/utils/openrouter'
 import { NextRequest, NextResponse } from 'next/server'
-import { callAIWithAutoModel } from '@/utils/openrouter'
+// import { callAIWithAutoModel } from '@/utils/openrouter'
 
 interface SharedItineraryData {
   id: string
@@ -550,6 +550,7 @@ export async function POST(
     
     // 生成HTML内容
     const html = await generateHTMLFromItinerary(title, itinerary)
+    // const html = mockSharedData['3'].html
     
     const newData: SharedItineraryData = {
       id,
@@ -565,7 +566,10 @@ export async function POST(
     
     return NextResponse.json({
       success: true,
-      data: newData
+      data: {
+        ...newData,
+        savedPageUrl: `/saved-page/${id}`
+      }
     })
     
   } catch (error) {

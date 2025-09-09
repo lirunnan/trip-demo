@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { ItineraryDay } from '@/components/ChatInterface'
 import TravelViews from '@/components/TravelViews'
@@ -11,6 +11,7 @@ import { Calendar, MapPin, Clock, Share2, Download, ArrowLeft, Wand2, Star, User
 import Link from 'next/link'
 import { getBaseUrl } from '@/utils/config'
 import { getWebUrlByGuideId } from '@/utils/webUrls'
+import ShareButton from '@/components/ShareButton'
 
 interface ShareableItinerary {
   id: string
@@ -53,7 +54,12 @@ export default function SharedItineraryPage() {
   const streamingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const codeContainerRef = useRef<HTMLDivElement | null>(null)
   
-  const webUrl = originalGuideId ? getWebUrlByGuideId(originalGuideId, isUpgraded) : ''
+  const webUrl = useMemo(
+    () => {
+      return isWebType ? getWebUrlByGuideId(id, isUpgraded) : '';
+    },
+    [id, isUpgraded, isWebType]
+  )
   
   const { loadSharedItinerary } = useExportFeatures()
 
@@ -115,7 +121,7 @@ export default function SharedItineraryPage() {
     const urlParams = new URLSearchParams(window.location.search)
     const displayType = urlParams.get('type')
     
-    if (displayType === 'web' && webUrl) {
+    if (displayType === 'web') {
       setIsWebType(true)
     }
   }, [webUrl])
@@ -961,13 +967,6 @@ const config = {
                     </div>
                   )}
                   </div>
-                  <button
-                    onClick={handleExport}
-                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    导出
-                  </button>
                 </div>
               </div>
             </div>
@@ -1057,8 +1056,8 @@ const config = {
                     </div>
                   )}
                   <iframe
-                    key={webUrl} // 使用key来强制重新加载iframe
-                    src={webUrl}
+                    key={webUrl+'?iframe=true'} // 使用key来强制重新加载iframe
+                    src={webUrl+'?iframe=true'}
                     className="w-full h-full border-0"
                     title="嵌入网页内容"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

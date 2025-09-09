@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2天旅行计划 - 行呗旅游攻略</title>
+    <meta name="description" content="2天旅行计划 - 由行呗AI生成的个性化旅游攻略">
+    <meta property="og:title" content="2天旅行计划">
+    <meta property="og:description" content="个性化AI旅游攻略">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大理精彩两日游</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4B79A1;
+            --secondary: #283E51;
+            --accent: #f0b27a;
+            --text: #2c3e50;
+            --light: #ecf0f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .day-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .location-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: scale(1.02);
+        }
+
+        .location-type {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .duration {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 2rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeOut 1s ease-out forwards;
+            animation-delay: 2s;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="loader">Loading...</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>🏞️ 大理精彩两日游</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <h3>总天数</h3>
+                    <p>2天</p>
+                </div>
+                <div class="stat-item">
+                    <h3>景点数量</h3>
+                    <p>6个</p>
+                </div>
+                <div class="stat-item">
+                    <h3>行程类型</h3>
+                    <p>文化+自然</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="day-card">
+            <h2>🌅 Day 1 - 2025年3月15日</h2>
+            <div class="location-card">
+                <span class="location-type">历史文化</span>
+                <h3>大理古城</h3>
+                <p>大理古城始建于明洪武十五年，是中国历史文化名城，拥有完整的古城墙和传统白族建筑风格</p>
+                <div class="duration">⏱️ 游览时长：3小时</div>
+            </div>
+            <!-- 其他景点卡片 -->
+        </div>
+
+        <div class="day-card">
+            <h2>🌄 Day 2 - 2025年3月16日</h2>
+            <div class="location-card">
+                <span class="location-type">古镇文化</span>
+                <h3>喜洲古镇</h3>
+                <p>保存完好的白族古镇，以精美的白族民居建筑和传统手工艺品闻名</p>
+                <div class="duration">⏱️ 游览时长：2小时</div>
+            </div>
+            <!-- 其他景点卡片 -->
+        </div>
+    </div>
+</body>
+</html>
+    
+    <script>
+        // 添加返回按钮（根据URL参数判断是否显示）
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查URL参数是否包含iframe=true
+            const urlParams = new URLSearchParams(window.location.search);
+            const isIframe = urlParams.get('iframe') === 'true';
+            
+            // 如果是iframe模式，则不显示返回按钮
+            if (isIframe) {
+                return;
+            }
+            
+            const backButton = document.createElement('div');
+            backButton.innerHTML = '← 返回首页';
+            backButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                font-weight: 500;
+                color: #333;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.5);
+                z-index: 1000;
+                transition: all 0.3s ease;
+            `;
+            
+            backButton.onmouseover = function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            };
+            
+            backButton.onmouseout = function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            };
+            
+            backButton.onclick = function() {
+                window.location.href = '/';
+            };
+            
+            document.body.appendChild(backButton);
+        });
+    </script>
+</body>
+</html>

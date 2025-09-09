@@ -92,7 +92,6 @@ export default function ChatInterface({
     }
   }
 
-  // 现在 ThemeTagsInput 内部处理键盘事件，这些函数不再需要
 
   const renderItinerary = (itinerary: ItineraryDay[]) => {
     return (

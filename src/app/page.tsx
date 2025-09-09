@@ -11,7 +11,8 @@ import { useItineraryActions } from '@/hooks/useItineraryActions'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
 import { addTimeInfoToItinerary } from '@/utils/timeCalculator'
 import { generateConversationId, postConversations } from './api/conversation'
-import { callAI, callAIWithAutoModel } from '@/utils/openrouter'
+import { indexedDBManager, initIndexedDB, saveAsStaticFile } from '@/utils/indexedDB'
+import { initServiceWorker } from '@/utils/serviceWorker'
 
 interface DemoGuide {
   id: string
@@ -206,50 +207,81 @@ export default function Home() {
     if (currentItinerary.length === 0) return
     
     try {
+      // 初始化存储服务
+      await initIndexedDB()
+      await initServiceWorker()
+      
       // 生成唯一ID用于服务端存储
-      const serverId = `server_${convId}`
+      const id = `server_${convId}`
       const title = `${currentItinerary.length}天旅行计划`
-      const html = callAI(
-            {
-              prompt: `使用以下信息生成一个HTML格式的文本，要求内容完整且美观：
-      - 标题: ${title}
-      - 行程概要: ${currentItinerary}
-      - HTML格式要求: 
-        - 整体宽度900px，左右padding共60px
-        - 背景色#f8f9fa，内容区域白色背景，阴影效果
-        - 
-      `,
-            }
-          );
-          console.log(html);
+      
+      console.log('🔄 正在生成并保存HTML攻略...')
+      
       // 向服务端API创建分享内容
-      const response = await fetch(`/api/shared/${serverId}`, {
+      const response = await fetch(`/api/shared/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           title,
-          itinerary: currentItinerary
+          itinerary: currentItinerary,
+          guideId: convId
         })
       })
       
-      if (response.ok) {
-        const shareUrl = `${window.location.origin}/shared/${serverId}`
-        await navigator.clipboard.writeText(shareUrl)
+      const result = await response.json()
+      
+      if (result.success && result.data) {
+        // 保存到IndexedDB
+        await indexedDBManager.saveHTMLPage({
+          id,
+          title,
+          html: result.data.html,
+          createdAt: new Date().toISOString(),
+          guideId: convId
+        })
+        await saveAsStaticFile(id);
+        // 生成可访问的URL
+        const savedPageUrl = `${window.location.origin}/shared/${id}`
+        
+        // 复制链接到剪贴板（带错误处理）
+        let clipboardSuccess = false
+        try {
+          await navigator.clipboard.writeText(savedPageUrl)
+          clipboardSuccess = true
+        } catch (error) {
+          console.warn('剪贴板复制失败，可能是页面未聚焦:', error)
+          // 降级方案：创建临时文本域进行复制
+          try {
+            const textArea = document.createElement('textarea')
+            textArea.value = savedPageUrl
+            textArea.style.position = 'fixed'
+            textArea.style.left = '-999999px'
+            textArea.style.top = '-999999px'
+            document.body.appendChild(textArea)
+            textArea.focus()
+            textArea.select()
+            document.execCommand('copy')
+            document.body.removeChild(textArea)
+            clipboardSuccess = true
+          } catch (fallbackError) {
+            console.warn('降级复制方案也失败:', fallbackError)
+          }
+        }
         
         const successMessage: Message = {
           id: Date.now().toString(),
           role: 'assistant',
-          content: '🟢 服务端渲染分享链接已复制！这种方式加载速度快，适合快速浏览。',
+          content: `✅ 攻略已保存为HTML页面！\n\n🔗 可通过以下链接访问：\n${savedPageUrl}\n\n${clipboardSuccess ? '📋 链接已复制到剪贴板' : '💡 请手动复制上方链接'}`,
           timestamp: new Date()
         }
         setMessages(prev => [...prev, successMessage])
       } else {
-        throw new Error('服务端创建失败')
+        throw new Error(result.error || '生成HTML失败')
       }
     } catch (error) {
-      console.error('服务端分享失败:', error)
+      console.error('❌ 保存攻略失败:', error)
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',

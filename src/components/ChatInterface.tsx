@@ -128,7 +128,7 @@ export default function ChatInterface({
     // 首页底部社区推荐（指向分享页）
     const communityGuides = [
       {
-        id: '3',
+        id: 'uk-harry-potter-7days',
         title: '英国七日魔法之旅',
         destination: '伦敦·爱丁堡·牛津',
         duration: '7天6夜',
@@ -139,7 +139,7 @@ export default function ChatInterface({
         rating: 4.9
       },
       {
-        id: '4',
+        id: 'japan-sakura-7days',
         title: '日本樱花季七日游',
         destination: '东京·京都·大阪',
         duration: '7天6夜',

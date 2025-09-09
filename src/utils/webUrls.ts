@@ -5,11 +5,11 @@
 export const getWebUrlByGuideId = (guideId: string, isUpgraded: boolean = false): string => {
   switch (guideId) {
     case 'uk-harry-potter-7days':
-      return isUpgraded 
+      return !isUpgraded 
         ? 'https://v0-harry-potter-trip-zf.vercel.app/'
         : `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3030'}/templates/uk-harry-potter-7days.html`
     case 'japan-sakura-7days':
-      return isUpgraded 
+      return !isUpgraded 
         ? 'https://v0-japan-travel-website-six.vercel.app/'
         : `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3030'}/templates/japan-7days.html`
     default:

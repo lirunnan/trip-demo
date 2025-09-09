@@ -132,12 +132,12 @@ export const getWebUrlByGuideId = (guideId: string, isUpgraded: boolean = false)
   switch (guideId) {
     case 'uk-harry-potter-7days':
       return isUpgraded 
-        ? 'https://comate-harry-potter-trip-zf.vercel.app/'
-        : `${process.env.NEXT_PUBLIC_BASE_URL}/templates/uk-harry-potter-7days.html`
+        ? `${process.env.NEXT_PUBLIC_BASE_URL}/templates/uk-harry-potter-7days.html`
+        : 'https://comate-harry-potter-trip-zf.vercel.app/'
     case 'japan-sakura-7days':
       return isUpgraded 
-        ? 'https://comate-japan-travel-website-six.vercel.app/'
-        : `${process.env.NEXT_PUBLIC_BASE_URL}/templates/japan-7days.html`
+        ? `${process.env.NEXT_PUBLIC_BASE_URL}/templates/japan-7days.html`
+        : 'https://comate-japan-travel-website-six.vercel.app/'
   }
 }
 ```

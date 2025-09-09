@@ -3,6 +3,9 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { MessageCircle, Send, Sparkles, Palette, Layout, Users, Share2 } from 'lucide-react'
 import { getBaseUrl } from '@/utils/config'
+import { indexedDBManager, initIndexedDB, saveAsStaticFile } from '@/utils/indexedDB'
+import { initServiceWorker } from '@/utils/serviceWorker'
+import { Message } from './ChatInterface'
 
 interface CustomizationRequest {
   id: string
@@ -22,6 +25,7 @@ interface PageCustomizerProps {
   onAddShareMessage?: (messageFunc: (actionType: 'trip' | 'page', url: string) => void) => void
   guideId?: string
   onUpgradeRequest?: () => void
+  onContentUpdated?: () => void // 新增：内容更新后的回调
 }
 
 export default function PageCustomizer({ 
@@ -34,7 +38,8 @@ export default function PageCustomizer({
   webUrl = '',
   onAddShareMessage,
   guideId,
-  onUpgradeRequest
+  onUpgradeRequest,
+  onContentUpdated
 }: PageCustomizerProps) {
   const [messages, setMessages] = useState<CustomizationRequest[]>([
     {
@@ -222,27 +227,74 @@ ${actionType === 'trip'
     }
 
     setMessages(prev => [...prev, newUserMessage])
-
-    // 模拟AI处理时间
-    setTimeout(() => {
-      const { response, template, shouldUpgrade } = getMockResponse(userMessage)
-      
+    const lh = await fetch(`/api/shared/${guideId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+          title: '',
+          itinerary: '',
+          guideId: 'server_'+guideId,
+          chat: userMessage,
+        })
+    })
+    const result = await lh.json();
+    // 初始化存储服务
+    await initIndexedDB()
+    await initServiceWorker()
+    
+    // 生成唯一ID用于服务端存储
+    const id = `${guideId}`
+    console.log('🔄 正在修改HTML攻略...')
+    console.log(result);
+    if (result.success && result.data) {
+      // 保存到IndexedDB
+      await indexedDBManager.saveHTMLPage({
+        id,
+        title: '行呗',
+        html: result.data.html,
+        createdAt: new Date().toISOString(),
+        guideId
+      })
+      await saveAsStaticFile(id);
       const aiMessage: CustomizationRequest = {
         id: (Date.now() + 1).toString(),
         userMessage: '',
-        aiResponse: response,
+        aiResponse: '✅ 已按您要求更新旅游攻略！页面内容已刷新。',
         timestamp: new Date()
       }
-
       setMessages(prev => [...prev, aiMessage])
+      setIsLoading(false)
       
-      // 应用模板变化
-      if (template !== currentTemplate) {
-        onTemplateChange(template)
+      // 通知父组件内容已更新，需要刷新iframe
+      if (onContentUpdated) {
+        onContentUpdated()
       }
       
-      setIsLoading(false)
-    }, 1000)
+      // 生成可访问的URL
+      // setMessages(prev => [...prev, successMessage])
+    } else {
+      throw new Error(result.error || '生成HTML失败')
+    }
+    
+    // 模拟AI处理时间
+    // setTimeout(() => {
+    //   const { response, template, shouldUpgrade } = getMockResponse(userMessage)
+      
+    //   const aiMessage: CustomizationRequest = {
+    //     id: (Date.now() + 1).toString(),
+    //     userMessage: '',
+    //     aiResponse: response,
+    //     timestamp: new Date()
+    //   }
+
+    //   setMessages(prev => [...prev, aiMessage])
+      
+    //   // 应用模板变化
+    //   if (template !== currentTemplate) {
+    //     onTemplateChange(template)
+    //   }
+      
+    //   setIsLoading(false)
+    // }, 1000)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

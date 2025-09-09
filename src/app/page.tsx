@@ -245,30 +245,10 @@ export default function Home() {
         // 生成可访问的URL
         const savedPageUrl = `${window.location.origin}/shared/${id}`
         
-        // 复制链接到剪贴板（带错误处理）
-        let clipboardSuccess = false
-        try {
-          await navigator.clipboard.writeText(savedPageUrl)
-          clipboardSuccess = true
-        } catch (error) {
-          console.warn('剪贴板复制失败，可能是页面未聚焦:', error)
-          // 降级方案：创建临时文本域进行复制
-          try {
-            const textArea = document.createElement('textarea')
-            textArea.value = savedPageUrl
-            textArea.style.position = 'fixed'
-            textArea.style.left = '-999999px'
-            textArea.style.top = '-999999px'
-            document.body.appendChild(textArea)
-            textArea.focus()
-            textArea.select()
-            document.execCommand('copy')
-            document.body.removeChild(textArea)
-            clipboardSuccess = true
-          } catch (fallbackError) {
-            console.warn('降级复制方案也失败:', fallbackError)
-          }
-        }
+        // 复制链接到剪贴板（使用现代工具）
+        const { copyToClipboard } = await import('@/utils/clipboard')
+        const copyResult = await copyToClipboard(savedPageUrl)
+        const clipboardSuccess = copyResult.success
         
         const successMessage: Message = {
           id: Date.now().toString(),

@@ -513,9 +513,14 @@ export async function GET(
     
     // 模拟API延迟
     await new Promise(resolve => setTimeout(resolve, 500))
-    
     // 检查是否为预设的mock数据
-    const sharedData = mockSharedData[id]
+    const sharedData = {
+      id,
+      title: '',
+      html: '',
+      createdAt: '',
+      guideId: id
+    }
     
     if (!sharedData) {
       return NextResponse.json(
@@ -577,6 +582,72 @@ export async function POST(
     return NextResponse.json(
       { error: '创建失败，请稍后重试' },
       { status: 500 }
+    )
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }>}
+) {
+  const { id } = await params
+  const body = await request.json()
+  const { title, itinerary, guideId, chat } = body
+  console.log('shuru ', chat)
+  const lastContentURL = `/shared/${id}.html`
+  // 获取lastContentURL中文本内容
+  try {
+    const lastContent = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3030'}${lastContentURL}`)
+    const htmlContent = await lastContent.text()
+    const prompt = `你是一个专业的前端设计师和旅游专家。请基于原始文件按要求调整HTML页面。
+**设计要求**
+${chat}
+
+**重要**:
+- 保持风格不变
+- 请生成完整的HTML代码，包含所有样式和内容，没有改变的内容也需要输出
+- 确保代码可以直接在浏览器中运行
+- 使用中文内容
+- 样式要比普通网页更加炫酷和现代化
+- 根据目的地特色选择合适的主题色彩
+
+请直接输出完整的HTML代码，不允许省略，不需要任何解释文字。
+
+**原始HTML内容**:
+${htmlContent}
+`
+    const response = await callAIWithAutoModel({
+      prompt,
+      systemPrompt: '你是专业的前端设计师，擅长创建炫酷现代化交互模式的网页设计',
+      temperature: 0.8, // 提高创造性
+      maxTokens: 4000
+    })
+    
+    if (response.success && response.data?.content) {
+      console.log('✅ AI生成网页成功!')
+      const newData: SharedItineraryData = {
+        id,
+        title,
+        html: response.data?.content,
+        createdAt: new Date().toISOString(),
+        guideId
+      }
+      return NextResponse.json({
+        success: true,
+        data: {
+          ...newData,
+          savedPageUrl: `/saved-page/${id}`
+        }
+      })
+    } else {
+      console.warn('⚠️ AI生成失败，使用降级方案:', response.error)
+      return generateFallbackHTML(title, itinerary)
+    }
+  } catch (error) {
+    console.error('获取HTML内容失败:', error)
+    return NextResponse.json(
+      { error: '找不到对应的分享内容' },
+      { status: 404 }
     )
   }
 }

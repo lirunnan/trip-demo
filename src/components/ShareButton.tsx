@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Share, Copy, Check, ExternalLink } from 'lucide-react'
 import { saveAsStaticFile, ShareToStaticResult } from '@/utils/indexedDB'
+import { copyToClipboard } from '@/utils/clipboard'
 
 interface ShareButtonProps {
   pageId: string
@@ -26,12 +27,12 @@ export default function ShareButton({ pageId, onShare }: ShareButtonProps) {
       if (result.success && result.shareUrl) {
         // 自动复制链接到剪贴板
         const fullUrl = `${window.location.origin}${result.shareUrl}`
-        try {
-          await navigator.clipboard.writeText(fullUrl)
+        const copyResult = await copyToClipboard(fullUrl)
+        if (copyResult.success) {
           setCopied(true)
           setTimeout(() => setCopied(false), 2000)
-        } catch (error) {
-          console.warn('自动复制失败，用户可手动复制:', error)
+        } else {
+          console.warn('自动复制失败:', copyResult.error)
         }
       }
     } catch (error) {
@@ -48,32 +49,15 @@ export default function ShareButton({ pageId, onShare }: ShareButtonProps) {
   const copyLink = async () => {
     if (!shareResult?.shareUrl) return
 
-    try {
-      const fullUrl = `${window.location.origin}${shareResult.shareUrl}`
-      await navigator.clipboard.writeText(fullUrl)
+    const fullUrl = `${window.location.origin}${shareResult.shareUrl}`
+    const copyResult = await copyToClipboard(fullUrl)
+    
+    if (copyResult.success) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
-      console.warn('现代剪贴板API失败，尝试降级方案:', error)
-      // 降级方案：使用传统的复制方法
-      try {
-        const fullUrl = `${window.location.origin}${shareResult.shareUrl}`
-        const textArea = document.createElement('textarea')
-        textArea.value = fullUrl
-        textArea.style.position = 'fixed'
-        textArea.style.left = '-999999px'
-        textArea.style.top = '-999999px'
-        document.body.appendChild(textArea)
-        textArea.focus()
-        textArea.select()
-        document.execCommand('copy')
-        document.body.removeChild(textArea)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-      } catch (fallbackError) {
-        console.error('复制完全失败:', fallbackError)
-        alert('复制失败，请手动选择链接复制')
-      }
+    } else {
+      console.error('复制失败:', copyResult.error)
+      alert(`复制失败: ${copyResult.error}\n\n请手动复制链接: ${fullUrl}`)
     }
   }
 
@@ -155,7 +139,6 @@ export function ShareExample() {
       
       <ShareButton
         pageId="example-page-id"
-        title="示例旅游攻略"
         onShare={(result) => {
           console.log('分享结果:', result)
           if (result.success) {

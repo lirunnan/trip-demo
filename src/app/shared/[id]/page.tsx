@@ -53,6 +53,7 @@ export default function SharedItineraryPage() {
   const [streamingCode, setStreamingCode] = useState('')
   const streamingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const codeContainerRef = useRef<HTMLDivElement | null>(null)
+  const [iframeKey, setIframeKey] = useState(0) // 用于强制刷新iframe
   
   const webUrl = useMemo(
     () => {
@@ -189,6 +190,12 @@ export default function SharedItineraryPage() {
   // 添加分享消息的回调
   const handleAddShareMessage = useCallback((addFunc: (actionType: 'trip' | 'page', url: string) => void) => {
     setAddShareMessageFunc(() => addFunc)
+  }, [])
+
+  // 内容更新后刷新iframe
+  const handleContentUpdated = useCallback(() => {
+    console.log('🔄 内容已更新，刷新iframe...')
+    setIframeKey(prev => prev + 1) // 增加key值强制重新渲染iframe
   }, [])
 
   // 流式代码生成逻辑
@@ -987,6 +994,7 @@ const config = {
                   isWebMode={isWebType}
                   webUrl={webUrl}
                   guideId={originalGuideId || id}
+                  onContentUpdated={handleContentUpdated}
                 />
               </div>
             )}
@@ -1056,8 +1064,8 @@ const config = {
                     </div>
                   )}
                   <iframe
-                    key={webUrl+'?iframe=true'} // 使用key来强制重新加载iframe
-                    src={webUrl+'?iframe=true'}
+                    key={`${webUrl}?iframe=true&v=${iframeKey}`} // 使用key和版本号来强制重新加载iframe
+                    src={`${webUrl}?iframe=true`}
                     className="w-full h-full border-0"
                     title="嵌入网页内容"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1189,6 +1197,7 @@ const config = {
                 isWebMode={isWebType}
                 webUrl={webUrl}
                 guideId={originalGuideId || id}
+                onContentUpdated={handleContentUpdated}
               />
             </div>
           )}
@@ -1279,7 +1288,7 @@ const config = {
                   </div>
                 )}
                 <iframe
-                  key={webUrl} // 使用key来强制重新加载iframe
+                  key={`${webUrl}&v=${iframeKey}`} // 使用key和版本号来强制重新加载iframe
                   src={webUrl}
                   className="w-full h-full border-0"
                   title="嵌入网页内容"

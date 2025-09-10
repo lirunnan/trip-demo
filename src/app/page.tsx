@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useCallback, useRef, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import DemoCards from '../components/DemoCards'
-import ChatInterface, { Message, ItineraryDay } from '../components/ChatInterface'
+import ChatInterface, { Message, ItineraryDay, UserInfo } from '../components/ChatInterface'
 import TravelViews from '@/components/TravelViews'
 import XiaohongshuExtractor from '@/components/XiaohongshuExtractor'
 import { registerSystemMessageSender } from '@/utils/systemMessage'
@@ -11,7 +11,7 @@ import { useConversationMemory } from '@/hooks/useConversationMemory'
 import { useItineraryActions } from '@/hooks/useItineraryActions'
 import { useExportFeatures } from '@/hooks/useExportFeatures'
 import { addTimeInfoToItinerary } from '@/utils/timeCalculator'
-import { generateConversationId, postConversations } from './api/conversation'
+import { generateConversationId, postConversations, getConverstionsById } from './api/conversation'
 import { indexedDBManager, initIndexedDB, saveAsStaticFile } from '@/utils/indexedDB'
 import { initServiceWorker } from '@/utils/serviceWorker'
 
@@ -27,6 +27,7 @@ interface DemoGuide {
 
 export default function Home() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentItinerary, setCurrentItinerary] = useState<ItineraryDay[]>([])
@@ -36,6 +37,55 @@ export default function Home() {
   // 系统消息轮换相关
   const systemMessageTimerRef = useRef<NodeJS.Timeout | null>(null)
   const messageIndexRef = useRef(0)
+  
+  // 预设用户信息
+  const predefinedUsers = useMemo<UserInfo[]>(() => [
+    {
+      id: 'user-a',
+      name: 'A',
+      avatar: '',
+      color: '#3b82f6' // 蓝色
+    },
+    {
+      id: 'user-b',
+      name: 'B',
+      avatar: '',
+      color: '#10b981' // 绿色
+    },
+    {
+      id: 'user-c',
+      name: 'C',
+      avatar: '',
+      color: '#f59e0b' // 黄色
+    },
+    {
+      id: 'user-d',
+      name: 'D',
+      avatar: '',
+      color: '#ef4444' // 红色
+    },
+    {
+      id: 'user-e',
+      name: 'E',
+      avatar: '',
+      color: '#8b5cf6' // 紫色
+    }
+  ], [])
+  
+  // 从URL参数获取会话ID和当前用户ID
+  const collaborationConvId = searchParams.get('convId')
+  const currentUserId = searchParams.get('user') || 'user-a'
+  const currentUser = predefinedUsers.find(u => u.id === currentUserId) || predefinedUsers[0]
+  
+  // 协作相关状态
+  const [isCollaborationMode, setIsCollaborationMode] = useState(false)
+  const [collaborationUsers, setCollaborationUsers] = useState<UserInfo[]>([])
+  
+  // 模拟在线用户（实际项目中可以从服务器获取）
+  const [onlineUsers] = useState<UserInfo[]>(() => {
+    // 可以根据需要调整在线用户逻辑
+    return predefinedUsers.slice(0, 3) // 默认显示前3个用户在线
+  })
   
   // 旅游规划相关的思考文本
   const thinkingMessages = useMemo(() => [
@@ -145,6 +195,76 @@ export default function Home() {
     }
   }, [])
 
+  const loadCollaborationSession = useCallback(async () => {
+    try {
+      const response = await getConverstionsById(collaborationConvId!)
+      if (response.code === 200) {
+        const { data } = response
+        const { messages: historyMessages, conversationId } = data
+        
+        // 设置协作模式
+        setIsCollaborationMode(true)
+        setConvId(conversationId)
+        setIsInitialState(false)
+        
+        // 解析历史消息
+        const parsedMessages: Message[] = historyMessages.map((msg: any) => {
+          if (msg.role === 'USER') {
+            // 历史消息默认设置为原始发起者（用户A）
+            // 如果消息中有userId信息可以用来识别具体发送者
+            const originalSender = predefinedUsers[0] // 历史消息的原始发送者为用户A
+            
+            return {
+              id: msg.messageId,
+              role: 'user' as const,
+              content: msg.content,
+              timestamp: new Date(msg.timestamp),
+              sender: originalSender
+            }
+          } else if (msg.role === 'ASSISTANT') {
+            // 解析助手消息的内容为行程数据
+            let itinerary: ItineraryDay[] | undefined
+            try {
+              itinerary = JSON.parse(msg.content)
+            } catch (error) {
+              console.error('解析行程数据失败:', error)
+            }
+            
+            return {
+              id: msg.messageId,
+              role: 'assistant' as const,
+              content: '',
+              timestamp: new Date(msg.timestamp),
+              itinerary
+            }
+          }
+          return null
+        }).filter(Boolean) as Message[]
+        
+        // 设置消息和当前行程
+        setMessages(parsedMessages)
+        const lastAssistantMessage = parsedMessages.find(m => m.role === 'assistant' && m.itinerary)
+        if (lastAssistantMessage?.itinerary) {
+          setCurrentItinerary(lastAssistantMessage.itinerary)
+          updateItinerary(lastAssistantMessage.itinerary)
+        }
+        
+        // 设置协作用户（从URL参数或默认）
+        setCollaborationUsers(predefinedUsers.slice(0, 3))
+      }
+    } catch (error) {
+      console.error('加载协作会话失败:', error)
+      // 可以显示错误提示
+    }
+  }, [collaborationConvId, predefinedUsers, updateItinerary])
+
+  // 加载协作会话
+  useEffect(() => {
+    if (collaborationConvId) {
+      loadCollaborationSession()
+    }
+  }, [collaborationConvId, loadCollaborationSession])
+
   const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
     // 记录用户请求到上下文
     addUserRequest(content)
@@ -154,7 +274,8 @@ export default function Home() {
       id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       role: 'user',
       content,
-      timestamp: new Date()
+      timestamp: new Date(),
+      sender: currentUser
     }
     
     setMessages(prev => [...prev, userMessage])
@@ -207,7 +328,7 @@ export default function Home() {
     } finally {
       setIsLoading(false)
     }
-  }, [addUserRequest, convId, handleSendSystemMessage, updateItinerary, startSystemMessageRotation, stopSystemMessageRotation])
+  }, [addUserRequest, convId, handleSendSystemMessage, updateItinerary, startSystemMessageRotation, stopSystemMessageRotation, currentUser])
 
   const handleSelectDemo = useCallback((demo: DemoGuide) => {
     // 当选择Demo攻略时，自动填入相关内容并触发AI响应
@@ -223,6 +344,23 @@ export default function Home() {
   const handleShowPopularGuides = useCallback(() => {
     router.push('/popular')
   }, [router])
+
+  // 处理开始协作
+  const handleStartCollaboration = useCallback(() => {
+    if (convId) {
+      // 生成协作URL，包含会话ID和邀请的用户IDs
+      const collaborationUrl = `${window.location.origin}/?convId=${convId}&user=user-b`
+      
+      // 复制到剪贴板
+      navigator.clipboard.writeText(collaborationUrl).then(() => {
+        // 可以显示成功提示
+        handleSendSystemMessage('协作链接已复制到剪贴板，分享给朋友一起规划旅行吧！')
+      }).catch(err => {
+        console.error('复制失败:', err)
+        // 可以显示错误提示或者fallback
+      })
+    }
+  }, [convId, handleSendSystemMessage])
 
   const handleLocationDelete = useCallback(async (dayIndex: number, locationIndex: number) => {
     if (currentItinerary.length === 0 || !currentItinerary[dayIndex]) return
@@ -489,6 +627,7 @@ export default function Home() {
       {/* 主内容区域 */}
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-6">
+
         {/* 页面顶部：Demo攻略卡片 - 始终显示 */}
         <div className="mb-8">
           <DemoCards onSelectDemo={handleSelectDemo} onShowPopularGuides={handleShowPopularGuides} />
@@ -512,6 +651,11 @@ export default function Home() {
               onShowHistory={handleShowHistory}
               onGenerateFinalItinerary={handleShareServer}
               onSendSystemMessage={handleSendSystemMessage}
+              currentUser={currentUser}
+              allUsers={isCollaborationMode ? collaborationUsers : onlineUsers}
+              conversationId={convId}
+              isCollaborationMode={isCollaborationMode}
+              onStartCollaboration={handleStartCollaboration}
             />
           </div>
 

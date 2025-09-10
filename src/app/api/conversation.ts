@@ -34,3 +34,10 @@ export const getConversations = () => {
         'GET'
     )
 }
+
+export const getConverstionsById = (id: string) => {
+    return fetchApi<ConversationResponse>(
+        `${BASE_URL}/conversations/${id}`, 
+        'GET'
+    )
+}

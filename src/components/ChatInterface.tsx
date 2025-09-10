@@ -1,6 +1,6 @@
 'use client'
 
-import { User, Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History, Share2 } from 'lucide-react'
+import { Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History, Share2 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import ThemeTagsInput from './ThemeTagsInput'
@@ -14,6 +14,14 @@ export interface Message {
   content: string
   timestamp: Date
   itinerary?: ItineraryDay[]
+  sender?: UserInfo  // 发送者信息，仅在user角色时有效
+}
+
+export interface UserInfo {
+  id: string
+  name: string
+  avatar: string
+  color: string
 }
 
 export interface ItineraryDay {
@@ -57,6 +65,11 @@ interface ChatInterfaceProps {
   onShowHistory?: () => void
   onGenerateFinalItinerary?: () => void // 新增：生成最终攻略的回调
   onSendSystemMessage?: (content: string) => void // 新增：发送系统消息的回调
+  currentUser: UserInfo // 当前用户信息
+  allUsers: UserInfo[] // 所有协作用户信息
+  conversationId?: string // 当前会话ID
+  isCollaborationMode?: boolean // 是否为协作模式
+  onStartCollaboration?: () => void // 开始协作的回调
 }
 
 export default function ChatInterface({ 
@@ -67,7 +80,12 @@ export default function ChatInterface({
   xiaohongshuExtractor,
   onShowHistory,
   onGenerateFinalItinerary,
-  onSendSystemMessage
+  onSendSystemMessage,
+  currentUser,
+  allUsers,
+  conversationId,
+  isCollaborationMode = false,
+  onStartCollaboration
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -528,11 +546,17 @@ export default function ChatInterface({
               }
               
               // 处理普通消息（用户和助手）
+              const isCurrentUser = message.role === 'user' && message.sender?.id === currentUser.id
+              const isOtherUser = message.role === 'user' && message.sender && message.sender.id !== currentUser.id
+              
+              // 如果是user消息但没有sender信息，默认处理为其他用户（历史消息的兼容性处理）
+              const isUserWithoutSender = message.role === 'user' && !message.sender
+              
               return (
                 <div
                   key={message.id}
                   className={`flex items-start gap-3 ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                    isCurrentUser ? 'justify-end' : 'justify-start'
                   }`}
                 >
                   {message.role === 'assistant' && (
@@ -540,13 +564,47 @@ export default function ChatInterface({
                       <Bot className="w-4 h-4 text-white" />
                     </div>
                   )}
+
+                  {/* 其他用户头像（左侧显示） */}
+                  {isOtherUser && message.sender && (
+                    <div className="flex flex-col items-center gap-1">
+                      <div 
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
+                        style={{ backgroundColor: message.sender.color }}
+                      >
+                        {message.sender.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{message.sender.name}</span>
+                    </div>
+                  )}
+
+                  {/* 没有sender信息的用户消息头像（左侧显示） */}
+                  {isUserWithoutSender && (
+                    <div className="flex flex-col items-center gap-1">
+                      <div 
+                        className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
+                      >
+                        A
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">用户A</span>
+                    </div>
+                  )}
                   
                   <div
                     className={`max-w-[80%] p-4 rounded-2xl ${
-                      message.role === 'user'
+                      isCurrentUser
                         ? 'bg-blue-500 text-white'
+                        : (isOtherUser && message.sender) || isUserWithoutSender
+                        ? 'text-white'
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
                     }`}
+                    style={
+                      (isOtherUser && message.sender)
+                        ? { backgroundColor: message.sender.color }
+                        : isUserWithoutSender
+                        ? { backgroundColor: '#6b7280' } // 默认灰色给没有sender的消息
+                        : {}
+                    }
                   >
                     <div className="whitespace-pre-wrap">{message.content}</div>
                     {message.itinerary && renderItinerary(message.itinerary)}
@@ -563,9 +621,16 @@ export default function ChatInterface({
                     }
                   </div>
 
-                  {message.role === 'user' && (
-                    <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center flex-shrink-0">
-                      <User className="w-4 h-4 text-white" />
+                  {/* 当前用户头像（右侧显示） */}
+                  {isCurrentUser && (
+                    <div className="flex flex-col items-center gap-1">
+                      <div 
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold"
+                        style={{ backgroundColor: currentUser.color }}
+                      >
+                        {currentUser.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">我</span>
                     </div>
                   )}
                 </div>
@@ -590,6 +655,54 @@ export default function ChatInterface({
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            {/* 协作用户显示 */}
+            {(!isInitialState && conversationId) && (
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    {isCollaborationMode ? '协作成员：' : '邀请协作：'}
+                  </span>
+                  {!isCollaborationMode ? (
+                    <button
+                      onClick={onStartCollaboration}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-colors"
+                    >
+                      <span>🤝</span>
+                      <span>一起规划</span>
+                    </button>
+                  ) : (
+                    <span className="text-xs text-gray-500 dark:text-gray-500">{allUsers.length} 人在线</span>
+                  )}
+                </div>
+                
+                {isCollaborationMode && (
+                  <div className="flex gap-2">
+                    {allUsers.map((user) => (
+                      <div
+                        key={user.id}
+                        className={`flex items-center gap-2 px-2 py-1 rounded-full text-xs ${
+                          user.id === currentUser.id 
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700' 
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <div 
+                          className="w-4 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                          style={{ backgroundColor: user.color }}
+                        >
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-medium">{user.id === currentUser.id ? '我' : user.name}</span>
+                        {user.id === currentUser.id && (
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* 已选择的主题标签显示 */}
             {selectedThemes.length > 0 && (
               <div className="mb-3">

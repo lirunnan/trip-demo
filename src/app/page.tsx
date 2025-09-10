@@ -52,6 +52,26 @@ export default function Home() {
     exportAsTextFile
   } = useExportFeatures()
 
+    // 发送系统消息的函数
+  const handleSendSystemMessage = useCallback((content: string) => {
+    const systemMessage: Message = {
+      id: Date.now().toString(),
+      role: 'system',
+      content,
+      timestamp: new Date()
+    }
+    
+    setMessages(prev => {
+      // 移除之前的系统消息，只保留最新的一个
+      const nonSystemMessages = prev.filter(msg => msg.role !== 'system')
+      return [...nonSystemMessages, systemMessage]
+    })
+  }, [])
+
+  // 注册系统消息发送器到全局工具类
+  React.useEffect(() => {
+    registerSystemMessageSender(handleSendSystemMessage)
+  }, [handleSendSystemMessage])
 
   const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
     // 记录用户请求到上下文
@@ -109,7 +129,7 @@ export default function Home() {
     } finally {
       setIsLoading(false)
     }
-  }, [addUserRequest, convId, updateItinerary])
+  }, [addUserRequest, convId, handleSendSystemMessage, updateItinerary])
 
   const handleSelectDemo = useCallback((demo: DemoGuide) => {
     // 当选择Demo攻略时，自动填入相关内容并触发AI响应
@@ -274,7 +294,7 @@ export default function Home() {
       }
       setMessages(prev => [...prev, errorMessage])
     }
-  }, [convId, currentItinerary])
+  }, [convId, currentItinerary, handleSendSystemMessage])
 
   const handleShareClient = useCallback(async () => {
     if (currentItinerary.length === 0) return
@@ -343,27 +363,6 @@ export default function Home() {
   const handleShowHistory = useCallback(() => {
     router.push('/history')
   }, [router])
-
-  // 发送系统消息的函数
-  const handleSendSystemMessage = useCallback((content: string) => {
-    const systemMessage: Message = {
-      id: Date.now().toString(),
-      role: 'system',
-      content,
-      timestamp: new Date()
-    }
-    
-    setMessages(prev => {
-      // 移除之前的系统消息，只保留最新的一个
-      const nonSystemMessages = prev.filter(msg => msg.role !== 'system')
-      return [...nonSystemMessages, systemMessage]
-    })
-  }, [])
-
-  // 注册系统消息发送器到全局工具类
-  React.useEffect(() => {
-    registerSystemMessageSender(handleSendSystemMessage)
-  }, [handleSendSystemMessage])
 
   return (
     <div className="min-h-screen relative">

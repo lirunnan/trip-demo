@@ -52,6 +52,17 @@ body {
   66% { transform: translate(-8px, 8px) rotate(240deg); }
 }
 
+/* 呼吸圆圈交换动画 */
+@keyframes moveRight {
+  0%, 100% { transform: translateX(0px) translateY(-50%); }
+  50% { transform: translateX(32px) translateY(-50%); }
+}
+
+@keyframes moveLeft {
+  0%, 100% { transform: translateX(0px) translateY(-50%); }
+  50% { transform: translateX(-32px) translateY(-50%); }
+}
+
 /* 应用自定义动画 */
 .animate-float {
   animation: float 6s ease-in-out infinite;

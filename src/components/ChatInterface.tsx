@@ -20,6 +20,18 @@ export interface ItineraryDay {
   day: number
   date: string
   locations: Location[]
+  accommodation?: Accommodation
+}
+
+export interface Accommodation {
+  name: string
+  type: string
+  coordinates: [number, number] // [lng, lat]
+  description: string
+  price: string
+  country: string
+  province: string
+  city: string
 }
 
 export interface Location {
@@ -107,6 +119,26 @@ export default function ChatInterface({
               第{day.day}天 ({day.date})
             </h5>
             <div className="mt-2 space-y-2">
+              {/* 住宿信息 */}
+              {day.accommodation && (
+                <div className="flex items-start gap-2 mt-3 pt-2">
+                  <Hotel className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
+                  <div>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      {day.accommodation.name}
+                    </span>
+                    <span className="text-sm text-orange-600 dark:text-orange-400 ml-2">
+                      {day.accommodation.type}
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                      {day.accommodation.price}
+                    </span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      {day.accommodation.description}
+                    </p>
+                  </div>
+                </div>
+              )}
               {day.locations.map((location, index) => (
                 <div key={index} className="flex items-start gap-2">
                   <span className="text-blue-500 mt-1">•</span>
@@ -250,7 +282,7 @@ export default function ChatInterface({
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {xiaohongshuExtractor && xiaohongshuExtractor}
                 {/* 可以添加更多输入方式 */}
-                <button className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer opacity-50 cursor-not-allowed">
+                <button className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer opacity-50">
                   <span className="text-blue-600 dark:text-blue-400 text-sm font-bold">📝</span>
                   <span className="text-gray-400 text-sm font-medium">模板导入</span>
                   <span className="text-xs text-gray-400">(即将上线)</span>
@@ -271,7 +303,7 @@ export default function ChatInterface({
           {/* 装饰性行程路线 */}
           <div className="w-full max-w-6xl relative">
             {/* 主路线 */}
-            <div className="relative h-24">
+            <div className="relative h-20 mt-4">
               {/* 背景路径 */}
               <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 400" preserveAspectRatio="none">
                 {/* 主路径 - 曲线 */}
@@ -465,8 +497,30 @@ export default function ChatInterface({
                 }
                 
                 return (
-                  <div key={message.id} className="flex justify-center">
-                    <div className="bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-full text-sm border border-amber-200 dark:border-amber-700 animate-pulse">
+                  <div key={message.id} className="flex items-center gap-3">
+
+                    
+                    {/* 系统消息内容 */}
+                    <div className="flex bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-full text-sm border border-amber-200 dark:border-amber-700 animate-pulse">
+                      {/* 左侧呼吸感装饰 - 交换位置动效 */}
+                      <div className="relative w-12 h-6 pr-3">
+                        {/* 第一个呼吸圆圈 - 左右移动 */}
+                        <div className="absolute top-2/3 -translate-y-1/2 transition-all duration-2000 ease-in-out animate-[moveRight_3s_ease-in-out_infinite]">
+                          <div className="relative">
+                            <div className="w-3 h-3 bg-amber-400 dark:bg-amber-500 rounded-full animate-pulse"></div>
+                            <div className="absolute inset-0 w-3 h-3 bg-amber-300 dark:bg-amber-400 rounded-full animate-ping opacity-75"></div>
+                            <div className="absolute -inset-1 w-5 h-5 bg-amber-200 dark:bg-amber-300 rounded-full animate-pulse opacity-30"></div>
+                          </div>
+                        </div>
+                        
+                        {/* 第二个呼吸圆圈 - 右左移动，延迟启动 */}
+                        <div className="absolute top-1/2 -translate-y-1/2 right-0 transition-all duration-2000 ease-in-out animate-[moveLeft_3s_ease-in-out_infinite]">
+                          <div className="relative">
+                            <div className="w-2.5 h-2.5 bg-amber-300 dark:bg-amber-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                            <div className="absolute inset-0 w-2.5 h-2.5 bg-amber-200 dark:bg-amber-300 rounded-full animate-ping opacity-60" style={{animationDelay: '0.3s'}}></div>
+                          </div>
+                        </div>
+                      </div>
                       {message.content}
                     </div>
                   </div>

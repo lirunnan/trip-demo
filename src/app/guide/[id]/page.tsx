@@ -99,7 +99,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
       const sendInitialMessage = async () => {
         addUserRequest(initialMessage)
         
-        const userMessageId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        const userMessageId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
         const userMessage: Message = {
           id: userMessageId,
           role: 'user',
@@ -113,7 +113,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
         try {
           const aiResponse = await simulateAIResponse(initialMessage)
           
-          const assistantMessageId = `assistant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          const assistantMessageId = `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
           const assistantMessage: Message = {
             id: assistantMessageId,
             role: 'assistant',
@@ -130,7 +130,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
           }
         } catch (error) {
           console.error('发送消息失败:', error)
-          const errorMessageId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          const errorMessageId = `error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
           const errorMessage: Message = {
             id: errorMessageId,
             role: 'assistant',
@@ -150,7 +150,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
   const handleSendMessage = useCallback(async (content: string) => {
     addUserRequest(content)
     
-    const userMessageId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const userMessageId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
     const userMessage: Message = {
       id: userMessageId,
       role: 'user',
@@ -164,7 +164,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     try {
       const aiResponse = await simulateAIResponse(content)
       
-      const assistantMessageId = `assistant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const assistantMessageId = `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
       const assistantMessage: Message = {
         id: assistantMessageId,
         role: 'assistant',
@@ -181,7 +181,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
       }
     } catch (error) {
       console.error('发送消息失败:', error)
-      const errorMessageId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const errorMessageId = `error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
       const errorMessage: Message = {
         id: errorMessageId,
         role: 'assistant',
@@ -207,7 +207,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     updateItinerary(updatedItinerary)
     
     const adjustmentMessage = generateRouteAdjustmentMessage('delete', locationToDelete.name)
-    const aiMessageId = `adjustment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const aiMessageId = `adjustment_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
     const aiMessage: Message = {
       id: aiMessageId,
       role: 'assistant',
@@ -231,7 +231,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     setCurrentItinerary(newItinerary)
     updateItinerary(newItinerary)
     
-    const reorderMessageId = `reorder_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const reorderMessageId = `reorder_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
     const reorderMessage: Message = {
       id: reorderMessageId,
       role: 'assistant',
@@ -357,7 +357,7 @@ ${day.locations.map(location => `• ${location.name}: ${location.description} (
     try {
       exportAsTextFile(currentItinerary, title)
       
-      const successMessageId = `export_success_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const successMessageId = `export_success_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
       const successMessage: Message = {
         id: successMessageId,
         role: 'assistant',

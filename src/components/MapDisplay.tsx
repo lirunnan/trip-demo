@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { ItineraryDay } from './ChatInterface'
-import { MapPin, Clock, Calendar } from 'lucide-react'
+import { MapPin, Clock, Calendar, Hotel } from 'lucide-react'
 interface MapDisplayProps {
   itinerary: ItineraryDay[]
   className?: string
@@ -172,8 +172,11 @@ export default function MapDisplay({
         
         const myGeo = new window.BMap.Geocoder();
         const locationResults: { index: number, point: any, location: any }[] = []
+        let accommodationResult: { point: any, accommodation: any } | null = null
         let completedCount = 0
         const totalLocations = currentDayData.locations.length
+        const hasAccommodation = !!currentDayData.accommodation
+        const totalItems = totalLocations + (hasAccommodation ? 1 : 0)
         
         // 使用异步处理所有地点
         currentDayData.locations.forEach((location, index) => {
@@ -243,35 +246,100 @@ export default function MapDisplay({
               })
             }
             
-            // 当所有地理编码完成后，按顺序绘制路线
-            if (completedCount === totalLocations) {
-              // 过滤出有效的点，并按原始顺序排列
-              const validPoints = locationResults
-                .filter(result => result && result.point)
-                .map(result => result.point)
-              
-              console.log('所有地点处理完成，绘制路线，点数:', validPoints.length)
-              
-              // 绘制路线
-              if (validPoints.length > 1) {
-                const polyline = new window.BMap.Polyline(validPoints, {
-                  strokeColor: '#1890ff',
-                  strokeWeight: 3,
-                  strokeOpacity: 0.8
-                })
-                map.addOverlay(polyline)
-                console.log('路线绘制完成')
-              }
-
-              // 调整视野
-              if (validPoints.length > 0) {
-                const viewport = map.getViewport(validPoints)
-                map.centerAndZoom(viewport.center, Math.max(viewport.zoom - 1, 10))
-                console.log('视野调整完成')
-              }
-            }
+            // 触发完成检查
+            checkCompletion()
           })
         })
+        
+        // 处理住宿信息
+        if (hasAccommodation && currentDayData.accommodation) {
+          const accommodation = currentDayData.accommodation
+          console.log(accommodation.city + accommodation.name, 'getting accommodation geocode')
+          
+          myGeo.getPoint(accommodation.province + accommodation.city + accommodation.name, (pt: any) => {
+            completedCount++
+            if (pt) {
+              const point = new window.BMap.Point(pt.lng, pt.lat)
+              accommodationResult = { point, accommodation }
+              
+              // 创建住宿标记图标（橙色酒店图标）
+              const iconSize = new window.BMap.Size(28, 28)
+              const iconOffset = new window.BMap.Size(14, 14)
+              const hotelIcon = new window.BMap.Icon(
+                `data:image/svg+xml;base64,${btoa(`
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="11" fill="#f97316" stroke="white" stroke-width="2"/>
+                    <path d="M8 14h8v2H8v-2zm0-3h8v2H8v-2zm8-2V7H8v2h8z" fill="white"/>
+                  </svg>
+                `)}`, 
+                iconSize, 
+                { offset: iconOffset }
+              )
+              
+              // 创建住宿标记
+              const hotelMarker = new window.BMap.Marker(point, { icon: hotelIcon })
+              map.addOverlay(hotelMarker)
+              
+              // 构建住宿信息窗口内容
+              const hotelInfoContent = `
+                <div style="padding: 8px; max-width: 200px;">
+                  <h4 style="margin: 0 0 8px 0; font-weight: bold; color: #333;">🏨 ${accommodation.name}</h4>
+                  <p style="margin: 0 0 4px 0; color: #f97316; font-size: 12px; font-weight: bold;">
+                    ${accommodation.type}
+                  </p>
+                  <p style="margin: 0 0 4px 0; color: #666; font-size: 12px;">
+                    💰 ${accommodation.price}
+                  </p>
+                  <p style="margin: 0 0 8px 0; color: #666; font-size: 12px;">${accommodation.description}</p>
+                </div>`
+              
+              const hotelInfoWindow = new window.BMap.InfoWindow(hotelInfoContent)
+              
+              hotelMarker.addEventListener('click', () => {
+                map.openInfoWindow(hotelInfoWindow, point)
+              })
+            }
+            
+            // 触发完成检查
+            checkCompletion()
+          })
+        }
+        
+        // 完成检查函数
+        function checkCompletion() {
+          if (completedCount === totalItems) {
+            // 过滤出有效的景点，并按原始顺序排列
+            const validPoints = locationResults
+              .filter(result => result && result.point)
+              .map(result => result.point)
+            
+            // 如果有住宿信息，添加到视野调整的点集合中
+            const allPoints = [...validPoints]
+            if (accommodationResult && accommodationResult.point) {
+              allPoints.push(accommodationResult.point)
+            }
+            
+            console.log('所有地点处理完成，绘制路线，景点数:', validPoints.length, '住宿数:', accommodationResult ? 1 : 0)
+            
+            // 绘制路线（只连接景点，不包括住宿）
+            if (validPoints.length > 1) {
+              const polyline = new window.BMap.Polyline(validPoints, {
+                strokeColor: '#1890ff',
+                strokeWeight: 3,
+                strokeOpacity: 0.8
+              })
+              map.addOverlay(polyline)
+              console.log('路线绘制完成')
+            }
+
+            // 调整视野（包括住宿）
+            if (allPoints.length > 0) {
+              const viewport = map.getViewport(allPoints)
+              map.centerAndZoom(viewport.center, Math.max(viewport.zoom - 1, 10))
+              console.log('视野调整完成')
+            }
+          }
+        }
         
       } catch (error) {
         console.error('更新地图标记失败:', error)
@@ -412,6 +480,29 @@ export default function MapDisplay({
                   </div>
                 </div>
               ))}
+              
+              {/* 住宿信息 */}
+              {currentDayData.accommodation && (
+                <div className="flex items-start gap-3 text-sm pt-2 border-t border-gray-200 dark:border-gray-600 mt-3">
+                  <Hotel className="flex-shrink-0 w-5 h-5 text-orange-500 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-gray-800 dark:text-gray-200">
+                        {currentDayData.accommodation.name}
+                      </span>
+                      <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded">
+                        {currentDayData.accommodation.type}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {currentDayData.accommodation.price}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1 text-xs leading-relaxed">
+                      {currentDayData.accommodation.description}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

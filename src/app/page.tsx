@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import DemoCards from '../components/DemoCards'
 import ChatInterface, { Message, ItineraryDay } from '../components/ChatInterface'
@@ -32,6 +32,41 @@ export default function Home() {
   const [currentItinerary, setCurrentItinerary] = useState<ItineraryDay[]>([])
   const [isInitialState, setIsInitialState] = useState(true)
   const [convId, setConvId] = useState('');
+  
+  // 系统消息轮换相关
+  const systemMessageTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const messageIndexRef = useRef(0)
+  
+  // 旅游规划相关的思考文本
+  const thinkingMessages = useMemo(() => [
+    '正在分析您的旅行需求...',
+    '深度解析目的地特色...',
+    '搜索最佳景点和路线...',
+    '评估景点热度与口碑...',
+    '优化行程时间安排...',
+    '规划最佳游览顺序...',
+    '匹配合适的住宿推荐...',
+    '筛选高性价比酒店...',
+    '计算交通时间和成本...',
+    '分析各种出行方式...',
+    '整合当地美食推荐...',
+    '挖掘隐藏美食宝藏...',
+    '查询天气和最佳游览时机...',
+    '分析季节性旅游特点...',
+    '评估预算与消费水平...',
+    '制定详细费用清单...',
+    '收集实用旅行贴士...',
+    '整理当地文化习俗...',
+    '准备应急联系信息...',
+    '生成个性化旅行建议...',
+    '定制专属游览体验...',
+    '完善行程细节安排...',
+    '添加备选方案预案...',
+    '整合多维度旅行信息...',
+    '验证行程合理性...',
+    '优化用户体验流程...',
+    '准备为您呈现专属攻略...'
+  ], [])
   const { 
     context, 
     addUserRequest, 
@@ -55,7 +90,7 @@ export default function Home() {
     // 发送系统消息的函数
   const handleSendSystemMessage = useCallback((content: string) => {
     const systemMessage: Message = {
-      id: Date.now().toString(),
+      id: `system_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       role: 'system',
       content,
       timestamp: new Date()
@@ -68,10 +103,47 @@ export default function Home() {
     })
   }, [])
 
+  // 启动系统消息轮换
+  const startSystemMessageRotation = useCallback(() => {
+    // 清理可能存在的定时器
+    if (systemMessageTimerRef.current) {
+      clearInterval(systemMessageTimerRef.current)
+    }
+    
+    // 重置索引
+    messageIndexRef.current = 0
+    
+    // 立即显示第一条消息
+    handleSendSystemMessage(thinkingMessages[0])
+    
+    // 设置定时器每3秒更换消息
+    systemMessageTimerRef.current = setInterval(() => {
+      messageIndexRef.current = (messageIndexRef.current + 1) % thinkingMessages.length
+      handleSendSystemMessage(thinkingMessages[messageIndexRef.current])
+    }, 5000)
+  }, [handleSendSystemMessage, thinkingMessages])
+
+  // 停止系统消息轮换
+  const stopSystemMessageRotation = useCallback(() => {
+    if (systemMessageTimerRef.current) {
+      clearInterval(systemMessageTimerRef.current)
+      systemMessageTimerRef.current = null
+    }
+  }, [])
+
   // 注册系统消息发送器到全局工具类
   React.useEffect(() => {
     registerSystemMessageSender(handleSendSystemMessage)
   }, [handleSendSystemMessage])
+
+  // 组件卸载时清理定时器
+  React.useEffect(() => {
+    return () => {
+      if (systemMessageTimerRef.current) {
+        clearInterval(systemMessageTimerRef.current)
+      }
+    }
+  }, [])
 
   const handleSendMessage = useCallback(async (content: string, themePrompt?: string) => {
     // 记录用户请求到上下文
@@ -79,7 +151,7 @@ export default function Home() {
     // console.log(content);
     // 添加用户消息
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       role: 'user',
       content,
       timestamp: new Date()
@@ -96,11 +168,14 @@ export default function Home() {
         currentConvId = generateConversationId();
         setConvId(currentConvId);
       }
-      handleSendSystemMessage('正在思考中')
+      startSystemMessageRotation()
       const gRes = await postConversations(currentConvId, content);
+      // 停止系统消息轮换
+      stopSystemMessageRotation()
+      
       // 添加AI响应
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `assistant_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '',
         timestamp: new Date(),
@@ -118,9 +193,12 @@ export default function Home() {
       }
     } catch (error) {
       console.error('发送消息失败:', error)
+      // 停止系统消息轮换
+      stopSystemMessageRotation()
+      
       // 错误处理
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '抱歉，生成攻略时出现了问题，请稍后再试。',
         timestamp: new Date()
@@ -129,7 +207,7 @@ export default function Home() {
     } finally {
       setIsLoading(false)
     }
-  }, [addUserRequest, convId, handleSendSystemMessage, updateItinerary])
+  }, [addUserRequest, convId, handleSendSystemMessage, updateItinerary, startSystemMessageRotation, stopSystemMessageRotation])
 
   const handleSelectDemo = useCallback((demo: DemoGuide) => {
     // 当选择Demo攻略时，自动填入相关内容并触发AI响应
@@ -163,7 +241,7 @@ export default function Home() {
     // 生成AI反馈消息
     const adjustmentMessage = generateRouteAdjustmentMessage('delete', locationToDelete.name)
     const aiMessage: Message = {
-      id: Date.now().toString(),
+      id: `adjustment_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       role: 'assistant',
       content: adjustmentMessage,
       timestamp: new Date(),
@@ -190,7 +268,7 @@ export default function Home() {
     
     // 生成AI反馈消息
     const reorderMessage: Message = {
-      id: Date.now().toString(),
+      id: `reorder_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       role: 'assistant',
       content: `🔄 行程顺序已更新！我已重新计算了时间安排和路线规划。
 
@@ -214,7 +292,7 @@ export default function Home() {
       
       // 显示成功消息
       const successMessage: Message = {
-        id: Date.now().toString(),
+        id: `share_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '🔗 分享链接已复制到剪贴板！您可以将链接发送给朋友，让他们查看您的旅行计划。',
         timestamp: new Date()
@@ -275,7 +353,7 @@ export default function Home() {
         const clipboardSuccess = copyResult.success
         
         const successMessage: Message = {
-          id: Date.now().toString(),
+          id: `server_share_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
           role: 'assistant',
           content: `✅ 攻略已保存为HTML页面！\n\n🔗 可通过以下链接访问：\n${savedPageUrl}\n\n${clipboardSuccess ? '📋 链接已复制到剪贴板' : '💡 请手动复制上方链接'}`,
           timestamp: new Date()
@@ -287,7 +365,7 @@ export default function Home() {
     } catch (error) {
       console.error('❌ 保存攻略失败:', error)
       const errorMessage: Message = {
-        id: Date.now().toString(),
+        id: `server_error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '服务端分享失败，请稍后重试。',
         timestamp: new Date()
@@ -308,7 +386,7 @@ export default function Home() {
       await navigator.clipboard.writeText(clientShareUrl)
       
       const successMessage: Message = {
-        id: Date.now().toString(),
+        id: `client_share_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '🟠 客户端渲染分享链接已复制！这种方式支持定制功能，体验更完整。',
         timestamp: new Date()
@@ -317,7 +395,7 @@ export default function Home() {
     } catch (error) {
       console.error('客户端分享失败:', error)
       const errorMessage: Message = {
-        id: Date.now().toString(),
+        id: `client_error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '客户端分享失败，请稍后重试。',
         timestamp: new Date()
@@ -334,7 +412,7 @@ export default function Home() {
       
       // 显示成功消息
       const successMessage: Message = {
-        id: Date.now().toString(),
+        id: `export_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '📄 行程文件已导出！文件包含完整的行程安排、时间表和旅行贴士。',
         timestamp: new Date()
@@ -343,7 +421,7 @@ export default function Home() {
     } catch (error) {
       console.error('导出失败:', error)
       const errorMessage: Message = {
-        id: Date.now().toString(),
+        id: `export_error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         role: 'assistant',
         content: '导出失败，请稍后重试。',
         timestamp: new Date()

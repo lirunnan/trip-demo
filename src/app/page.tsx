@@ -353,14 +353,26 @@ export default function Home() {
       
       // 复制到剪贴板
       navigator.clipboard.writeText(collaborationUrl).then(() => {
-        // 可以显示成功提示
-        handleSendSystemMessage('协作链接已复制到剪贴板，分享给朋友一起规划旅行吧！')
+        // 创建协作系统消息，不显示呼吸动画
+        const collaborationSystemMessage: Message = {
+          id: `collaboration_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+          role: 'system',
+          content: '协作链接已复制到剪贴板，分享给朋友一起规划旅行吧！',
+          timestamp: new Date(),
+          showBreathingAnimation: false
+        }
+        
+        setMessages(prev => {
+          // 移除之前的系统消息，只保留最新的一个
+          const nonSystemMessages = prev.filter(msg => msg.role !== 'system')
+          return [...nonSystemMessages, collaborationSystemMessage]
+        })
       }).catch(err => {
         console.error('复制失败:', err)
         // 可以显示错误提示或者fallback
       })
     }
-  }, [convId, handleSendSystemMessage])
+  }, [convId])
 
   const handleLocationDelete = useCallback(async (dayIndex: number, locationIndex: number) => {
     if (currentItinerary.length === 0 || !currentItinerary[dayIndex]) return

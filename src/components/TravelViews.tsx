@@ -133,7 +133,7 @@ export default function TravelViews({
               )}
               {(onShareServer || onShareClient) ? (
                 <div className="relative share-menu-container">
-                  <button
+                  {/* <button
                     onClick={toggleShareMenu}
                     className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                     title="分享行程"
@@ -143,9 +143,9 @@ export default function TravelViews({
                     <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                  </button>
+                  </button> */}
                   
-                  {showShareMenu && (
+                  {/* {showShareMenu && (
                     <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                       <div className="py-1">
                         {onShareServer && (
@@ -174,7 +174,7 @@ export default function TravelViews({
                         )}
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
               ) : (
                 <button

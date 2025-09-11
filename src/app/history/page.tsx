@@ -6,7 +6,8 @@ import { getConversations } from '../api/conversation'
 import { ArrowLeft, Clock, MessageSquare, Calendar } from 'lucide-react'
 
 interface Conversation {
-  id: string
+  title: string
+  conversationId: string
   createdAt: string
   updatedAt: string
   messages: any[]
@@ -135,17 +136,18 @@ export default function HistoryPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {conversations.map((conversation, index) => (
               <div
-                key={conversation.id ? `conversation-${conversation.id}` : `conversation-index-${index}`}
+                key={conversation.conversationId ? `conversation-${conversation.conversationId}` : `conversation-index-${index}`}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden cursor-pointer group"
                 onClick={() => {
                   // TODO: 实现点击跳转到对话详情的逻辑
-                  console.log('点击会话:', conversation.id)
+                  router.push(`/?convId=${conversation.conversationId}`)
+                  console.log('点击会话:', conversation.conversationId)
                 }}
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-                      {getConversationTitle(conversation.messages)}
+                      {conversation.title}
                     </h3>
                     <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full ml-2 flex-shrink-0">
                       <MessageSquare className="w-3 h-3" />
@@ -170,7 +172,7 @@ export default function HistoryPage() {
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        ID: {conversation.id}...
+                        ID: {conversation.conversationId}
                       </span>
                       <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
                         查看详情

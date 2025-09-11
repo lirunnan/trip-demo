@@ -179,7 +179,7 @@ export async function analyzeWithSpecificModel(
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'X-Title': 'Travel Assistant AI',
-        'HTTP-Referer': 'http://localhost:3030'
+        'HTTP-Referer': process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3030'
       },
       body: JSON.stringify({
         model: modelConfig.name,

@@ -1,12 +1,11 @@
 'use client'
 
-import { Bot, Loader2, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History, Share2 } from 'lucide-react'
+import { Bot, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History, Share2 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import ThemeTagsInput from './ThemeTagsInput'
 import Link from 'next/link'
 import Image from 'next/image'
-import { postConversations } from '@/app/api/conversation'
 
 export interface Message {
   id: string
@@ -411,15 +410,15 @@ export default function ChatInterface({
         rating: 4.7
       },
       {
-        id: 'tibet-lhasa-spiritual',
-        title: '西藏拉萨心灵净化之旅',
-        destination: '拉萨·林芝',
-        duration: '7天6夜',
+        id: 'xian-terracotta-warriors',
+        title: '西安古都历史探索',
+        destination: '西安·华山',
+        duration: '4天3夜',
         thumbnail: '/images/placeholder.png',
-        tags: ['朝圣', '文化'],
-        views: 16789,
-        likes: 987,
-        rating: 4.9
+        tags: ['历史', '文化'],
+        views: 18920,
+        likes: 1156,
+        rating: 4.8
       }
     ] as const
   

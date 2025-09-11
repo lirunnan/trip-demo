@@ -13,7 +13,7 @@ export const getWebUrlByGuideId = (guideId: string, isUpgraded: boolean = false)
         ? 'https://v0-japan-travel-website-six.vercel.app/'
         : `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3030'}/templates/japan-7days.html`
     default:
-      return `http://localhost:3030/shared/${guideId}.html` // 其他攻略暂无对应的web展示页面
+      return `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3030'}/shared/${guideId}.html` // 其他攻略暂无对应的web展示页面
   }
 }
 

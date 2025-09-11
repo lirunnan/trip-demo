@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行呗 - 行呗旅游攻略</title>
+    <meta name="description" content="行呗 - 由行呗AI生成的个性化旅游攻略">
+    <meta property="og:title" content="行呗">
+    <meta property="og:description" content="个性化AI旅游攻略">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西安快乐探索之旅</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #E84C3D;
+            --secondary: #2C3E50;
+            --accent: #F1C40F;
+            --bg: #ECF0F1;
+            --text: #2C3E50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #E84C3D, #E67E22);
+            padding: 80px 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🏰</text></svg>') center/60px repeat;
+            opacity: 0.1;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            from { transform: translateX(0) translateY(0); }
+            to { transform: translateX(-50%) translateY(-50%); }
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: slideIn 1s ease-out;
+            position: relative;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            perspective: 1000px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateZ(20px) rotateX(10deg);
+        }
+
+        .day-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: -40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .day-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .location-card {
+            background: linear-gradient(135deg, #fff, var(--bg));
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(44, 62, 80, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .location-type {
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 30px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(232, 76, 61, 0.3);
+        }
+
+        .duration {
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .day-card {
+                margin: 20px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🎉 西安快乐探索之旅</h1>
+        <div class="stats">
+            <div class="stat-item">📅 总天数：2天</div>
+            <div class="stat-item">🎯 景点数：4个</div>
+            <div class="stat-item">🌟 精品行程</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="day-container">
+            <div class="day-card">
+                <h2>Day 1 - 2025年8月15日</h2>
+                <div class="location-card">
+                    <span class="location-type">博物馆</span>
+                    <h3>陕西历史博物馆</h3>
+                    <p>中国第一座大型现代化国家级博物馆，馆藏文物37万余件，时间跨度长达一百多万年，被誉为'古都明珠，华夏宝库'。</p>
+                    <div class="duration">⏱️ 建议游览：3-4小时</div>
+                </div>
+                <div class="location-card">
+                    <span class="location-type">购物中心</span>
+                    <h3>西安大悦城</h3>
+                    <p>大型现代化购物中心，集购物、餐饮、娱乐于一体，空调系统完善。</p>
+                    <div class="duration">⏱️ 建议游览：2-3小时</div>
+                </div>
+            </div>
+
+            <div class="day-card">
+                <h2>Day 2 - 2025年8月16日</h2>
+                <div class="location-card">
+                    <span class="location-type">博物馆</span>
+                    <h3>西安博物馆</h3>
+                    <p>国家一级博物馆，集博物馆、名胜古迹、城市园林为一体，馆藏文物13万件。</p>
+                    <div class="duration">⏱️ 建议游览：3小时</div>
+                </div>
+                <div class="location-card">
+                    <span class="location-type">历史文化遗址</span>
+                    <h3>小雁塔</h3>
+                    <p>世界文化遗产，唐代佛教建筑遗存，与西安博物馆相邻。</p>
+                    <div class="duration">⏱️ 建议游览：1.5小时</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isIframe = urlParams.get('iframe') === 'true';
+            
+            if (!isIframe) {
+                const backButton = document.createElement('div');
+                backButton.innerHTML = '← 返回行呗';
+                backButton.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    background: rgba(255,255,255,0.9);
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    font-weight: 500;
+                    color: #333;
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255,255,255,0.5);
+                    z-index: 1000;
+                    transition: all 0.3s ease;
+                `;
+                
+                backButton.onmouseover = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+                };
+                
+                backButton.onmouseout = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                };
+                
+                backButton.onclick = function() {
+                    window.location.href = '/';
+                };
+                
+                document.body.appendChild(backButton);
+            }
+        });
+    </script>
+</body>
+</html>
+    
+    <script>
+        // 添加返回按钮（根据URL参数判断是否显示）
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查URL参数是否包含iframe=true
+            const urlParams = new URLSearchParams(window.location.search);
+            const isIframe = urlParams.get('iframe') === 'true';
+            
+            // 如果是iframe模式，则不显示返回按钮
+            if (isIframe) {
+                return;
+            }
+            
+            const backButton = document.createElement('div');
+            backButton.innerHTML = '← 返回首页';
+            backButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                font-weight: 500;
+                color: #333;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.5);
+                z-index: 1000;
+                transition: all 0.3s ease;
+            `;
+            
+            backButton.onmouseover = function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            };
+            
+            backButton.onmouseout = function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            };
+            
+            backButton.onclick = function() {
+                window.location.href = '/';
+            };
+            
+            document.body.appendChild(backButton);
+        });
+    </script>
+</body>
+</html>

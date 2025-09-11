@@ -26,6 +26,8 @@ interface PageCustomizerProps {
   guideId?: string
   onUpgradeRequest?: () => void
   onContentUpdated?: () => void // 新增：内容更新后的回调
+  onStartIdeEffect?: () => void // 新增：启动IDE编码效果的回调
+  onStopIdeEffect?: () => void // 新增：停止IDE编码效果的回调
 }
 
 export default function PageCustomizer({ 
@@ -39,7 +41,9 @@ export default function PageCustomizer({
   onAddShareMessage,
   guideId,
   onUpgradeRequest,
-  onContentUpdated
+  onContentUpdated,
+  onStartIdeEffect,
+  onStopIdeEffect
 }: PageCustomizerProps) {
   const [messages, setMessages] = useState<CustomizationRequest[]>([
     {
@@ -218,6 +222,11 @@ ${actionType === 'trip'
     setInput('')
     setIsLoading(true)
 
+    // 触发IDE编码效果
+    if (onStartIdeEffect) {
+      onStartIdeEffect()
+    }
+
     // 添加用户消息
     const newUserMessage: CustomizationRequest = {
       id: Date.now().toString(),
@@ -227,52 +236,88 @@ ${actionType === 'trip'
     }
 
     setMessages(prev => [...prev, newUserMessage])
-    const lh = await fetch(`/api/shared/${guideId}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-          title: '',
-          itinerary: '',
-          guideId: 'server_'+guideId,
-          chat: userMessage,
-        })
-    })
-    const result = await lh.json();
-    // 初始化存储服务
-    await initIndexedDB()
-    await initServiceWorker()
-    
-    // 生成唯一ID用于服务端存储
-    const id = `${guideId}`
-    console.log('🔄 正在修改HTML攻略...')
-    console.log(result);
-    if (result.success && result.data) {
-      // 保存到IndexedDB
-      await indexedDBManager.saveHTMLPage({
-        id,
-        title: '行呗',
-        html: result.data.html,
-        createdAt: new Date().toISOString(),
-        guideId
+
+    try {
+      const lh = await fetch(`/api/shared/${guideId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            title: '',
+            itinerary: '',
+            guideId: 'server_'+guideId,
+            chat: userMessage,
+          })
       })
-      await saveAsStaticFile(id);
-      const aiMessage: CustomizationRequest = {
+      const result = await lh.json();
+      
+      // 初始化存储服务
+      await initIndexedDB()
+      await initServiceWorker()
+      
+      // 生成唯一ID用于服务端存储
+      const id = `server_${guideId}`
+      console.log('🔄 正在修改HTML攻略...')
+      console.log(result);
+      
+      if (result.success && result.data) {
+        // 保存到IndexedDB
+        await indexedDBManager.saveHTMLPage({
+          id: id,
+          title: '行呗',
+          html: result.data.html,
+          createdAt: new Date().toISOString(),
+          guideId
+        })
+        await saveAsStaticFile(id);
+        
+        // 停止IDE编码效果
+        if (onStopIdeEffect) {
+          onStopIdeEffect()
+        }
+        
+        const aiMessage: CustomizationRequest = {
+          id: (Date.now() + 1).toString(),
+          userMessage: '',
+          aiResponse: '✅ 已按您要求更新旅游攻略！页面内容已刷新。',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, aiMessage])
+        setIsLoading(false)
+        
+        // 通知父组件内容已更新，需要刷新iframe
+        if (onContentUpdated) {
+          onContentUpdated()
+        }
+      } else {
+        // API失败时也要停止IDE效果
+        if (onStopIdeEffect) {
+          onStopIdeEffect()
+        }
+        
+        const errorMessage: CustomizationRequest = {
+          id: (Date.now() + 1).toString(),
+          userMessage: '',
+          aiResponse: '❌ 更新失败，请稍后重试。',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, errorMessage])
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error('API请求失败:', error)
+      
+      // 发生错误时停止IDE效果
+      if (onStopIdeEffect) {
+        onStopIdeEffect()
+      }
+      
+      const errorMessage: CustomizationRequest = {
         id: (Date.now() + 1).toString(),
         userMessage: '',
-        aiResponse: '✅ 已按您要求更新旅游攻略！页面内容已刷新。',
+        aiResponse: '❌ 网络错误，请检查网络连接后重试。',
         timestamp: new Date()
       }
-      setMessages(prev => [...prev, aiMessage])
+      setMessages(prev => [...prev, errorMessage])
       setIsLoading(false)
-      
-      // 通知父组件内容已更新，需要刷新iframe
-      if (onContentUpdated) {
-        onContentUpdated()
-      }
-      
-      // 生成可访问的URL
-      // setMessages(prev => [...prev, successMessage])
-    } else {
-      throw new Error(result.error || '生成HTML失败')
     }
     
     // 模拟AI处理时间

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西安快乐探索之旅 - 行呗旅游攻略</title>
+    <meta name="description" content="2天快乐之旅 - 由行呗AI生成的个性化旅游攻略">
+    <meta property="og:title" content="西安快乐探索之旅">
+    <meta property="og:description" content="个性化AI旅游攻略">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #5D69B3;
+            --secondary: #8A94CC;
+            --accent: #FF6B8B;
+            --bg: #F8F9FF;
+            --text: #333366;
+            --highlight: #FFD166;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), #7B68EE);
+            padding: 70px 20px 60px;
+            color: white;
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(93, 105, 179, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><circle cx="20" cy="20" r="8" fill="white" opacity="0.2"/><circle cx="80" cy="30" r="12" fill="white" opacity="0.2"/><circle cx="40" cy="70" r="10" fill="white" opacity="0.2"/></svg>');
+            background-size: 200px;
+        }
+
+        .header h1 {
+            font-size: 3.2em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            animation: fadeIn 1s ease-out;
+            position: relative;
+        }
+
+        .header h1 i {
+            margin-right: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.25);
+            padding: 15px 25px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-3px);
+        }
+
+        .day-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+            margin-bottom: 50px;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 12px 25px rgba(93, 105, 179, 0.15);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+        }
+
+        .day-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(93, 105, 179, 0.25);
+        }
+
+        .day-card h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .day-card h2 i {
+            color: var(--accent);
+            font-size: 1.3em;
+        }
+
+        .location-card {
+            background: linear-gradient(to right, #fff, #F0F3FF);
+            margin: 25px 0;
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(138, 148, 204, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: translateX(5px);
+            box-shadow: 5px 5px 15px rgba(138, 148, 204, 0.2);
+        }
+
+        .location-type {
+            display: inline-block;
+            padding: 8px 18px;
+            background: linear-gradient(to right, var(--accent), #FF8E9E);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(255, 107, 139, 0.3);
+        }
+
+        .location-card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .location-card h3 i {
+            color: var(--accent);
+        }
+
+        .location-card p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .duration {
+            color: var(--accent);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.05em;
+        }
+
+        .fun-fact {
+            background: var(--highlight);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .fun-fact i {
+            color: var(--accent);
+            font-size: 1.2em;
+            margin-top: 3px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text);
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 50px 20px 40px;
+                border-radius: 0 0 30px 30px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .stat-item {
+                width: 90%;
+                justify-content: center;
+            }
+            
+            .day-card {
+                padding: 25px;
+                margin: 0 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><i class="fas fa-smile-beam"></i> 西安快乐探索之旅</h1>
+        <div class="stats">
+            <div class="stat-item"><i class="fas fa-calendar-alt"></i> 总天数：2天</div>
+            <div class="stat-item"><i class="fas fa-map-marker-alt"></i> 景点数：4个</div>
+            <div class="stat-item"><i class="fas fa-star"></i> 欢乐行程</div>
+            <div class="stat-item"><i class="fas fa-sun"></i> 快乐指数：★★★★★</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="day-container">
+            <div class="day-card">
+                <h2><i class="fas fa-sun"></i> Day 1 - 2025年8月15日</h2>
+                <div class="location-card">
+                    <span class="location-type">博物馆</span>
+                    <h3><i class="fas fa-landmark"></i> 陕西历史博物馆</h3>
+                    <p>中国第一座大型现代化国家级博物馆，馆藏文物37万余件，时间跨度长达一百多万年，被誉为'古都明珠，华夏宝库'。</p>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：3-4小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：寻找博物馆里的"唐妞"文创，她可爱的形象会让你会心一笑！</div>
+                    </div>
+                </div>
+                <div class="location-card">
+                    <span class="location-type">购物中心</span>
+                    <h3><i class="fas fa-shopping-bag"></i> 西安大悦城</h3>
+                    <p>大型现代化购物中心，集购物、餐饮、娱乐于一体，空调系统完善，是夏日避暑好去处。</p>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：2-3小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：顶楼的露天平台是拍摄大雁塔的绝佳位置，别忘了打卡拍照！</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card">
+                <h2><i class="fas fa-sun"></i> Day 2 - 2025年8月16日</h2>
+                <div class="location-card">
+                    <span class="location-type">博物馆</span>
+                    <h3><i class="fas fa-landmark"></i> 西安博物馆</h3>
+                    <p>国家一级博物馆，集博物馆、名胜古迹、城市园林为一体，馆藏文物13万件。</p>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：3小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：寻找镇馆之宝——唐代三彩腾空马，感受盛唐的活力与动感！</div>
+                    </div>
+                </div>
+                <div class="location-card">
+                    <span class="location-type">历史文化遗址</span>
+                    <h3><i class="fas fa-pagoda"></i> 小雁塔</h3>
+                    <p>世界文化遗产，唐代佛教建筑遗存，与西安博物馆相邻，环境清幽宜人。</p>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：1.5小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：敲响雁塔晨钟，许下心愿，感受千年古塔的宁静与祥和！</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>行呗旅游攻略 © 2025 | 快乐旅行，美好回忆</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isIframe = urlParams.get('iframe') === 'true';
+            
+            // 如果是iframe模式，则不显示返回按钮
+            if (isIframe) {
+                return;
+            }
+            // 添加返回按钮
+            const backButton = document.createElement('div');
+            backButton.innerHTML = '<i class="fas fa-arrow-left"></i> 返回行呗';
+            backButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 12px 20px;
+                border-radius: 12px;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(93, 105, 179, 0.2);
+                font-weight: 600;
+                color: var(--primary);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.5);
+                z-index: 1000;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            `;
+            
+            backButton.onmouseover = function() {
+                this.style.transform = 'translateY(-3px)';
+                this.style.boxShadow = '0 6px 20px rgba(93, 105, 179, 0.3)';
+                this.style.background = 'rgba(255,255,255,1)';
+            };
+            
+            backButton.onmouseout = function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 15px rgba(93, 105, 179, 0.2)';
+                this.style.background = 'rgba(255,255,255,0.9)';
+            };
+            
+            backButton.onclick = function() {
+                window.location.href = '/';
+            };
+            
+            document.body.appendChild(backButton);
+            
+            // 添加卡片悬停效果
+            const cards = document.querySelectorAll('.location-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '8px 8px 20px rgba(138, 148, 204, 0.3)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = '5px 5px 15px rgba(138, 148, 204, 0.2)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -54,6 +54,7 @@ export default function SharedItineraryPage() {
   const streamingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const codeContainerRef = useRef<HTMLDivElement | null>(null)
   const [iframeKey, setIframeKey] = useState(0) // 用于强制刷新iframe
+  const [isIdeEffectActive, setIsIdeEffectActive] = useState(false) // 新增：IDE编码效果状态
   
   const webUrl = useMemo(
     () => {
@@ -198,7 +199,7 @@ export default function SharedItineraryPage() {
     setIframeKey(prev => prev + 1) // 增加key值强制重新渲染iframe
   }, [])
 
-  // 流式代码生成逻辑
+    // 流式代码生成逻辑
   const startStreamingCode = useCallback(() => {
     const codeTemplate = `// 🚀 升级体验组件生成中...
 import React, { useState, useEffect, useCallback } from 'react'
@@ -295,6 +296,24 @@ const config = {
     }, 5) // 25ms间隔，稍快一些
     
     streamingIntervalRef.current = streamInterval
+  }, [])
+
+  // 启动IDE编码效果
+  const handleStartIdeEffect = useCallback(() => {
+    console.log('🚀 启动IDE编码效果')
+    setIsIdeEffectActive(true)
+    startStreamingCode()
+  }, [startStreamingCode])
+
+  // 停止IDE编码效果
+  const handleStopIdeEffect = useCallback(() => {
+    console.log('✅ IDE编码效果完成')
+    setIsIdeEffectActive(false)
+    // 清理代码生成定时器
+    if (streamingIntervalRef.current) {
+      clearInterval(streamingIntervalRef.current)
+      streamingIntervalRef.current = null
+    }
   }, [])
 
   // 处理升级请求
@@ -995,6 +1014,8 @@ const config = {
                   webUrl={webUrl}
                   guideId={originalGuideId || id}
                   onContentUpdated={handleContentUpdated}
+                  onStartIdeEffect={handleStartIdeEffect}
+                  onStopIdeEffect={handleStopIdeEffect}
                 />
               </div>
             )}
@@ -1005,7 +1026,7 @@ const config = {
                 <TravelCommunity onApplyTemplate={handleApplyTemplate} onExitCommunity={handleExitCommunity} onPreviewTemplate={handlePreviewTemplate} />
               ) : isWebType ? (
                 <div className="h-full overflow-hidden relative">
-                  {isUpgrading && (
+                  {(isUpgrading || isIdeEffectActive) && (
                     <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
                       <div className="text-center max-w-2xl">
                         {/* IDE编码效果 - 流式代码生成 */}
@@ -1050,8 +1071,15 @@ const config = {
                           </div>
                         </div>
                         
-                        <h3 className="text-lg font-medium text-gray-800 mb-2">🌟 正在升级体验</h3>
-                        <p className="text-gray-600">{isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...'}</p>
+                        <h3 className="text-lg font-medium text-gray-800 mb-2">
+                          {isIdeEffectActive ? '💻 AI编码中...' : '🌟 正在升级体验'}
+                        </h3>
+                        <p className="text-gray-600">
+                          {isIdeEffectActive 
+                            ? '正在根据您的需求生成定制化页面...'
+                            : (isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...')
+                          }
+                        </p>
                         
                         {/* 进度条保持原样 */}
                         <div className="mt-4">
@@ -1198,6 +1226,8 @@ const config = {
                 webUrl={webUrl}
                 guideId={originalGuideId || id}
                 onContentUpdated={handleContentUpdated}
+                onStartIdeEffect={handleStartIdeEffect}
+                onStopIdeEffect={handleStopIdeEffect}
               />
             </div>
           )}
@@ -1208,7 +1238,7 @@ const config = {
               <TravelCommunity onApplyTemplate={handleApplyTemplate} onExitCommunity={handleExitCommunity} onPreviewTemplate={handlePreviewTemplate} />
             ) : isWebType ? (
               <div className="h-full overflow-hidden relative">
-                {isUpgrading && (
+                {(isUpgrading || isIdeEffectActive) && (
                   <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-20">
                     <div className="text-center max-w-2xl">
                       {/* IDE编码效果 - 流式代码生成 */}
@@ -1274,8 +1304,15 @@ const config = {
                         </div>
                       </div>
                       
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">🌟 正在升级体验</h3>
-                      <p className="text-gray-600">{isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...'}</p>
+                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                        {isIdeEffectActive ? '💻 AI编码中...' : '🌟 正在升级体验'}
+                      </h3>
+                      <p className="text-gray-600">
+                        {isIdeEffectActive 
+                          ? '正在根据您的需求生成定制化页面...'
+                          : (isUpgraded ? '正在加载更丰富的展示...' : '即将为您呈现更丰富的展示...')
+                        }
+                      </p>
                       
                       {/* 进度条保持原样 */}
                       <div className="mt-4">
@@ -1600,30 +1637,30 @@ const config = {
     )
   }
 
-  if (error || (!itinerary && !serverContent)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MapPin className="w-8 h-8 text-red-500" />
-          </div>
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-            {error || '行程不存在'}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            该行程可能已被删除或链接已过期
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            返回首页
-          </Link>
-        </div>
-      </div>
-    )
-  }
+  // if (error || (!itinerary && !serverContent)) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+  //       <div className="text-center max-w-md">
+  //         <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+  //           <MapPin className="w-8 h-8 text-red-500" />
+  //         </div>
+  //         <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+  //           {error || '行程不存在'}
+  //         </h1>
+  //         <p className="text-gray-600 dark:text-gray-400 mb-6">
+  //           该行程可能已被删除或链接已过期
+  //         </p>
+  //         <Link
+  //           href="/"
+  //           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+  //         >
+  //           <ArrowLeft className="w-4 h-4" />
+  //           返回首页
+  //         </Link>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return renderTemplate()
 }

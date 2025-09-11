@@ -199,7 +199,7 @@ export function useExportFeatures() {
       const itineraryData = savedData[shareId]
       
       if (!itineraryData) {
-        throw new Error('行程不存在或已过期')
+        // throw new Error('行程不存在或已过期')
       }
       
       return itineraryData

@@ -20,31 +20,31 @@ interface DemoCardsProps {
 
 const demoGuides: DemoGuide[] = [
   {
-    id: 'tokyo-3days',
-    title: '东京3日深度游',
-    destination: '东京',
-    duration: '3天2夜',
-    theme: '文化体验',
-    highlights: ['浅草寺', '东京塔', '银座购物', '筑地市场'],
-    preview: '经典东京必去景点，完美的初次日本行程规划'
-  },
-  {
-    id: 'paris-romance',
-    title: '巴黎浪漫之旅',
-    destination: '巴黎',
+    id: 'beijing-imperial',
+    title: '北京皇城文化之旅',
+    destination: '北京',
     duration: '4天3夜',
-    theme: '浪漫度假',
-    highlights: ['埃菲尔铁塔', '卢浮宫', '塞纳河游船', '香榭丽舍大街'],
-    preview: '感受法式浪漫，品味艺术与美食的完美结合'
+    theme: '历史文化',
+    highlights: ['故宫', '天坛', '颐和园', '长城'],
+    preview: '探索千年古都，感受厚重历史文化和皇家园林之美'
   },
   {
-    id: 'thailand-adventure',
-    title: '泰国海岛探险',
-    destination: '普吉岛',
-    duration: '5天4夜',
-    theme: '海岛度假',
-    highlights: ['皮皮岛', '攀牙湾', '泰式按摩', '海鲜大餐'],
-    preview: '热带海岛风情，享受阳光沙滩和异域文化'
+    id: 'hangzhou-jiangnan',
+    title: '杭州江南水乡',
+    destination: '杭州',
+    duration: '3天2夜',
+    theme: '自然风光',
+    highlights: ['西湖', '灵隐寺', '宋城', '河坊街'],
+    preview: '人间天堂美景，品味江南水乡的诗情画意'
+  },
+  {
+    id: 'chengdu-panda',
+    title: '成都美食熊猫游',
+    destination: '成都',
+    duration: '3天2夜',
+    theme: '美食文化',
+    highlights: ['大熊猫基地', '宽窄巷子', '火锅', '川菜'],
+    preview: '巴蜀文化体验，品尝正宗川菜，邂逅可爱国宝'
   }
 ]
 

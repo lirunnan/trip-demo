@@ -593,28 +593,28 @@ export async function PUT(
   try {
     const lastContent = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3030'}${lastContentURL}`)
     const htmlContent = await lastContent.text()
-    const prompt = `你是一个专业的前端设计师和旅游专家。请基于原始文件按要求调整HTML页面。
+    const prompt = `
+    **原始HTML内容**:
+${htmlContent}
+   请基于原始文件按要求调整HTML页面。
 **设计要求**
 ${chat}
 
 **重要**:
-- 保持风格不变
-- 请生成完整的HTML代码，包含所有样式和内容，没有改变的内容也需要输出
+- 内容不变
+- 请生成完整的HTML代码，包含所有样式和内容
 - 确保代码可以直接在浏览器中运行
 - 使用中文内容
 - 样式要比普通网页更加炫酷和现代化
 - 根据目的地特色选择合适的主题色彩
 
 请直接输出完整的HTML代码，不允许省略，不需要任何解释文字。
-
-**原始HTML内容**:
-${htmlContent}
 `
     const response = await callAIWithAutoModel({
       prompt,
       systemPrompt: '你是专业的前端设计师，擅长创建炫酷现代化交互模式的网页设计',
-      temperature: 0.8, // 提高创造性
-      maxTokens: 4000
+      temperature: 0.2, // 提高创造性
+      maxTokens: 10000
     })
     
     if (response.success && response.data?.content) {

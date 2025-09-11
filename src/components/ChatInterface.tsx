@@ -45,11 +45,20 @@ export interface UserInfo {
   color: string
 }
 
+export interface LocalTransportationTrip {
+  walking?: string
+  taxi?: string
+  publicTransport?: string
+  carRental?: string
+  summary: string
+}
+
 export interface ItineraryDay {
   day: number
   date: string
   locations: Location[]
   accommodation?: Accommodation
+  localTransportation?: LocalTransportationTrip
 }
 
 export interface Accommodation {
@@ -148,6 +157,66 @@ export default function ChatInterface({
   }
 
 
+  const renderLocalTransportation = (localTransport: LocalTransportationTrip) => {
+    return (
+      <div className="mt-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 space-y-2">
+        <h6 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2 text-sm">
+          🚇 本地交通
+        </h6>
+        
+        {/* 总结 */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded p-2">
+          <p className="text-xs text-blue-800 dark:text-blue-200 font-medium">
+            💡 {localTransport.summary}
+          </p>
+        </div>
+
+        {/* 交通方式 */}
+        <div className="grid grid-cols-1 gap-2">
+          {localTransport.walking && (
+            <div className="flex items-start gap-2">
+              <span className="text-green-500 text-xs mt-0.5">🚶</span>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium text-green-600 dark:text-green-400">步行：</span>
+                {localTransport.walking}
+              </p>
+            </div>
+          )}
+          
+          {localTransport.publicTransport && (
+            <div className="flex items-start gap-2">
+              <span className="text-blue-500 text-xs mt-0.5">🚇</span>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium text-blue-600 dark:text-blue-400">地铁/公交：</span>
+                {localTransport.publicTransport}
+              </p>
+            </div>
+          )}
+          
+          {localTransport.taxi && (
+            <div className="flex items-start gap-2">
+              <span className="text-yellow-500 text-xs mt-0.5">🚕</span>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium text-yellow-600 dark:text-yellow-400">出租车：</span>
+                {localTransport.taxi}
+              </p>
+            </div>
+          )}
+          
+          {localTransport.carRental && (
+            <div className="flex items-start gap-2">
+              <span className="text-red-500 text-xs mt-0.5">🚗</span>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium text-red-600 dark:text-red-400">租车：</span>
+                {localTransport.carRental}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   const renderItinerary = (itinerary: ItineraryDay[]) => {
     return (
       <div className="mt-4 space-y-4">
@@ -194,6 +263,9 @@ export default function ChatInterface({
                   </div>
                 </div>
               ))}
+              
+              {/* 本地交通信息 */}
+              {day.localTransportation && renderLocalTransportation(day.localTransportation)}
             </div>
           </div>
         ))}

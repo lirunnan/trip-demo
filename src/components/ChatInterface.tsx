@@ -13,9 +13,29 @@ export interface Message {
   role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: Date
+  interCityTransportation?: InterCityTransportation
   itinerary?: ItineraryDay[]
   sender?: UserInfo  // 发送者信息，仅在user角色时有效
   showBreathingAnimation?: boolean  // 是否显示呼吸感动画，默认true
+}
+
+export interface TransportationTrip {
+  type: string
+  name: string
+  departureTime: string
+  arrivalTime: string
+  departureStation: string
+  arrivalStation: string
+  duration: string
+  price: string
+  description: string
+  reason: string
+}
+
+export interface InterCityTransportation {
+  outbound: TransportationTrip
+  returnTrip: TransportationTrip
+  summary: string
 }
 
 export interface UserInfo {
@@ -177,6 +197,109 @@ export default function ChatInterface({
             </div>
           </div>
         ))}
+      </div>
+    )
+  }
+
+  const renderTransportation = (transportation: InterCityTransportation) => {
+    return (
+      <div className="mt-4 space-y-4">
+        <h4 className="font-semibold text-gray-800 dark:text-gray-200">🚄 城际交通</h4>
+        
+        {/* 总结 */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
+          <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+            📋 {transportation.summary}
+          </p>
+        </div>
+
+        {/* 去程 */}
+        <div className="border-l-4 border-green-500 pl-4">
+          <h5 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+            <Plane className="w-4 h-4 text-green-500" />
+            去程 - {transportation.outbound.name}
+          </h5>
+          <div className="mt-2 space-y-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm text-gray-500 dark:text-gray-400">出发</span>
+                <p className="font-medium text-gray-700 dark:text-gray-300">
+                  {transportation.outbound.departureStation}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {transportation.outbound.departureTime}
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-500 dark:text-gray-400">到达</span>
+                <p className="font-medium text-gray-700 dark:text-gray-300">
+                  {transportation.outbound.arrivalStation}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {transportation.outbound.arrivalTime}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="text-gray-600 dark:text-gray-400">
+                🕐 {transportation.outbound.duration}
+              </span>
+              <span className="text-green-600 dark:text-green-400 font-medium">
+                💰 {transportation.outbound.price}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {transportation.outbound.description}
+            </p>
+            <p className="text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 p-2 rounded">
+              💡 {transportation.outbound.reason}
+            </p>
+          </div>
+        </div>
+
+        {/* 返程 */}
+        <div className="border-l-4 border-purple-500 pl-4">
+          <h5 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+            <Plane className="w-4 h-4 text-purple-500 transform rotate-180" />
+            返程 - {transportation.returnTrip.name}
+          </h5>
+          <div className="mt-2 space-y-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm text-gray-500 dark:text-gray-400">出发</span>
+                <p className="font-medium text-gray-700 dark:text-gray-300">
+                  {transportation.returnTrip.departureStation}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {transportation.returnTrip.departureTime}
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-500 dark:text-gray-400">到达</span>
+                <p className="font-medium text-gray-700 dark:text-gray-300">
+                  {transportation.returnTrip.arrivalStation}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {transportation.returnTrip.arrivalTime}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="text-gray-600 dark:text-gray-400">
+                🕐 {transportation.returnTrip.duration}
+              </span>
+              <span className="text-purple-600 dark:text-purple-400 font-medium">
+                💰 {transportation.returnTrip.price}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {transportation.returnTrip.description}
+            </p>
+            <p className="text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 p-2 rounded">
+              💡 {transportation.returnTrip.reason}
+            </p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -518,9 +641,9 @@ export default function ChatInterface({
                 return (
                   <div key={message.id} className="flex items-center gap-3">
                     {/* 系统消息内容 */}
-                    <div className={`flex bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-full text-sm border border-amber-200 dark:border-amber-700 ${message.showBreathingAnimation && 'animate-pulse'}`}>
+                    <div className={`flex bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-full text-sm border border-amber-200 dark:border-amber-700 ${message.showBreathingAnimation !== false && 'animate-pulse'}`}>
                       {/* 左侧呼吸感装饰 - 根据showBreathingAnimation条件显示 */}
-                      {message.showBreathingAnimation && (
+                      {message.showBreathingAnimation !== false && (
                         <div className="relative w-12 h-6 pr-3">
                           {/* 第一个呼吸圆圈 - 左右移动 */}
                           <div className="absolute top-2/3 -translate-y-1/2 transition-all duration-2000 ease-in-out animate-[moveRight_3s_ease-in-out_infinite]">
@@ -608,6 +731,7 @@ export default function ChatInterface({
                     }
                   >
                     <div className="whitespace-pre-wrap">{message.content}</div>
+                    {message.interCityTransportation && renderTransportation(message.interCityTransportation)}
                     {message.itinerary && renderItinerary(message.itinerary)}
                     {
                       message.itinerary && (

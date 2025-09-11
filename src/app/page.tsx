@@ -223,9 +223,10 @@ export default function Home() {
             }
           } else if (msg.role === 'ASSISTANT') {
             // 解析助手消息的内容为行程数据
-            let itinerary: ItineraryDay[] | undefined
+            let itinerary: any
             try {
               itinerary = JSON.parse(msg.content)
+              console.log(itinerary)
             } catch (error) {
               console.error('解析行程数据失败:', error)
             }
@@ -235,7 +236,8 @@ export default function Home() {
               role: 'assistant' as const,
               content: '',
               timestamp: new Date(msg.timestamp),
-              itinerary
+              interCityTransportation: itinerary.interCityTransportation,
+              itinerary: itinerary.itinerary
             }
           }
           return null
@@ -300,6 +302,7 @@ export default function Home() {
         role: 'assistant',
         content: '',
         timestamp: new Date(),
+        interCityTransportation: gRes?.data?.plan?.interCityTransportation,
         itinerary: gRes?.data?.plan?.itinerary
       }
       console.log(assistantMessage)

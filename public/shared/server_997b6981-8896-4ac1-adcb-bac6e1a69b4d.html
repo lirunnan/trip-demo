@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1天旅行计划 - 行呗旅游攻略</title>
+    <meta name="description" content="1天旅行计划 - 由行呗AI生成的个性化旅游攻略">
+    <meta property="og:title" content="1天旅行计划">
+    <meta property="og:description" content="个性化AI旅游攻略">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北京1日游 - 探索帝都之美</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e63946;
+            --secondary: #1d3557;
+            --accent: #457b9d;
+            --background: #f1faee;
+            --text: #2b2d42;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f6f9fc 0%, #e9f2f9 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/></svg>') repeat;
+            opacity: 0.1;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.1);
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .timeline {
+            display: grid;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .location-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .location-type {
+            background: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .duration {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tips {
+            background: linear-gradient(135deg, #457b9d 0%, #1d3557 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+        }
+
+        .tips h2 {
+            margin-bottom: 20px;
+        }
+
+        .tips ul {
+            list-style: none;
+        }
+
+        .tips li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .tips li::before {
+            content: '👉';
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .location-card {
+                padding: 20px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--secondary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .location-card {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏛️ 北京经典1日游</h1>
+            <p>探索中国首都的历史文化精髓</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <h3>总天数</h3>
+                    <p>1天</p>
+                </div>
+                <div class="stat-item">
+                    <h3>景点数</h3>
+                    <p>4个</p>
+                </div>
+                <div class="stat-item">
+                    <h3>行程日期</h3>
+                    <p>2025-03-15</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="timeline">
+            <div class="location-card">
+                <div class="location-header">
+                    <h2>🏛️ 天安门广场</h2>
+                    <span class="location-type">历史文化景点</span>
+                </div>
+                <p>世界上最大的城市广场，观看升旗仪式的最佳地点</p>
+                <p class="duration">⏱️ 游览时长：1小时</p>
+            </div>
+
+            <div class="location-card">
+                <div class="location-header">
+                    <h2>🏰 故宫博物院</h2>
+                    <span class="location-type">历史文化景点</span>
+                </div>
+                <p>明清两代的皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑群</p>
+                <p class="duration">⏱️ 游览时长：3小时</p>
+            </div>
+
+            <div class="location-card">
+                <div class="location-header">
+                    <h2>🌳 景山公园</h2>
+                    <span class="location-type">公园景点</span>
+                </div>
+                <p>俯瞰故宫全景的最佳位置，明代皇家园林</p>
+                <p class="duration">⏱️ 游览时长：1小时</p>
+            </div>
+
+            <div class="location-card">
+                <div class="location-header">
+                    <h2>🏮 什刹海</h2>
+                    <span class="location-type">历史文化街区</span>
+                </div>
+                <p>北京著名的历史文化旅游区，包含前海、后海和西海三个湖泊</p>
+                <p class="duration">⏱️ 游览时长：2小时</p>
+            </div>
+        </div>
+
+        <div class="tips">
+            <h2>📌 旅行贴士</h2>
+            <ul>
+                <li>建议清早前往天安门广场，可观看升旗仪式</li>
+                <li>故宫需要提前预约门票，建议网上购买</li>
+                <li>景山公园登高需要适量体力，建议准备充足水分</li>
+                <li>什刹海地区晚上景色最美，可以考虑傍晚前往</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            <p>© 2024 北京旅游攻略 | 设计制作</p>
+        </footer>
+    </div>
+</body>
+</html>
+    
+    <script>
+        // 添加返回按钮（根据URL参数判断是否显示）
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查URL参数是否包含iframe=true
+            const urlParams = new URLSearchParams(window.location.search);
+            const isIframe = urlParams.get('iframe') === 'true';
+            
+            // 如果是iframe模式，则不显示返回按钮
+            if (isIframe) {
+                return;
+            }
+            
+            const backButton = document.createElement('div');
+            backButton.innerHTML = '← 返回首页';
+            backButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: rgba(255,255,255,0.9);
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                font-weight: 500;
+                color: #333;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.5);
+                z-index: 1000;
+                transition: all 0.3s ease;
+            `;
+            
+            backButton.onmouseover = function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            };
+            
+            backButton.onmouseout = function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            };
+            
+            backButton.onclick = function() {
+                window.location.href = '/';
+            };
+            
+            document.body.appendChild(backButton);
+        });
+    </script>
+</body>
+</html>

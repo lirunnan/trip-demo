@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北京旅行仪表盘 - 三日行程管控中心</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+            background-size: 400% 400%;
+            animation: dashboardGradient 20s ease infinite;
+            color: #e0e6ed;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        @keyframes dashboardGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 科技感背景网格 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 30s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* 仪表盘容器 */
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* 顶部控制栏 */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,255,255,0.2);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .dashboard-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ffff, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: titleScan 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleScan {
+            0% { 
+                filter: brightness(1);
+                text-shadow: 0 0 10px rgba(0,255,255,0.3);
+            }
+            100% { 
+                filter: brightness(1.2);
+                text-shadow: 0 0 20px rgba(0,255,255,0.6);
+            }
+        }
+
+        .dashboard-stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px 15px;
+            background: rgba(0,255,255,0.1);
+            border: 1px solid rgba(0,255,255,0.3);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00ffff;
+            display: block;
+            text-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #a0a9b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* 仪表盘网格 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* 控制面板卡片 */
+        .control-panel {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,255,255,0.2);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .control-panel:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(0,255,255,0.4);
+            box-shadow: 
+                0 15px 50px rgba(0,0,0,0.4),
+                0 0 30px rgba(0,255,255,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        /* 卡片扫描线效果 */
+        .control-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: scanLine 3s ease-in-out infinite;
+        }
+
+        @keyframes scanLine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: -100%; }
+        }
+
+        /* 卡片标题 */
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,255,255,0.2);
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-icon {
+            font-size: 1.5rem;
+            color: #0080ff;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .panel-status {
+            padding: 4px 12px;
+            background: rgba(0,255,0,0.2);
+            border: 1px solid rgba(0,255,0,0.4);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #00ff00;
+            text-transform: uppercase;
+            font-weight: 500;
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* 日程控制面板 */
+        .day-control {
+            margin-bottom: 25px;
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,128,255,0.1);
+            border: 1px solid rgba(0,128,255,0.3);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .day-header:hover {
+            background: rgba(0,128,255,0.2);
+            border-color: rgba(0,128,255,0.5);
+            transform: translateX(5px);
+        }
+
+        .day-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .day-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0080ff;
+            background: rgba(0,128,255,0.2);
+            border: 2px solid rgba(0,128,255,0.4);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 10px rgba(0,128,255,0.5);
+        }
+
+        .day-details h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            color: #e0e6ed;
+            margin-bottom: 3px;
+        }
+
+        .day-details p {
+            font-size: 0.9rem;
+            color: #a0a9b8;
+        }
+
+        .day-metrics {
+            display: flex;
+            gap: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(0,255,255,0.2);
+        }
+
+        .metric-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #00ffff;
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: #a0a9b8;
+            text-transform: uppercase;
+        }
+
+        /* 酒店监控面板 */
+        .hotel-monitor {
+            background: rgba(255,165,0,0.1);
+            border: 1px solid rgba(255,165,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hotel-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffa500;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hotel-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .hotel-stat {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255,165,0,0.2);
+        }
+
+        .hotel-stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffa500;
+            display: block;
+        }
+
+        .hotel-stat-label {
+            font-size: 0.7rem;
+            color: #a0a9b8;
+            margin-top: 2px;
+        }
+
+        /* 图像监控网格 */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .image-monitor {
+            position: relative;
+            height: 120px;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(0,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-monitor:hover {
+            border-color: rgba(0,255,255,0.6);
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,255,255,0.3);
+        }
+
+        .image-monitor img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8) contrast(1.2) hue-rotate(10deg);
+            transition: filter 0.3s ease;
+        }
+
+        .image-monitor:hover img {
+            filter: brightness(1) contrast(1.3) hue-rotate(0deg);
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                45deg,
+                rgba(0,255,255,0.1) 0%,
+                transparent 50%,
+                rgba(0,128,255,0.1) 100%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-monitor:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .image-status {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 12px;
+            height: 12px;
+            background: #00ff00;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.5);
+            animation: statusPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* 景点控制列表 */
+        .attraction-controls {
+            list-style: none;
+        }
+
+        .attraction-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,255,255,0.2);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .attraction-control:hover {
+            background: rgba(0,255,255,0.1);
+            border-color: rgba(0,255,255,0.4);
+            transform: translateX(8px);
+        }
+
+        .attraction-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .attraction-icon {
+            font-size: 1.8rem;
+            color: #0080ff;
+            animation: iconRotate 4s linear infinite;
+        }
+
+        @keyframes iconRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .attraction-details h4 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            color: #e0e6ed;
+            margin-bottom: 2px;
+        }
+
+        .attraction-details p {
+            font-size: 0.8rem;
+            color: #a0a9b8;
+        }
+
+        .attraction-controls-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-display {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            color: #00ffff;
+            background: rgba(0,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(0,255,255,0.3);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: indicatorBlink 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes indicatorBlink {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        /* 系统监控区域 */
+        .system-monitor {
+            background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,0,0,0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .system-monitor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff0000, #ff6600, #ffaa00);
+            animation: systemScan 2s ease-in-out infinite;
+        }
+
+        @keyframes systemScan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .monitor-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .monitor-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-5px);
+        }
+
+        .monitor-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00ff00;
+            display: block;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(0,255,0,0.5);
+        }
+
+        .monitor-label {
+            font-size: 0.9rem;
+            color: #a0a9b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 图片灯箱 */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 15px;
+            border: 3px solid #00ffff;
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.5),
+                0 0 30px rgba(0,255,255,0.3);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #00ffff;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.8);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #00ffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(0,255,255,0.2);
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-monitor {
+                height: 200px;
+            }
+
+            .day-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .day-metrics {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00ffff;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: loadingGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes loadingGlow {
+            0% { 
+                text-shadow: 0 0 10px rgba(0,255,255,0.5);
+                transform: scale(1);
+            }
+            100% { 
+                text-shadow: 0 0 30px rgba(0,255,255,1);
+                transform: scale(1.02);
+            }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(0,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #0080ff);
+            border-radius: 2px;
+            animation: loadingProgress 2s ease-in-out infinite;
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; transform: translateX(-100%); }
+            50% { width: 100%; transform: translateX(0%); }
+            100% { width: 100%; transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="loading-text">SYSTEM INITIALIZING</div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- 仪表盘标题栏 -->
+        <div class="dashboard-header" data-aos="fade-down">
+            <h1 class="dashboard-title">Beijing Travel Control</h1>
+            <div class="dashboard-stats">
+                <div class="stat-item">
+                    <span class="stat-number">03</span>
+                    <span class="stat-label">Days</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">08</span>
+                    <span class="stat-label">Sites</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100</span>
+                    <span class="stat-label">Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 仪表盘网格 -->
+        <div class="dashboard-grid">
+            <!-- 第一天控制面板 -->
+            <div class="control-panel" data-aos="fade-up" data-aos-delay="100">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-icon">🏛️</span>
+                        Day 01 Control
+                    </div>
+                    <div class="panel-status">ACTIVE</div>
+                </div>
+
+                <div class="day-control">
+                    <div class="day-header">
+                        <div class="day-info">
+                            <div class="day-number">1</div>
+                            <div class="day-details">
+                                <h3>皇城探秘</h3>
+                                <p>2025-03-15 | 天安门·故宫·景山</p>
+                            </div>
+                        </div>
+                        <div class="day-metrics">
+                            <div class="metric">
+                                <span class="metric-value">5-6</span>
+                                <span class="metric-label">Hours</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-value">3</span>
+                                <span class="metric-label">Sites</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hotel-monitor">
+                        <div class="hotel-name">
+                            <span>🏨</span>
+                            Beijing Hilton Wangfujing
+                        </div>
+                        <div class="hotel-stats">
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">★★★★★</span>
+                                <span class="hotel-stat-label">Rating</span>
+                            </div>
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">¥1000</span>
+                                <span class="hotel-stat-label">Price</span>
+                            </div>
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">2.1km</span>
+                                <span class="hotel-stat-label">Distance</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-grid">
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=58480a9db5c5432ca6bea8144808a7a8&docGuid=cjoHPppdo8w0Hi" alt="天安门广场" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=2e4f769e464743a281f014304a0ef9cd&docGuid=cjoHPppdo8w0Hi" alt="故宫博物院" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=3147a6789e25467e9c97b50a298ce50d&docGuid=cjoHPppdo8w0Hi" alt="景山公园" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                    </div>
+
+                    <ul class="attraction-controls">
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">🏛️</div>
+                                <div class="attraction-details">
+                                    <h4>Tiananmen Square</h4>
+                                    <p>世界最大城市广场</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">1H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">🏰</div>
+                                <div class="attraction-details">
+                                    <h4>Forbidden City</h4>
+                                    <p>明清皇家宫殿</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">3-4H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">🌸</div>
+                                <div class="attraction-details">
+                                    <h4>Jingshan Park</h4>
+                                    <p>故宫全景观赏点</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">1H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 第二天控制面板 -->
+            <div class="control-panel" data-aos="fade-up" data-aos-delay="200">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-icon">🐉</span>
+                        Day 02 Control
+                    </div>
+                    <div class="panel-status">STANDBY</div>
+                </div>
+
+                <div class="day-control">
+                    <div class="day-header">
+                        <div class="day-info">
+                            <div class="day-number">2</div>
+                            <div class="day-details">
+                                <h3>长城壮游</h3>
+                                <p>2025-03-16 | 八达岭·明十三陵</p>
+                            </div>
+                        </div>
+                        <div class="day-metrics">
+                            <div class="metric">
+                                <span class="metric-value">6-8</span>
+                                <span class="metric-label">Hours</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-value">2</span>
+                                <span class="metric-label">Sites</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hotel-monitor">
+                        <div class="hotel-name">
+                            <span>🏨</span>
+                            Beijing Hilton Wangfujing
+                        </div>
+                        <div class="hotel-stats">
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">★★★★★</span>
+                                <span class="hotel-stat-label">Rating</span>
+                            </div>
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">¥1000</span>
+                                <span class="hotel-stat-label">Price</span>
+                            </div>
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">70km</span>
+                                <span class="hotel-stat-label">To Wall</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-grid">
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=160b39edf4dc4f538f710cadbfb2f7fc&docGuid=cjoHPppdo8w0Hi" alt="八达岭长城" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=e46484b8251749068b51c143a19b24dd&docGuid=cjoHPppdo8w0Hi" alt="长城烽火台" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=8d1b49bf906742ff879cef5021101e94&docGuid=cjoHPppdo8w0Hi" alt="明十三陵" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                    </div>
+
+                    <ul class="attraction-controls">
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">🐉</div>
+                                <div class="attraction-details">
+                                    <h4>Badaling Great Wall</h4>
+                                    <p>万里长城精华段</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">4-5H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">👑</div>
+                                <div class="attraction-details">
+                                    <h4>Ming Tombs</h4>
+                                    <p>明代皇帝陵墓群</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">2-3H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 第三天控制面板 -->
+            <div class="control-panel" data-aos="fade-up" data-aos-delay="300">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-icon">🌺</span>
+                        Day 03 Control
+                    </div>
+                    <div class="panel-status">PENDING</div>
+                </div>
+
+                <div class="day-control">
+                    <div class="day-header">
+                        <div class="day-info">
+                            <div class="day-number">3</div>
+                            <div class="day-details">
+                                <h3>园林雅韵</h3>
+                                <p>2025-03-17 | 颐和园·圆明园·清华</p>
+                            </div>
+                        </div>
+                        <div class="day-metrics">
+                            <div class="metric">
+                                <span class="metric-value">6-7</span>
+                                <span class="metric-label">Hours</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-value">3</span>
+                                <span class="metric-label">Sites</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hotel-monitor">
+                        <div class="hotel-name">
+                            <span>🏨</span>
+                            Beijing Hilton Wangfujing
+                        </div>
+                        <div class="hotel-stats">
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">★★★★★</span>
+                                <span class="hotel-stat-label">Rating</span>
+                            </div>
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">¥1000</span>
+                                <span class="hotel-stat-label">Price</span>
+                            </div>
+                            <div class="hotel-stat">
+                                <span class="hotel-stat-value">15km</span>
+                                <span class="hotel-stat-label">To Parks</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-grid">
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=c17d295467144295bd11055486b10e48&docGuid=cjoHPppdo8w0Hi" alt="颐和园" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=90b7f670b09d4a9a96dceaa7645c6550&docGuid=cjoHPppdo8w0Hi" alt="圆明园" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                        <div class="image-monitor" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=acbdd87d43644a05bf1677b921352c13&docGuid=cjoHPppdo8w0Hi" alt="清华大学" />
+                            <div class="image-overlay"></div>
+                            <div class="image-status"></div>
+                        </div>
+                    </div>
+
+                    <ul class="attraction-controls">
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">🌺</div>
+                                <div class="attraction-details">
+                                    <h4>Summer Palace</h4>
+                                    <p>完整皇家园林</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">3-4H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">🏮</div>
+                                <div class="attraction-details">
+                                    <h4>Yuanmingyuan</h4>
+                                    <p>圆明园遗址公园</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">2-3H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                        <li class="attraction-control">
+                            <div class="attraction-info">
+                                <div class="attraction-icon">📚</div>
+                                <div class="attraction-details">
+                                    <h4>Tsinghua University</h4>
+                                    <p>著名高等学府</p>
+                                </div>
+                            </div>
+                            <div class="attraction-controls-right">
+                                <div class="time-display">1-2H</div>
+                                <div class="status-indicator"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系统监控区域 -->
+        <div class="system-monitor" data-aos="fade-up" data-aos-delay="400">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="panel-icon">⚡</span>
+                    System Monitor
+                </div>
+                <div class="panel-status">OPTIMAL</div>
+            </div>
+
+            <div class="monitor-grid">
+                <div class="monitor-item">
+                    <span class="monitor-value">98.7%</span>
+                    <span class="monitor-label">System Health</span>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-value">¥3600</span>
+                    <span class="monitor-label">Total Budget</span>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-value">72H</span>
+                    <span class="monitor-label">Duration</span>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-value">8</span>
+                    <span class="monitor-label">Attractions</span>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-value">15.2°C</span>
+                    <span class="monitor-label">Weather</span>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-value">READY</span>
+                    <span class="monitor-label">Status</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片灯箱 -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <!-- JavaScript库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // 初始化AOS动画库
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100,
+            easing: 'ease-out-cubic'
+        });
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('fade-out');
+            }, 3000);
+        });
+
+        // 图片灯箱功能
+        function openLightbox(element) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const img = element.querySelector('img');
+            
+            lightboxImg.src = img.src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 键盘事件监听
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+
+        // 实时时钟更新
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // 更新所有时间显示
+            const timeDisplays = document.querySelectorAll('.time-display');
+            timeDisplays.forEach((display, index) => {
+                if (index === 0) {
+                    display.textContent = timeString;
+                }
+            });
+        }
+
+        // 每秒更新时钟
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 系统状态模拟
+        function updateSystemStatus() {
+            const healthValue = document.querySelector('.monitor-value');
+            const currentHealth = parseFloat(healthValue.textContent);
+            const newHealth = (95 + Math.random() * 5).toFixed(1);
+            healthValue.textContent = `${newHealth}%`;
+            
+            // 状态指示器闪烁
+            const indicators = document.querySelectorAll('.status-indicator');
+            indicators.forEach(indicator => {
+                const colors = ['#00ff00', '#ffff00', '#ff6600'];
+                indicator.style.background = colors[Math.floor(Math.random() * colors.length)];
+            });
+        }
+
+        // 每5秒更新系统状态
+        setInterval(updateSystemStatus, 5000);
+
+        // 控制面板交互效果
+        const controlPanels = document.querySelectorAll('.control-panel');
+        controlPanels.forEach(panel => {
+            panel.addEventListener('mouseenter', function() {
+                this.style.borderColor = 'rgba(0,255,255,0.6)';
+                this.querySelector('.panel-status').style.background = 'rgba(0,255,0,0.3)';
+            });
+            
+            panel.addEventListener('mouseleave', function() {
+                this.style.borderColor = 'rgba(0,255,255,0.2)';
+                this.querySelector('.panel-status').style.background = 'rgba(0,255,0,0.2)';
+            });
+        });
+
+        // 景点控制项点击效果
+        const attractionControls = document.querySelectorAll('.attraction-control');
+        attractionControls.forEach(control => {
+            control.addEventListener('click', function() {
+                // 模拟激活效果
+                this.style.background = 'rgba(0,255,255,0.2)';
+                this.style.borderColor = 'rgba(0,255,255,0.6)';
+                
+                setTimeout(() => {
+                    this.style.background = 'rgba(0,0,0,0.3)';
+                    this.style.borderColor = 'rgba(0,255,255,0.2)';
+                }, 1000);
+            });
+        });
+
+        // 添加科技感扫描效果
+        function createScanEffect() {
+            const panels = document.querySelectorAll('.control-panel');
+            panels.forEach((panel, index) => {
+                setTimeout(() => {
+                    panel.style.animation = 'panelScan 2s ease-in-out';
+                }, index * 500);
+            });
+        }
+
+        // 添加扫描动画CSS
+        const scanStyle = document.createElement('style');
+        scanStyle.textContent = `
+            @keyframes panelScan {
+                0% { box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+                50% { box-shadow: 0 8px 32px rgba(0,255,255,0.4), inset 0 1px 0 rgba(0,255,255,0.3); }
+                100% { box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+            }
+        `;
+        document.head.appendChild(scanStyle);
+
+        // 页面加载完成后执行扫描效果
+        setTimeout(createScanEffect, 4000);
+    </script>
+</body>
+</html>

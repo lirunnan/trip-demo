@@ -2,7 +2,6 @@
 
 import { MapPin, Clock, Copy, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
-
 interface DemoGuide {
   id: string
   title: string

@@ -548,13 +548,13 @@ export async function POST(
     const { title, itinerary, guideId } = body
     
     // 生成HTML内容
-    const html = await generateHTMLFromItinerary(title, itinerary)
+    const res = await generateHTMLByClaudeCode(title, itinerary, guideId+'.html')
     // const html = mockSharedData['3'].html
     
     const newData: SharedItineraryData = {
       id,
       title,
-      html,
+      html: JSON.stringify(res),
       createdAt: new Date().toISOString(),
       guideId
     }
@@ -565,10 +565,7 @@ export async function POST(
     
     return NextResponse.json({
       success: true,
-      data: {
-        ...newData,
-        savedPageUrl: `/saved-page/${id}`
-      }
+      data: res
     })
     
   } catch (error) {
@@ -614,7 +611,8 @@ ${chat}
       prompt,
       systemPrompt: '你是专业的前端设计师，擅长创建炫酷现代化交互模式的网页设计',
       temperature: 0.2, // 提高创造性
-      maxTokens: 10000
+      maxTokens: 100000,
+      model: 'openai/gpt-5'
     })
     
     if (response.success && response.data?.content) {
@@ -644,6 +642,77 @@ ${chat}
       { status: 404 }
     )
   }
+}
+
+async function generateHTMLByClaudeCode(title: string, itinerary: any[], fileName: string) {
+  console.log('🎨 开始使用AI生成炫酷网页...')
+    
+    // 准备行程数据
+    const totalDays = itinerary.length
+    const totalAttractions = itinerary.reduce((total: number, day: any) => total + day.locations.length, 0)
+    
+    // 构建详细的行程信息
+    const itineraryDetails = itinerary.map((day: any) => ({
+      day: day.day,
+      date: day.date,
+      locations: day.locations.map((location: any) => ({
+        name: location.name,
+        description: location.description,
+        duration: location.duration,
+        type: location.type
+      }))
+    }))
+  const prompt = `你是一个专业的前端设计师和旅游专家。请为以下旅游行程生成一个极其炫酷、现代化的HTML页面。
+
+**行程标题**: ${title}
+**总天数**: ${totalDays}天
+**总景点数**: ${totalAttractions}个
+
+**详细行程**:
+${JSON.stringify(itineraryDetails, null, 2)}
+
+**设计要求**:
+1. 使用现代化的CSS设计，包含渐变背景、阴影效果、动画过渡
+2. 采用响应式设计，支持手机和桌面端
+3. 使用炫酷的配色方案（可以根据目的地特色选择主题色）
+4. 添加图标和emoji让页面更生动
+5. 使用现代字体和排版
+6. 添加悬停效果和微动画
+7. 包含玻璃拟态效果、渐变边框等现代设计元素
+8. 使用CSS Grid或Flexbox进行布局
+9. 添加loading动画和过渡效果
+10. 确保文字清晰易读，对比度良好
+
+**页面结构应包含**:
+- 炫酷的标题区域（带背景渐变和统计信息）
+- 每日行程卡片（带阴影和悬停效果）
+- 旅行贴士区域
+- 页脚信息
+- 完整的CSS样式（包含在<style>标签中）
+
+**重要**:
+- 请生成完整的HTML代码，包含所有样式
+- 确保代码可以直接在浏览器中运行
+- 使用中文内容
+- 样式要比普通网页更加炫酷和现代化
+- 根据目的地特色选择合适的主题色彩
+
+请直接输出完整的HTML代码，不需要任何解释文字。
+  `
+  const response = await fetch(`/api/proxy/execute`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      "command": `claude -p "'在这个目录下生成一个文件名为'+fileName+'文件'}" --allowedTools Bash,Read --permission-mode acceptEdits`,
+      "working_directory": "/Users/wangshenyu/Projects/trip-demo/public",
+      "timeout": 60
+    }),
+  })
+  console.log(`claude -p ${'\n 在这个目录下生成一个文件名为'+fileName+'文件'} --allowedTools Bash,Read --permission-mode acceptEdits`)
+  console.log(response);
+  return response;
 }
 
 // 使用AI生成炫酷网页的函数
@@ -708,7 +777,8 @@ ${JSON.stringify(itineraryDetails, null, 2)}
       prompt,
       systemPrompt: '你是专业的前端设计师，擅长创建炫酷现代化的网页设计',
       temperature: 0.8, // 提高创造性
-      maxTokens: 4000
+      maxTokens: 4000,
+      model: 'openai/gpt5'
     })
     
     if (response.success && response.data?.content) {

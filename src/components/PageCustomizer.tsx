@@ -238,36 +238,47 @@ ${actionType === 'trip'
     setMessages(prev => [...prev, newUserMessage])
 
     try {
-      const lh = await fetch(`/api/shared/${guideId}`, {
-        method: 'PUT',
+      // const lh = await fetch(`/api/shared/${guideId}`, {
+      //   method: 'PUT',
+      //   body: JSON.stringify({
+      //       title: '',
+      //       itinerary: '',
+      //       guideId: 'server_'+guideId,
+      //       chat: userMessage,
+      //     })
+      // })
+      const response = await fetch(`/api/proxy/execute`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-            title: '',
-            itinerary: '',
-            guideId: 'server_'+guideId,
-            chat: userMessage,
-          })
+          "command": `claude -p "修改这个目录下的一个文件名为server_${guideId}.html的文件，仅修改body标签的内容，要求为:${userMessage}" --allowedTools Bash,Read --permission-mode acceptEdits`,
+          "working_directory": "/Users/wangshenyu/Projects/trip-demo/public/shared",
+          "timeout": 60000
+        }),
       })
-      const result = await lh.json();
+      const result = await response.json();
       
-      // 初始化存储服务
-      await initIndexedDB()
-      await initServiceWorker()
+      // // 初始化存储服务
+      // await initIndexedDB()
+      // await initServiceWorker()
       
       // 生成唯一ID用于服务端存储
       const id = `server_${guideId}`
       console.log('🔄 正在修改HTML攻略...')
       console.log(result);
       
-      if (result.success && result.data) {
+      if (result.success) {
         // 保存到IndexedDB
-        await indexedDBManager.saveHTMLPage({
-          id: id,
-          title: '行呗',
-          html: result.data.html,
-          createdAt: new Date().toISOString(),
-          guideId
-        })
-        await saveAsStaticFile(id);
+        // await indexedDBManager.saveHTMLPage({
+        //   id: id,
+        //   title: '行呗',
+        //   html: result.data.html,
+        //   createdAt: new Date().toISOString(),
+        //   guideId
+        // })
+        // await saveAsStaticFile(id);
         
         // 停止IDE编码效果
         if (onStopIdeEffect) {

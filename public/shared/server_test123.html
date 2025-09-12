@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1天旅行计划 - 北京经典一日游</title>
+    <title>3天北京旅行计划 - 现代化旅游指南</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     <style>
@@ -15,10 +15,10 @@
 
         body {
             font-family: 'Noto Sans SC', 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 25%, #fd79a8 50%, #a29bfe 75%, #6c5ce7 100%);
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #ffecd2 100%);
             background-size: 300% 300%;
-            animation: dreamyGradient 12s ease infinite;
-            color: #2d3436;
+            animation: dreamyGradient 15s ease infinite;
+            color: #2c3e50;
             line-height: 1.7;
             overflow-x: hidden;
         }
@@ -29,6 +29,7 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* 可爱的手绘背景图案 */
         body::before {
             content: '';
             position: fixed;
@@ -39,7 +40,7 @@
             background-image: 
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20 20 Q30 10 40 20 T60 20 Q70 10 80 20 Q70 30 60 20 T40 20 Q30 30 20 20' fill='%23fff' opacity='0.1'/%3E%3C/svg%3E"),
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='15' fill='none' stroke='%23fff' stroke-width='2' opacity='0.1'/%3E%3Cpath d='M30 40 Q40 30 50 40 Q40 50 30 40' fill='%23fff' opacity='0.1'/%3E%3C/svg%3E"),
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M30 15 L35 25 L45 25 L37 32 L40 42 L30 37 L20 42 L23 32 L15 25 L25 25 Z' fill='%23fff' opacity='0.08'/%3E%3C/svg%3E");
+                url("data:image/svg+xml,%3Csv xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M30 15 L35 25 L45 25 L37 32 L40 42 L30 37 L20 42 L23 32 L15 25 L25 25 Z' fill='%23fff' opacity='0.08'/%3E%3C/svg%3E");
             background-size: 100px 100px, 80px 80px, 60px 60px;
             background-position: 0 0, 30px 30px, 60px 60px;
             z-index: -1;
@@ -52,6 +53,7 @@
             66% { transform: translate(-15px, 15px) rotate(-3deg); }
         }
 
+        /* 顶部装饰条 */
         .top-decoration {
             height: 20px;
             background: linear-gradient(90deg, 
@@ -62,7 +64,7 @@
         }
 
         .top-decoration::after {
-            content: '♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡';
+            content: '🏛️ 🏰 🌸 🐉 👑 🌺 🏮 📚 🏛️ 🏰 🌸 🐉 👑 🌺 🏮 📚';
             position: absolute;
             top: 50%;
             left: 0;
@@ -79,6 +81,7 @@
             50% { transform: translateY(-50%) scale(1.1); }
         }
 
+        /* 页面容器 */
         .container {
             max-width: 1300px;
             margin: 0 auto;
@@ -86,6 +89,7 @@
             position: relative;
         }
 
+        /* 英雄区域 */
         .hero-section {
             position: relative;
             height: 100vh;
@@ -130,6 +134,11 @@
             transition: all 0.4s ease;
             opacity: 0.9;
             border: 4px solid #fff;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
         }
 
         .hero-image:hover {
@@ -235,21 +244,21 @@
 
         .main-title::before,
         .main-title::after {
-            content: '🌸';
+            content: '🏛️';
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 3rem;
-            animation: petalSpin 4s ease-in-out infinite;
+            font-size: 3.5rem;
+            animation: petalSpin 5s ease-in-out infinite;
         }
 
         .main-title::before {
-            left: -90px;
+            left: -120px;
         }
 
         .main-title::after {
-            right: -90px;
-            content: '🎀';
+            right: -120px;
+            content: '🇨🇳';
             animation-direction: reverse;
         }
 
@@ -293,6 +302,7 @@
             }
         }
 
+        /* 滚动指示器 */
         .scroll-indicator {
             position: absolute;
             bottom: 30px;
@@ -326,6 +336,7 @@
             }
         }
 
+        /* 内容区域 */
         .content-section {
             padding: 100px 0;
             position: relative;
@@ -336,6 +347,7 @@
             border-bottom: none;
         }
 
+        /* 装饰性分隔线 */
         .divider {
             text-align: center;
             margin: 60px 0;
@@ -375,6 +387,7 @@
             box-shadow: 0 8px 25px rgba(253, 121, 168, 0.2);
         }
 
+        /* 日程卡片 */
         .day-section {
             margin-bottom: 80px;
             position: relative;
@@ -498,6 +511,7 @@
             box-shadow: 0 6px 20px rgba(253, 121, 168, 0.2);
         }
 
+        /* 酒店信息 */
         .hotel-info {
             background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
             border-radius: 25px;
@@ -564,6 +578,7 @@
             font-weight: 600;
         }
 
+        /* 景点列表 */
         .attractions {
             position: relative;
             z-index: 1;
@@ -634,6 +649,19 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .attraction-type {
+            background: linear-gradient(135deg, #4ecdc4, #96ceb4);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 18px;
+            border: 3px solid #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(76, 205, 196, 0.3);
+            transition: all 0.3s ease;
         }
 
         .attraction-duration {
@@ -665,74 +693,49 @@
             color: #2d3436;
         }
 
-        .transportation-section {
-            margin-top: 40px;
-            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(253, 121, 168, 0.1));
-            border-radius: 25px;
+        /* 交通信息 */
+        .transportation-info {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 30px;
             padding: 35px;
-            border: 4px solid #6c5ce7;
+            margin-bottom: 40px;
+            border: 4px solid #4ecdc4;
             position: relative;
             z-index: 1;
             transition: all 0.4s ease;
         }
 
-        .transportation-section:hover {
+        .transportation-info:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(108, 92, 231, 0.2);
+            box-shadow: 0 20px 50px rgba(76, 205, 196, 0.3);
         }
 
-        .transportation-title {
+        .transport-title {
             font-size: 1.8rem;
             font-weight: 800;
-            color: #6c5ce7;
-            margin-bottom: 20px;
+            color: #2c3e50;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .transportation-title::before {
-            content: '🚊';
+        .transport-title::before {
+            content: '🚇';
             font-size: 2rem;
             background: rgba(255, 255, 255, 0.8);
             padding: 8px;
             border-radius: 50%;
-            border: 3px solid #6c5ce7;
-            animation: transportSway 3s ease-in-out infinite;
+            border: 3px solid #4ecdc4;
         }
 
-        @keyframes transportSway {
-            0%, 100% { transform: rotate(-3deg) scale(1); }
-            50% { transform: rotate(3deg) scale(1.05); }
-        }
-
-        .transportation-item {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 2px solid #6c5ce7;
-            transition: all 0.3s ease;
-        }
-
-        .transportation-item:hover {
-            transform: translateX(10px);
-            border-color: #fd79a8;
-        }
-
-        .transport-type {
-            font-weight: 700;
-            color: #6c5ce7;
+        .transport-summary {
+            color: #2c3e50;
             font-size: 1.2rem;
-            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        .transport-details {
-            color: #636e72;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
+        /* 页脚 */
         .footer {
             text-align: center;
             padding: 60px 0;
@@ -745,7 +748,7 @@
         }
 
         .footer::before {
-            content: '♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★';
+            content: '🏛️ ★ 🏰 ★ 🌸 ★ 🐉 ★ 👑 ★ 🌺 ★ 🏮 ★ 📚 ★ 🏛️ ★';
             position: absolute;
             top: 0;
             left: -100%;
@@ -782,51 +785,7 @@
             opacity: 0.9;
         }
 
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #fd79a8, #6c5ce7, #fdcb6e);
-            background-size: 300% 300%;
-            animation: loadingGradient 2s ease infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.5s ease;
-        }
-
-        @keyframes loadingGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .loading.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loading-text {
-            font-family: 'Nunito', sans-serif;
-            font-size: 4rem;
-            font-weight: 900;
-            color: #fff;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            animation: loadingBounce 1.5s ease-in-out infinite alternate;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 30px 50px;
-            border-radius: 35px;
-            border: 4px solid rgba(255, 255, 255, 0.5);
-        }
-
-        @keyframes loadingBounce {
-            0% { transform: scale(1) rotate(-2deg); }
-            100% { transform: scale(1.1) rotate(2deg); }
-        }
-
+        /* 响应式设计 */
         @media (max-width: 768px) {
             .main-title {
                 font-size: 3.5rem;
@@ -876,38 +835,78 @@
                 display: none;
             }
         }
+
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fd79a8, #6c5ce7, #fdcb6e);
+            background-size: 300% 300%;
+            animation: loadingGradient 2s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes loadingGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .loading.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: loadingBounce 1.5s ease-in-out infinite alternate;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px 50px;
+            border-radius: 35px;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes loadingBounce {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
     </style>
 </head>
 <body>
+    <!-- 加载动画 -->
     <div class="loading" id="loading">
-        <div class="loading-text">北京1天之旅</div>
+        <div class="loading-text">3天北京旅行计划</div>
     </div>
 
     <div class="top-decoration"></div>
 
     <div class="container">
+        <!-- 英雄区域 -->
         <section class="hero-section">
             <div class="hero-bg"></div>
             
             <div class="hero-images">
-                <div class="hero-image img1">
-                    <img src="https://images.unsplash.com/photo-1508804185872-d7badad00f7d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="天安门广场" />
-                </div>
-                <div class="hero-image img2">
-                    <img src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="故宫博物院" />
-                </div>
-                <div class="hero-image img3">
-                    <img src="https://images.unsplash.com/photo-1570123106161-c3d6e9f87fa5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="景山公园" />
-                </div>
-                <div class="hero-image img4">
-                    <img src="https://images.unsplash.com/photo-1548919973-5cef591cdbc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="什刹海" />
-                </div>
+                <div class="hero-image img1">🏛️</div>
+                <div class="hero-image img2">🏰</div>
+                <div class="hero-image img3">🌸</div>
+                <div class="hero-image img4">🐉</div>
             </div>
 
             <div class="hero-content" data-aos="zoom-in" data-aos-duration="1000">
-                <h1 class="main-title">1天旅行计划</h1>
-                <p class="subtitle">北京经典一日游 · 历史文化深度体验</p>
-                <p class="date-range">2025年3月15日</p>
+                <h1 class="main-title">3天旅行计划</h1>
+                <p class="subtitle">北京古都深度游 · 历史文化探索之旅</p>
+                <p class="date-range">2025年10月1日 - 2025年10月3日</p>
             </div>
 
             <div class="scroll-indicator" onclick="scrollToContent()">
@@ -915,19 +914,21 @@
             </div>
         </section>
 
+        <!-- 内容区域 -->
         <section class="content-section">
             <div class="divider" data-aos="fade-up">
                 <span class="divider-text">🎀 行程安排 🎀</span>
             </div>
 
+            <!-- 第一天 -->
             <section class="day-section" data-aos="fade-up" data-aos-delay="100">
                 <div class="day-card">
                     <div class="day-header">
                         <div class="day-title">
                             <span class="day-number">1</span>
                             <div>
-                                <div>第一天</div>
-                                <div class="day-date">2025-03-15</div>
+                                <div>第一天 - 历史文化之旅</div>
+                                <div class="day-date">2025-10-01</div>
                             </div>
                         </div>
                     </div>
@@ -935,7 +936,8 @@
                     <div class="hotel-info" data-aos="fade-right" data-aos-delay="200">
                         <div class="hotel-name">北京王府井希尔顿酒店 <span style="color: #6c5ce7;">★★★★★</span></div>
                         <div class="hotel-details">
-                            <strong>价格：</strong>¥1200-1800/晚<br>
+                            <strong>价格：</strong>¥800-1200/晚<br>
+                            <strong>位置：</strong>王府井商业区<br>
                             <strong>特色：</strong>位于王府井商业区，交通便利，设施完善
                         </div>
                     </div>
@@ -946,10 +948,11 @@
                             <div class="attraction-content">
                                 <div class="attraction-name">
                                     天安门广场
+                                    <span class="attraction-type">历史文化广场</span>
                                     <span class="attraction-duration">1小时</span>
                                 </div>
                                 <div class="attraction-description">
-                                    世界上最大的城市广场，观看升旗仪式的最佳地点
+                                    世界上最大的城市广场，中国的政治中心。这里是新中国的象征，见证了无数历史时刻。
                                 </div>
                             </div>
                         </div>
@@ -959,10 +962,11 @@
                             <div class="attraction-content">
                                 <div class="attraction-name">
                                     故宫博物院
-                                    <span class="attraction-duration">3小时</span>
+                                    <span class="attraction-type">历史文化博物馆</span>
+                                    <span class="attraction-duration">3-4小时</span>
                                 </div>
                                 <div class="attraction-description">
-                                    明清两代的皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑群
+                                    明清两代的皇家宫殿，世界文化遗产。红墙黄瓦，雕梁画栋，展现了中华文明的辉煌。
                                 </div>
                             </div>
                         </div>
@@ -972,54 +976,156 @@
                             <div class="attraction-content">
                                 <div class="attraction-name">
                                     景山公园
+                                    <span class="attraction-type">城市公园</span>
                                     <span class="attraction-duration">1小时</span>
                                 </div>
                                 <div class="attraction-description">
-                                    俯瞰故宫全景的最佳位置，明代皇家园林
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="600">
-                            <div class="attraction-bullet">🛶</div>
-                            <div class="attraction-content">
-                                <div class="attraction-name">
-                                    什刹海
-                                    <span class="attraction-duration">2小时</span>
-                                </div>
-                                <div class="attraction-description">
-                                    北京著名的历史文化旅游区，包含前海、后海和西海三个湖泊
+                                    俯瞰故宫全景的最佳位置，登高望远，古都风貌尽收眼底。
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="transportation-section" data-aos="fade-up" data-aos-delay="700">
-                        <div class="transportation-title">🚊 交通指南</div>
-                        
-                        <div class="transportation-item">
-                            <div class="transport-type">🚶 步行</div>
-                            <div class="transport-details">天安门广场到故宫步行约10分钟，故宫到景山公园步行约15分钟</div>
+                    <div class="transportation-info" data-aos="fade-up" data-aos-delay="600">
+                        <div class="transport-title">交通出行</div>
+                        <div class="transport-summary">
+                            市中心景点集中，建议步行+地铁结合。天安门广场到故宫步行约10分钟，故宫到景山公园步行约15分钟。地铁1号线天安门东站，公交线路众多。
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第二天 -->
+            <section class="day-section" data-aos="fade-up" data-aos-delay="200">
+                <div class="day-card">
+                    <div class="day-header">
+                        <div class="day-title">
+                            <span class="day-number">2</span>
+                            <div>
+                                <div>第二天 - 长城古迹游</div>
+                                <div class="day-date">2025-10-02</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hotel-info" data-aos="fade-right" data-aos-delay="300">
+                        <div class="hotel-name">北京王府井希尔顿酒店 <span style="color: #6c5ce7;">★★★★★</span></div>
+                        <div class="hotel-details">
+                            <strong>价格：</strong>¥800-1200/晚<br>
+                            <strong>位置：</strong>王府井商业区<br>
+                            <strong>特色：</strong>连续住宿，避免搬运行李
+                        </div>
+                    </div>
+
+                    <div class="attractions">
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="400">
+                            <div class="attraction-bullet">🐉</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    八达岭长城
+                                    <span class="attraction-type">历史遗迹</span>
+                                    <span class="attraction-duration">4-5小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    万里长城的精华段，世界文化遗产。蜿蜒壮丽，不到长城非好汉，感受古代军事建筑的智慧。
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="transportation-item">
-                            <div class="transport-type">🚕 出租车</div>
-                            <div class="transport-details">什刹海区域建议打车，起步价13元，每公里2.3元</div>
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="500">
+                            <div class="attraction-bullet">👑</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    明十三陵
+                                    <span class="attraction-type">历史陵墓</span>
+                                    <span class="attraction-duration">2-3小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    明朝十三位皇帝的陵墓群，规模宏大，建筑精美，体现了明代皇家陵寝的建筑艺术。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="transportation-info" data-aos="fade-up" data-aos-delay="600">
+                        <div class="transport-title">交通出行</div>
+                        <div class="transport-summary">
+                            建议参加一日游团或包车前往郊区景点。德胜门乘坐877路公交直达八达岭，¥12/人。市区到长城单程约¥200-300打车费。长城景区内需要大量步行。
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第三天 -->
+            <section class="day-section" data-aos="fade-up" data-aos-delay="300">
+                <div class="day-card">
+                    <div class="day-header">
+                        <div class="day-title">
+                            <span class="day-number">3</span>
+                            <div>
+                                <div>第三天 - 园林学府游</div>
+                                <div class="day-date">2025-10-03</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hotel-info" data-aos="fade-right" data-aos-delay="400">
+                        <div class="hotel-name">北京王府井希尔顿酒店 <span style="color: #6c5ce7;">★★★★★</span></div>
+                        <div class="hotel-details">
+                            <strong>价格：</strong>¥800-1200/晚<br>
+                            <strong>位置：</strong>王府井商业区<br>
+                            <strong>特色：</strong>最后一晚住宿，方便次日返程
+                        </div>
+                    </div>
+
+                    <div class="attractions">
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="500">
+                            <div class="attraction-bullet">🌺</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    颐和园
+                                    <span class="attraction-type">皇家园林</span>
+                                    <span class="attraction-duration">3-4小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    中国现存最完整的皇家园林，山水相依，亭台楼阁错落有致，体现了中国古典园林艺术的精华。
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="transportation-item">
-                            <div class="transport-type">🚇 地铁</div>
-                            <div class="transport-details">地铁1号线天安门东站可达天安门和故宫，地铁6号线北海北站可达什刹海</div>
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="600">
+                            <div class="attraction-bullet">🏮</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    圆明园
+                                    <span class="attraction-type">遗址公园</span>
+                                    <span class="attraction-duration">2小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    清代大型皇家园林，现为遗址公园。虽历经沧桑，但残垣断壁诉说着历史的兴衰。
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="transportation-item">
-                            <div class="transport-type">🚗 租车</div>
-                            <div class="transport-details">不建议租车，市中心停车困难且交通拥堵</div>
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="700">
+                            <div class="attraction-bullet">📚</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    清华大学
+                                    <span class="attraction-type">高等院校</span>
+                                    <span class="attraction-duration">1小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    中国著名高等学府，自强不息、厚德载物的校训激励着一代代学子，校园环境优美典雅。
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="transportation-item">
-                            <div class="transport-type">📝 推荐</div>
-                            <div class="transport-details">建议使用地铁+步行组合，经济便捷且避免堵车</div>
+                    <div class="transportation-info" data-aos="fade-up" data-aos-delay="800">
+                        <div class="transport-title">交通出行</div>
+                        <div class="transport-summary">
+                            地铁+打车结合，高校区建议骑行体验。地铁4号线北宫门站可达颐和园。颐和园内需要大量步行游览。景点间打车约¥20-30。可选择共享单车在校园区骑行。
                         </div>
                     </div>
                 </div>
@@ -1027,45 +1133,52 @@
         </section>
 
         <footer class="footer" data-aos="fade-up">
-            <div class="footer-text">美好的北京一日游结束啦！</div>
-            <div class="footer-subtitle">Wonderful Beijing One-Day Tour Complete!</div>
+            <div class="footer-text">北京3天探险之旅圆满结束！</div>
+            <div class="footer-subtitle">Beijing 3-Day Adventure Complete!</div>
         </footer>
     </div>
 
+    <!-- JavaScript库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script>
+        // 初始化AOS动画库
         AOS.init({
             duration: 800,
             once: true,
             offset: 100
         });
 
+        // 页面加载完成后初始化
         window.addEventListener('load', () => {
+            // 隐藏加载动画
             setTimeout(() => {
                 document.getElementById('loading').classList.add('fade-out');
             }, 1800);
         });
 
+        // 滚动到内容区域
         function scrollToContent() {
             document.querySelector('.content-section').scrollIntoView({
                 behavior: 'smooth'
             });
         }
 
-        const emojis = ['🌸', '🎀', '💕', '⭐', '🌈', '🦄', '🍭', '🎈'];
+        // 添加可爱的随机表情动画
+        const emojis = ['🏛️', '🏰', '🌸', '🐉', '👑', '🌺', '🏮', '📚'];
         setInterval(() => {
             const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
             const bullets = document.querySelectorAll('.attraction-bullet');
-            const randomBullet = bullets[Math.floor(Math.random() * bullets.length)];
-            if (randomBullet && Math.random() > 0.8) {
+            if (bullets.length > 0 && Math.random() > 0.8) {
+                const randomBullet = bullets[Math.floor(Math.random() * bullets.length)];
                 const originalContent = randomBullet.textContent;
                 randomBullet.textContent = randomEmoji;
                 setTimeout(() => {
                     randomBullet.textContent = originalContent;
-                }, 1000);
+                }, 1500);
             }
-        }, 3000);
+        }, 4000);
 
+        // 平滑滚动效果
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -1079,14 +1192,73 @@
             });
         });
 
-        document.querySelectorAll('.attraction-item, .hotel-info, .transportation-item').forEach(element => {
+        // 添加点击音效模拟（视觉反馈）
+        document.querySelectorAll('.attraction-item, .hotel-info, .transportation-info').forEach(element => {
             element.addEventListener('click', function() {
                 this.style.transform += ' scale(0.98)';
                 setTimeout(() => {
                     this.style.transform = this.style.transform.replace(' scale(0.98)', '');
-                }, 100);
+                }, 150);
             });
         });
+
+        // 英雄区域图标轮换动画
+        const heroImages = document.querySelectorAll('.hero-image');
+        const heroEmojis = ['🏛️', '🏰', '🌸', '🐉', '👑', '🌺', '🏮', '📚'];
+        let emojiIndex = 0;
+
+        setInterval(() => {
+            heroImages.forEach((img, index) => {
+                setTimeout(() => {
+                    const newEmoji = heroEmojis[(emojiIndex + index) % heroEmojis.length];
+                    img.textContent = newEmoji;
+                }, index * 200);
+            });
+            emojiIndex = (emojiIndex + 1) % heroEmojis.length;
+        }, 5000);
+
+        // 添加鼠标跟随效果
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.98) {
+                createFloatingEmoji(e.clientX, e.clientY);
+            }
+        });
+
+        function createFloatingEmoji(x, y) {
+            const emoji = document.createElement('div');
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.textContent = randomEmoji;
+            emoji.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                font-size: 20px;
+                pointer-events: none;
+                z-index: 1000;
+                animation: floatUp 2s ease-out forwards;
+            `;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatUp {
+                    0% { 
+                        opacity: 1; 
+                        transform: translate(0, 0) scale(1); 
+                    }
+                    100% { 
+                        opacity: 0; 
+                        transform: translate(${Math.random() * 200 - 100}px, -100px) scale(0.5); 
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.body.appendChild(emoji);
+            setTimeout(() => {
+                document.body.removeChild(emoji);
+                document.head.removeChild(style);
+            }, 2000);
+        }
     </script>
 </body>
 </html>

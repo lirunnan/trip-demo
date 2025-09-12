@@ -25,12 +25,73 @@ interface DemoGuide {
   preview: string
 }
 
+// 获取TTTT目录下所有文件路径的函数
+const getTTTTFiles = () => {
+  return [
+    {
+        "id": 1,
+        "style": "可爱卡通手账风格",
+        "description": "整体呈现出明亮、活泼、梦幻的视觉体验，充满少女心和趣味性",
+        "filename": "beijing-travel-cartoon"
+    },
+    {
+        "id": 2,
+        "style": "赛博朋克风格",
+        "description": "科技感仪表盘设计",
+        "filename": "beijing-travel-dashboard"
+    },
+    {
+        "id": 3,
+        "style": "现代简约清新风格",
+        "description": "结合了柔和的渐变色背景、精致的几何装饰元素、流畅的动画效果和大量留白设计，整体呈现清新雅致且富有呼吸感的视觉体验",
+        "filename": "beijing-travel-fresh"
+    },
+    {
+        "id": 4,
+        "style": "新中式美学风格",
+        "description": "融合传统中国元素（如古典纹样、书法字体、红金色调）与现代交互技术（粒子动画、滚动视差、灯箱效果），营造出既有文化底蕴又兼具现代感的视觉体验",
+        "filename": "beijing-travel-guide-enhanced"
+    },
+    {
+        "id": 5,
+        "style": "热带海岛度假风格与现代UI设计相结合的混搭风格",
+        "description": "通过蓝色渐变背景、海浪动画、漂浮图片、椰林元素等营造出海滨度假的视觉氛围，同时保持内容结构的清晰性和交互的现代感",
+        "filename": "beijing-travel-island"
+    },
+    {
+        "id": 6,
+        "style": "现代杂志编辑风格",
+        "description": "融合了深色沉浸式封面、网格布局、卡片式内容区块和精致的交互动效，呈现出高端旅行刊物的视觉体验",
+        "filename": "beijing-travel-magazine"
+    },
+    {
+        "id": 7,
+        "style": "波普艺术（Pop Art）风格",
+        "description": "鲜艳色彩、几何图形和动态效果相结合的波普艺术（Pop Art）风格，融合了现代视觉元素与复古流行文化特征",
+        "filename": "beijing-travel-pop-art"
+    },
+    {
+        "id": 8,
+        "style": "古卷棕调，缀艺游录",
+        "description": "仿古籍装帧的沉浸式游记设计，将现代网页技术（动画/交互）与传统书籍美学（烫金质感/章节结构）完美融合，创造如翻阅古老旅行手札的数字化体验",
+        "filename": "beijing-travel-storybook"
+    },
+    {
+        "id": 9,
+        "style": "紫晶轴韵梦幻雅旅",
+        "description": "紫色渐变如晶，时间轴为主线，梦幻朦胧美学，雅致文化旅程",
+        "filename": "beijing-travel-timeline"
+    }
+]
+}
+
 export default function Home() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentItinerary, setCurrentItinerary] = useState<ItineraryDay[]>([])
+  const [selectedTemplate, setSelectedTemplate] = useState<any>()
   const [isInitialState, setIsInitialState] = useState(true)
   const [convId, setConvId] = useState('');
   
@@ -237,7 +298,8 @@ export default function Home() {
               content: '',
               timestamp: new Date(msg.timestamp),
               interCityTransportation: itinerary.interCityTransportation,
-              itinerary: itinerary.itinerary
+              itinerary: itinerary.itinerary,
+              template: itinerary.selectedTemplate
             }
           }
           return null
@@ -248,6 +310,7 @@ export default function Home() {
         const lastAssistantMessage = parsedMessages.find(m => m.role === 'assistant' && m.itinerary)
         if (lastAssistantMessage?.itinerary) {
           setCurrentItinerary(lastAssistantMessage.itinerary)
+          setSelectedTemplate(lastAssistantMessage?.template)
           updateItinerary(lastAssistantMessage.itinerary)
         }
         
@@ -313,6 +376,7 @@ export default function Home() {
       // 更新当前行程数据
       if (gRes?.data?.plan?.itinerary) {
         setCurrentItinerary(gRes?.data?.plan?.itinerary)
+        setSelectedTemplate(gRes?.data?.plan?.selectedTemplate)
         updateItinerary(gRes?.data?.plan?.itinerary)
       }
     } catch (error) {
@@ -455,66 +519,159 @@ export default function Home() {
       console.error('分享失败:', error)
     }
   }, [currentItinerary, copyShareLink])
+  
 
   const handleShareServer = useCallback(async () => {
     if (currentItinerary.length === 0) return
     
     try {
-      // 初始化存储服务
-      await initIndexedDB()
-      await initServiceWorker()
+      handleSendSystemMessage('🔄 正在生成风格图片...')
+       try {
+      const response = await fetch('/api/generate-images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: messages[0].content
+        })
+      })
       
-      // 生成唯一ID用于服务端存储
+      const result = await response.json()
+      handleSendSystemMessage('🔄 正在生成背景图...')
+      if (result.success && result.data && result.data.imageUrl) {
+        console.log('✅ 图片生成成功，URL长度:', result.data.imageUrl.length)
+        console.log('📋 完整图片数据:', result.data.imageUrl)
+        
+        // 保存base64图片到public/images目录
+        try {
+          const saveResponse = await fetch('/api/save-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              imageData: result.data.imageUrl,
+              fileName: `generated-${convId}.png`
+            })
+          })
+          
+          if (saveResponse.ok) {
+            const saveResult = await saveResponse.json()
+            console.log('✅ 图片保存成功:', saveResult.filePath)
+          } else {
+            console.error('❌ 图片保存失败')
+          }
+        } catch (saveError) {
+          console.error('❌ 保存图片时出错:', saveError)
+        }
+        
+      } else {
+        
+      }
+    } catch (error) {
+      console.error('图片生成失败:', error)
+    } finally {
+    }
       const id = `server_${convId}`
       const title = `${currentItinerary.length}天旅行计划`
       
       handleSendSystemMessage('🔄 正在生成并保存HTML攻略...')
-      
-      // 向服务端API创建分享内容
-      const response = await fetch(`/api/shared/${id}`, {
+    console.log('模版：', `${selectedTemplate}`)
+    
+    // 检查图片是否存在，如果不存在则使用兜底图片
+    let backgroundImagePath = `/images/generated-${convId}.png`
+    try {
+      const checkResponse = await fetch(`/api/check-image?convId=${convId}`)
+      if (checkResponse.ok) {
+        const checkResult = await checkResponse.json()
+        backgroundImagePath = checkResult.imagePath
+        if (checkResult.fallback) {
+          console.log('🔄 使用兜底图片:', backgroundImagePath)
+        }
+      }
+    } catch (error) {
+      console.error('检查图片失败，使用兜底图片:', error)
+      backgroundImagePath = '/images/fallback-travel.png'
+    }
+
+      const prompt = `你是一个专业的前端设计师和旅游专家。请为以下旅游行程生成一个极其炫酷、现代化的HTML页面。
+
+**行程标题**: ${title}
+**总天数**: ${currentItinerary.length}天
+**详细行程**:
+${JSON.stringify(currentItinerary, null, 2)}
+
+**设计要求**:
+1. 设计样式和动效依据：/Users/wangshenyu/Projects/trip-demo/public/TTTT/${selectedTemplate?.fileName}.html
+2. 需包含路线展示，路线实现依据，svg不要修改，仅修改div为景点内容，点击弹出景点详情：/Users/wangshenyu/Projects/trip-demo/public/luxian/1.html
+3. 背景图设为：/Users/wangshenyu/Projects/trip-demo/public${backgroundImagePath}
+4. 具体行程内容依据详细行程
+
+**重要**:
+- 请生成完整的HTML代码，包含所有样式
+- 确保代码可以直接在浏览器中运行
+- 使用中文内容
+
+请直接输出完整的HTML代码，不需要任何解释文字。
+  `
+      const response = await fetch(`/api/proxy/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title,
-          itinerary: currentItinerary,
-          guideId: convId
-        })
+          "command": `claude -p "${prompt},最终输出为这个目录下的一个文件名为${id}.html的文件" --allowedTools Bash,Read --permission-mode acceptEdits`,
+          "working_directory": "/Users/wangshenyu/Projects/trip-demo/public/shared",
+          "timeout": 60000
+        }),
       })
       
       const result = await response.json()
       handleSendSystemMessage('页面生成成功！页面渲染中...')
-      if (result.success && result.data) {
-        // 保存到IndexedDB
-        await indexedDBManager.saveHTMLPage({
-          id,
-          title,
-          html: result.data.html,
-          createdAt: new Date().toISOString(),
-          guideId: convId
-        })
-        await saveAsStaticFile(id);
-        handleSendSystemMessage('页面渲染成功！')
-        handleSendSystemMessage('done')
-        // 生成可访问的URL
-        const savedPageUrl = `${window.location.origin}/shared/${id}?type=web`
-        
-        // 复制链接到剪贴板（使用现代工具）
-        const { copyToClipboard } = await import('@/utils/clipboard')
-        const copyResult = await copyToClipboard(savedPageUrl)
-        const clipboardSuccess = copyResult.success
-        
-        const successMessage: Message = {
-          id: `server_share_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-          role: 'assistant',
-          content: `✅ 攻略已保存为HTML页面！\n\n🔗 可通过以下链接访问：\n${savedPageUrl}\n\n${clipboardSuccess ? '📋 链接已复制到剪贴板' : '💡 请手动复制上方链接'}`,
-          timestamp: new Date()
-        }
-        setMessages(prev => [...prev, successMessage])
-      } else {
-        throw new Error(result.error || '生成HTML失败')
+      handleSendSystemMessage('页面渲染成功！')
+      handleSendSystemMessage('done')
+      const savedPageUrl = `${window.location.origin}/shared/${id}?type=web`
+      const { copyToClipboard } = await import('@/utils/clipboard')
+      const copyResult = await copyToClipboard(savedPageUrl)
+      const clipboardSuccess = copyResult.success
+      const successMessage: Message = {
+        id: `server_share_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+        role: 'assistant',
+        content: `✅ 攻略已保存为HTML页面！\n\n🔗 可通过以下链接访问：\n${savedPageUrl}\n\n${clipboardSuccess ? '📋 链接已复制到剪贴板' : '💡 请手动复制上方链接'}`,
+        timestamp: new Date()
       }
+      setMessages(prev => [...prev, successMessage])
+      // if (result.success && result.data) {
+      //   // 保存到IndexedDB
+      //   await indexedDBManager.saveHTMLPage({
+      //     id,
+      //     title,
+      //     html: result.data.html,
+      //     createdAt: new Date().toISOString(),
+      //     guideId: convId
+      //   })
+      //   await saveAsStaticFile(id);
+      //   handleSendSystemMessage('页面渲染成功！')
+      //   handleSendSystemMessage('done')
+      //   // 生成可访问的URL
+      //   const savedPageUrl = `${window.location.origin}/shared/${id}?type=web`
+        
+      //   // 复制链接到剪贴板（使用现代工具）
+      //   const { copyToClipboard } = await import('@/utils/clipboard')
+      //   const copyResult = await copyToClipboard(savedPageUrl)
+      //   const clipboardSuccess = copyResult.success
+        
+      //   const successMessage: Message = {
+      //     id: `server_share_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      //     role: 'assistant',
+      //     content: `✅ 攻略已保存为HTML页面！\n\n🔗 可通过以下链接访问：\n${savedPageUrl}\n\n${clipboardSuccess ? '📋 链接已复制到剪贴板' : '💡 请手动复制上方链接'}`,
+      //     timestamp: new Date()
+      //   }
+      //   setMessages(prev => [...prev, successMessage])
+      // } else {
+      //   throw new Error(result.error || '生成HTML失败')
+      // }
     } catch (error) {
       console.error('❌ 保存攻略失败:', error)
       const errorMessage: Message = {
@@ -525,7 +682,7 @@ export default function Home() {
       }
       setMessages(prev => [...prev, errorMessage])
     }
-  }, [convId, currentItinerary, handleSendSystemMessage])
+  }, [convId, currentItinerary, handleSendSystemMessage, messages])
 
   const handleShareClient = useCallback(async () => {
     if (currentItinerary.length === 0) return

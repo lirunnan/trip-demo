@@ -12,19 +12,25 @@
 </head>
 <body>
     <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>西安快乐探索之旅</title>
+    <title>西安文化之旅 - 行呗旅游攻略</title>
+    <meta name="description" content="2天文化之旅 - 由行呗AI生成的个性化旅游攻略">
+    <meta property="og:title" content="西安文化之旅">
+    <meta property="og:description" content="个性化AI旅游攻略">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #E84C3D;
-            --secondary: #2C3E50;
-            --accent: #F1C40F;
-            --bg: #ECF0F1;
-            --text: #2C3E50;
+            --primary: #C41E3A;
+            --secondary: #D4AF37;
+            --accent: #8B0000;
+            --bg: #FFF5E6;
+            --text: #2C1810;
+            --highlight: #FFB6C1;
         }
 
         * {
@@ -38,7 +44,7 @@
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
         .container {
@@ -48,37 +54,40 @@
         }
 
         .header {
-            background: linear-gradient(45deg, #E84C3D, #E67E22);
-            padding: 80px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 70px 20px 60px;
             color: white;
             text-align: center;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
             position: relative;
             overflow: hidden;
         }
 
         .header::before {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🏰</text></svg>') center/60px repeat;
-            opacity: 0.1;
-            animation: float 20s linear infinite;
-        }
-
-        @keyframes float {
-            from { transform: translateX(0) translateY(0); }
-            to { transform: translateX(-50%) translateY(-50%); }
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M14 16H9v-2h5V9.87a4 4 0 1 1 2 0V14h5v2h-5v15.95A10 10 0 0 0 23.66 27l-3.46-2 8.2-2.2-2.9 5a12 12 0 0 1-21 0l-2.89-5 8.2 2.2-3.47 2A10 10 0 0 0 14 31.95V16zm40 40h-5v-2h5v-4.13a4 4 0 1 1 2 0V54h5v2h-5v15.95A10 10 0 0 0 63.66 67l-3.47-2 8.2-2.2-2.88 5a12 12 0 0 1-21.02 0l-2.88-5 8.2 2.2-3.47 2A10 10 0 0 0 54 71.95V56zm-39 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm40-40a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM15 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm40 40a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'%3E%3C/path%3E%3C/svg%3E");
         }
 
         .header h1 {
             font-size: 3.5em;
             margin-bottom: 20px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            animation: slideIn 1s ease-out;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-out;
             position: relative;
+            font-weight: 700;
+        }
+
+        .header h1 i {
+            margin-right: 15px;
+            animation: bounce 2s infinite;
+            color: var(--secondary);
         }
 
         .stats {
@@ -86,153 +95,260 @@
             justify-content: center;
             gap: 40px;
             margin-top: 30px;
-            perspective: 1000px;
+            flex-wrap: wrap;
         }
 
         .stat-item {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             padding: 15px 25px;
-            border-radius: 15px;
+            border-radius: 20px;
             backdrop-filter: blur(10px);
-            transform-style: preserve-3d;
-            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .stat-item:hover {
-            transform: translateZ(20px) rotateX(10deg);
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-3px);
+            border-color: var(--secondary);
+        }
+
+        .stat-item i {
+            color: var(--secondary);
         }
 
         .day-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: -40px;
-            position: relative;
-            z-index: 1;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+            margin-bottom: 50px;
         }
 
         .day-card {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 12px 25px rgba(196, 30, 58, 0.15);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
             position: relative;
             overflow: hidden;
         }
 
         .day-card::before {
-            content: '';
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+            height: 8px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
         }
 
         .day-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(196, 30, 58, 0.25);
+        }
+
+        .day-card h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .day-card h2 i {
+            color: var(--secondary);
+            font-size: 1.3em;
         }
 
         .location-card {
-            background: linear-gradient(135deg, #fff, var(--bg));
-            margin: 20px 0;
+            background: linear-gradient(to right, #fff, var(--bg));
+            margin: 25px 0;
             padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(44, 62, 80, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(196, 30, 58, 0.1);
+            position: relative;
             transition: all 0.3s ease;
         }
 
         .location-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+            box-shadow: 5px 5px 15px rgba(196, 30, 58, 0.1);
         }
 
         .location-type {
             display: inline-block;
-            padding: 8px 20px;
-            background: var(--primary);
+            padding: 8px 18px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
             color: white;
-            border-radius: 30px;
-            font-size: 0.9em;
+            border-radius: 20px;
+            font-size: 0.95em;
             margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(232, 76, 61, 0.3);
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.3);
+        }
+
+        .location-card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .location-card h3 i {
+            color: var(--secondary);
+        }
+
+        .location-card p {
+            margin-bottom: 15px;
+            color: var(--text);
         }
 
         .duration {
-            color: var(--primary);
-            font-weight: 500;
-            margin-top: 10px;
+            color: var(--accent);
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            font-size: 1.05em;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-50px); }
+        .fun-fact {
+            background: var(--highlight);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .fun-fact i {
+            color: var(--primary);
+            font-size: 1.2em;
+            margin-top: 3px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text);
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
+            .header {
+                padding: 50px 20px 40px;
+                border-radius: 0 0 30px 30px;
             }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
             .stats {
                 flex-direction: column;
-                gap: 20px;
+                gap: 15px;
+                align-items: center;
             }
+            
+            .stat-item {
+                width: 90%;
+                justify-content: center;
+            }
+            
             .day-card {
-                margin: 20px 10px;
+                padding: 25px;
+                margin: 0 5px;
             }
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <h1>🎉 西安快乐探索之旅</h1>
+        <h1><i class="fas fa-landmark"></i> 西安文化之旅</h1>
         <div class="stats">
-            <div class="stat-item">📅 总天数：2天</div>
-            <div class="stat-item">🎯 景点数：4个</div>
-            <div class="stat-item">🌟 精品行程</div>
+            <div class="stat-item"><i class="fas fa-calendar-alt"></i> 总天数：2天</div>
+            <div class="stat-item"><i class="fas fa-map-marker-alt"></i> 景点数：4个</div>
+            <div class="stat-item"><i class="fas fa-star"></i> 文化行程</div>
+            <div class="stat-item"><i class="fas fa-sun"></i> 文化指数：★★★★★</div>
         </div>
     </header>
 
     <div class="container">
         <div class="day-container">
             <div class="day-card">
-                <h2>Day 1 - 2025年8月15日</h2>
+                <h2><i class="fas fa-sun"></i> Day 1 - 2025年8月15日</h2>
                 <div class="location-card">
                     <span class="location-type">博物馆</span>
-                    <h3>陕西历史博物馆</h3>
+                    <h3><i class="fas fa-landmark"></i> 陕西历史博物馆</h3>
                     <p>中国第一座大型现代化国家级博物馆，馆藏文物37万余件，时间跨度长达一百多万年，被誉为'古都明珠，华夏宝库'。</p>
-                    <div class="duration">⏱️ 建议游览：3-4小时</div>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：3-4小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：寻找博物馆里的"唐妞"文创，她可爱的形象会让你会心一笑！</div>
+                    </div>
                 </div>
                 <div class="location-card">
                     <span class="location-type">购物中心</span>
-                    <h3>西安大悦城</h3>
-                    <p>大型现代化购物中心，集购物、餐饮、娱乐于一体，空调系统完善。</p>
-                    <div class="duration">⏱️ 建议游览：2-3小时</div>
+                    <h3><i class="fas fa-shopping-bag"></i> 西安大悦城</h3>
+                    <p>大型现代化购物中心，集购物、餐饮、娱乐于一体，空调系统完善，是夏日避暑好去处。</p>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：2-3小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：顶楼的露天平台是拍摄大雁塔的绝佳位置，别忘了打卡拍照！</div>
+                    </div>
                 </div>
             </div>
 
             <div class="day-card">
-                <h2>Day 2 - 2025年8月16日</h2>
+                <h2><i class="fas fa-sun"></i> Day 2 - 2025年8月16日</h2>
                 <div class="location-card">
                     <span class="location-type">博物馆</span>
-                    <h3>西安博物馆</h3>
+                    <h3><i class="fas fa-landmark"></i> 西安博物馆</h3>
                     <p>国家一级博物馆，集博物馆、名胜古迹、城市园林为一体，馆藏文物13万件。</p>
-                    <div class="duration">⏱️ 建议游览：3小时</div>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：3小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：寻找镇馆之宝——唐代三彩腾空马，感受盛唐的活力与动感！</div>
+                    </div>
                 </div>
                 <div class="location-card">
                     <span class="location-type">历史文化遗址</span>
-                    <h3>小雁塔</h3>
-                    <p>世界文化遗产，唐代佛教建筑遗存，与西安博物馆相邻。</p>
-                    <div class="duration">⏱️ 建议游览：1.5小时</div>
+                    <h3><i class="fas fa-pagoda"></i> 小雁塔</h3>
+                    <p>世界文化遗产，唐代佛教建筑遗存，与西安博物馆相邻，环境清幽宜人。</p>
+                    <div class="duration"><i class="fas fa-clock"></i> 建议游览：1.5小时</div>
+                    <div class="fun-fact">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>快乐提示：敲响雁塔晨钟，许下心愿，感受千年古塔的宁静与祥和！</div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="footer">
+        <p>行呗旅游攻略 © 2025 | 文化之旅，美好回忆</p>
     </div>
 
     <script>
@@ -242,32 +358,37 @@
             
             if (!isIframe) {
                 const backButton = document.createElement('div');
-                backButton.innerHTML = '← 返回行呗';
+                backButton.innerHTML = '<i class="fas fa-arrow-left"></i> 返回行呗';
                 backButton.style.cssText = `
                     position: fixed;
                     top: 20px;
                     left: 20px;
                     background: rgba(255,255,255,0.9);
-                    padding: 10px 15px;
-                    border-radius: 8px;
+                    padding: 12px 20px;
+                    border-radius: 12px;
                     cursor: pointer;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    font-weight: 500;
-                    color: #333;
+                    box-shadow: 0 4px 15px rgba(196, 30, 58, 0.2);
+                    font-weight: 600;
+                    color: var(--primary);
                     backdrop-filter: blur(10px);
                     border: 1px solid rgba(255,255,255,0.5);
                     z-index: 1000;
                     transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                 `;
                 
                 backButton.onmouseover = function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 6px 20px rgba(196, 30, 58, 0.3)';
+                    this.style.background = 'rgba(255,255,255,1)';
                 };
                 
                 backButton.onmouseout = function() {
                     this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                    this.style.boxShadow = '0 4px 15px rgba(196, 30, 58, 0.2)';
+                    this.style.background = 'rgba(255,255,255,0.9)';
                 };
                 
                 backButton.onclick = function() {
@@ -276,6 +397,17 @@
                 
                 document.body.appendChild(backButton);
             }
+            
+            const cards = document.querySelectorAll('.location-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '8px 8px 20px rgba(196, 30, 58, 0.2)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = '5px 5px 15px rgba(196, 30, 58, 0.1)';
+                });
+            });
         });
     </script>
 </body>

@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北京时光轴之旅 - 三日时间线行程</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2c3e50;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* 页面容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* 标题区域 */
+        .header {
+            text-align: center;
+            padding: 80px 0 60px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            margin-bottom: 60px;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: titlePulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titlePulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .date-range {
+            font-size: 1.2rem;
+            color: #667eea;
+            font-weight: 600;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+        }
+
+        /* 时间轴容器 */
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+        /* 主时间轴线 */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(180deg, #667eea, #764ba2, #667eea);
+            transform: translateX(-50%);
+            border-radius: 3px;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            animation: timelineGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes timelineGlow {
+            0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6); }
+        }
+
+        /* 时间轴项目 */
+        .timeline-item {
+            position: relative;
+            margin-bottom: 80px;
+            width: 100%;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 0;
+            margin-right: calc(50% + 40px);
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: calc(50% + 40px);
+            margin-right: 0;
+            text-align: left;
+        }
+
+        /* 时间轴节点 */
+        .timeline-node {
+            position: absolute;
+            left: 50%;
+            top: 50px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: 6px solid #fff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            z-index: 10;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-node:hover {
+            transform: translateX(-50%) scale(1.2);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 时间轴内容 */
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            width: 0;
+            height: 0;
+            border: 15px solid transparent;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            right: -30px;
+            border-left-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -30px;
+            border-right-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+            border-color: rgba(102, 126, 234, 0.4);
+        }
+
+        /* 日期标签 */
+        .timeline-date {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-date {
+            justify-content: flex-end;
+        }
+
+        .timeline-item:nth-child(even) .timeline-date {
+            justify-content: flex-start;
+        }
+
+        .day-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 酒店信息 */
+        .hotel-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .hotel-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-item:nth-child(odd) .hotel-name {
+            justify-content: flex-end;
+        }
+
+        .hotel-name::before {
+            content: '🏨';
+            font-size: 1.2rem;
+        }
+
+        .hotel-details {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        /* 图片网格 */
+        .timeline-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .timeline-image {
+            border-radius: 15px;
+            overflow: hidden;
+            height: 150px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            position: relative;
+        }
+
+        .timeline-image:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .timeline-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .timeline-image:hover img {
+            transform: scale(1.1);
+        }
+
+        /* 景点列表 */
+        .attractions-list {
+            list-style: none;
+        }
+
+        .attraction-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-item:nth-child(odd) .attraction-item {
+            flex-direction: row-reverse;
+            text-align: right;
+            border-left: none;
+            border-right: 4px solid #667eea;
+        }
+
+        .attraction-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .timeline-item:nth-child(odd) .attraction-item:hover {
+            transform: translateX(-10px);
+        }
+
+        .attraction-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            color: #667eea;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-item:nth-child(odd) .attraction-icon {
+            margin-right: 0;
+            margin-left: 15px;
+        }
+
+        .attraction-item:hover .attraction-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .attraction-content {
+            flex: 1;
+        }
+
+        .attraction-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-item:nth-child(odd) .attraction-name {
+            justify-content: flex-end;
+        }
+
+        .attraction-duration {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .attraction-description {
+            color: #7f8c8d;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* 连接线动画 */
+        .timeline-connector {
+            position: absolute;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            top: 65px;
+            animation: connectorPulse 2s ease-in-out infinite;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-connector {
+            right: calc(50% + 30px);
+        }
+
+        .timeline-item:nth-child(even) .timeline-connector {
+            left: calc(50% + 30px);
+        }
+
+        @keyframes connectorPulse {
+            0%, 100% { opacity: 0.5; transform: scaleX(1); }
+            50% { opacity: 1; transform: scaleX(1.2); }
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 60px 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            margin-top: 80px;
+            border-radius: 50px 50px 0 0;
+        }
+
+        .footer-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .footer-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        /* 图片灯箱 */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.8);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(118, 75, 162, 0.8);
+            transform: scale(1.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .timeline-line {
+                left: 30px;
+            }
+
+            .timeline-node {
+                left: 30px;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 70px;
+                margin-right: 0;
+                text-align: left;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content::before,
+            .timeline-item:nth-child(even) .timeline-content::before {
+                left: -30px;
+                right: auto;
+                border-left-color: transparent;
+                border-right-color: rgba(255, 255, 255, 0.95);
+            }
+
+            .timeline-item:nth-child(odd) .timeline-date,
+            .timeline-item:nth-child(even) .timeline-date {
+                justify-content: flex-start;
+            }
+
+            .timeline-item:nth-child(odd) .hotel-name,
+            .timeline-item:nth-child(even) .hotel-name {
+                justify-content: flex-start;
+            }
+
+            .timeline-item:nth-child(odd) .attraction-item {
+                flex-direction: row;
+                text-align: left;
+                border-right: none;
+                border-left: 4px solid #667eea;
+            }
+
+            .timeline-item:nth-child(odd) .attraction-icon {
+                margin-left: 0;
+                margin-right: 15px;
+            }
+
+            .timeline-item:nth-child(odd) .attraction-name {
+                justify-content: flex-start;
+            }
+
+            .timeline-connector {
+                display: none;
+            }
+
+            .main-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: loadingPulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes loadingPulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="loading-text">北京时光轴之旅</div>
+    </div>
+
+    <!-- 标题区域 -->
+    <div class="header" data-aos="fade-down">
+        <div class="container">
+            <h1 class="main-title">北京时光轴之旅</h1>
+            <p class="subtitle">三日时间线行程 · 穿越古都历史长河</p>
+            <p class="date-range">2025年3月15日 - 2025年3月17日</p>
+        </div>
+    </div>
+
+    <!-- 时间轴容器 -->
+    <div class="container">
+        <div class="timeline-container">
+            <!-- 主时间轴线 -->
+            <div class="timeline-line"></div>
+
+            <!-- 第一天 -->
+            <div class="timeline-item" data-aos="fade-right" data-aos-delay="100">
+                <div class="timeline-node">1</div>
+                <div class="timeline-connector"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">
+                        <span>第一天</span>
+                        <span class="day-badge">2025-03-15</span>
+                    </div>
+
+                    <div class="hotel-section">
+                        <div class="hotel-name">北京王府井希尔顿酒店 ★★★★★</div>
+                        <div class="hotel-details">
+                            <strong>价格：</strong>¥800-1200/晚<br>
+                            <strong>特色：</strong>位于王府井商业区，交通便利，设施完善
+                        </div>
+                    </div>
+
+                    <div class="timeline-images">
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=58480a9db5c5432ca6bea8144808a7a8&docGuid=cjoHPppdo8w0Hi" alt="简约清新风格1" />
+                        </div>
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=2e4f769e464743a281f014304a0ef9cd&docGuid=cjoHPppdo8w0Hi" alt="简约清新风格2" />
+                        </div>
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=3147a6789e25467e9c97b50a298ce50d&docGuid=cjoHPppdo8w0Hi" alt="简约清新风格3" />
+                        </div>
+                    </div>
+
+                    <ul class="attractions-list">
+                        <li class="attraction-item">
+                            <div class="attraction-icon">🏛️</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    天安门广场
+                                    <span class="attraction-duration">1小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    世界上最大的城市广场，中国的象征性地点
+                                </div>
+                            </div>
+                        </li>
+                        <li class="attraction-item">
+                            <div class="attraction-icon">🏰</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    故宫博物院
+                                    <span class="attraction-duration">3-4小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    明清两代的皇家宫殿，世界文化遗产
+                                </div>
+                            </div>
+                        </li>
+                        <li class="attraction-item">
+                            <div class="attraction-icon">🌸</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    景山公园
+                                    <span class="attraction-duration">1小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    俯瞰故宫全景的最佳位置
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 第二天 -->
+            <div class="timeline-item" data-aos="fade-left" data-aos-delay="200">
+                <div class="timeline-node">2</div>
+                <div class="timeline-connector"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">
+                        <span>第二天</span>
+                        <span class="day-badge">2025-03-16</span>
+                    </div>
+
+                    <div class="hotel-section">
+                        <div class="hotel-name">北京王府井希尔顿酒店 ★★★★★</div>
+                        <div class="hotel-details">
+                            <strong>价格：</strong>¥800-1200/晚<br>
+                            <strong>特色：</strong>位于王府井商业区，交通便利，设施完善
+                        </div>
+                    </div>
+
+                    <div class="timeline-images">
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=160b39edf4dc4f538f710cadbfb2f7fc&docGuid=cjoHPppdo8w0Hi" alt="简约清新风格4" />
+                        </div>
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=e46484b8251749068b51c143a19b24dd&docGuid=cjoHPppdo8w0Hi" alt="简约清新风格5" />
+                        </div>
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=8d1b49bf906742ff879cef5021101e94&docGuid=cjoHPppdo8w0Hi" alt="民族特色风格2" />
+                        </div>
+                    </div>
+
+                    <ul class="attractions-list">
+                        <li class="attraction-item">
+                            <div class="attraction-icon">🐉</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    八达岭长城
+                                    <span class="attraction-duration">4-5小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    万里长城的精华段，世界文化遗产
+                                </div>
+                            </div>
+                        </li>
+                        <li class="attraction-item">
+                            <div class="attraction-icon">👑</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    明十三陵
+                                    <span class="attraction-duration">2-3小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    明代十三位皇帝的陵墓群
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 第三天 -->
+            <div class="timeline-item" data-aos="fade-right" data-aos-delay="300">
+                <div class="timeline-node">3</div>
+                <div class="timeline-connector"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">
+                        <span>第三天</span>
+                        <span class="day-badge">2025-03-17</span>
+                    </div>
+
+                    <div class="hotel-section">
+                        <div class="hotel-name">北京王府井希尔顿酒店 ★★★★★</div>
+                        <div class="hotel-details">
+                            <strong>价格：</strong>¥800-1200/晚<br>
+                            <strong>特色：</strong>位于王府井商业区，交通便利，设施完善
+                        </div>
+                    </div>
+
+                    <div class="timeline-images">
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=c17d295467144295bd11055486b10e48&docGuid=cjoHPppdo8w0Hi" alt="民族特色风格3" />
+                        </div>
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=90b7f670b09d4a9a96dceaa7645c6550&docGuid=cjoHPppdo8w0Hi" alt="民族特色风格4" />
+                        </div>
+                        <div class="timeline-image" onclick="openLightbox(this)">
+                            <img src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=acbdd87d43644a05bf1677b921352c13&docGuid=cjoHPppdo8w0Hi" alt="简约清新风格6" />
+                        </div>
+                    </div>
+
+                    <ul class="attractions-list">
+                        <li class="attraction-item">
+                            <div class="attraction-icon">🌺</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    颐和园
+                                    <span class="attraction-duration">3-4小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    中国现存最完整的皇家园林
+                                </div>
+                            </div>
+                        </li>
+                        <li class="attraction-item">
+                            <div class="attraction-icon">🏮</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    圆明园
+                                    <span class="attraction-duration">2-3小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    清代大型皇家园林，遗址公园
+                                </div>
+                            </div>
+                        </li>
+                        <li class="attraction-item">
+                            <div class="attraction-icon">📚</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    清华大学
+                                    <span class="attraction-duration">1-2小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    中国著名高等学府，校园环境优美
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer" data-aos="fade-up">
+        <div class="footer-text">时光荏苒，美好如初</div>
+        <div class="footer-subtitle">Timeline Beijing Journey</div>
+    </div>
+
+    <!-- 图片灯箱 -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <!-- JavaScript库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // 初始化AOS动画库
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('fade-out');
+            }, 1500);
+        });
+
+        // 图片灯箱功能
+        function openLightbox(element) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const img = element.querySelector('img');
+            
+            lightboxImg.src = img.src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 键盘事件监听
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+
+        // 时间轴滚动动画
+        window.addEventListener('scroll', () => {
+            const timelineLine = document.querySelector('.timeline-line');
+            const scrolled = window.pageYOffset;
+            const rate = scrolled / (document.body.scrollHeight - window.innerHeight);
+            
+            timelineLine.style.background = `linear-gradient(180deg, 
+                #667eea 0%, 
+                #764ba2 ${rate * 100}%, 
+                rgba(102, 126, 234, 0.3) ${rate * 100}%, 
+                rgba(102, 126, 234, 0.1) 100%)`;
+        });
+
+        // 节点动画
+        const timelineNodes = document.querySelectorAll('.timeline-node');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'nodeActivate 0.6s ease forwards';
+                }
+            });
+        });
+
+        timelineNodes.forEach(node => {
+            observer.observe(node);
+        });
+
+        // 添加节点激活动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes nodeActivate {
+                0% { transform: translateX(-50%) scale(0.8); opacity: 0.5; }
+                50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+                100% { transform: translateX(-50%) scale(1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

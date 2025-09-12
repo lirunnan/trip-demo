@@ -1,6 +1,6 @@
 'use client'
 
-import { Bot, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History, Share2 } from 'lucide-react'
+import { Bot, MapPin, Utensils, Building2, ShoppingBag, Camera, Hotel, Plane, X, History, Share2, MousePointer2 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import ThemeTagsInput from './ThemeTagsInput'
@@ -14,6 +14,7 @@ export interface Message {
   timestamp: Date
   interCityTransportation?: InterCityTransportation
   itinerary?: ItineraryDay[]
+  template?: any
   sender?: UserInfo  // 发送者信息，仅在user角色时有效
   showBreathingAnimation?: boolean  // 是否显示呼吸感动画，默认true
 }
@@ -120,6 +121,12 @@ export default function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   // textareaRef 现在由 ThemeTagsInput 组件内部处理
   
+  // 预定功能处理
+  const handleBooking = (type: 'outbound' | 'return' | 'hotel', data: any) => {
+    // TODO: 实现具体的预定逻辑
+    console.log(`预定${type}:`, data)
+  }
+  
   // 主题模式状态
   const {
     selectedThemes,
@@ -138,21 +145,50 @@ export default function ChatInterface({
   }, [messages])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (input.trim() && !isLoading) {
-      // 解析主题标签
-      const { themes, cleanInput } = parseThemeTags(input.trim())
-      
-      // 添加解析到的主题
-      themes.forEach(theme => addTheme(theme))
-      
-      // 生成包含主题信息的提示词
-      const allSelectedThemes = [...selectedThemes, ...themes]
-      const themePrompt = generateThemePrompt(allSelectedThemes, cleanInput || input.trim())
-      
-      onSendMessage(cleanInput || input.trim(), themePrompt)
-      setInput('')
-    }
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const { themes, cleanInput } = parseThemeTags(input.trim());
+    themes.filter(theme => !selectedThemes.includes(theme)).forEach(addTheme);
+
+    onSendMessage(
+      cleanInput || input.trim(),
+      generateThemePrompt(
+        Array.from(new Set([...selectedThemes, ...themes])),
+        cleanInput || input.trim()
+      )
+    );
+    setInput('');
+  };
+
+  // 预定提示组件
+  const BookingTooltip = ({ children, onBook, type }: { 
+    children: React.ReactNode, 
+    onBook: () => void,
+    type: string 
+  }) => {
+    const [isHovered, setIsHovered] = useState(false)
+    
+    return (
+      <div 
+        className="relative inline-block w-full"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {children}
+        {isHovered && (
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10">
+            <button
+              onClick={onBook}
+              className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105"
+            >
+              <MousePointer2 className="w-4 h-4" />
+              一键预定
+            </button>
+          </div>
+        )}
+      </div>
+    )
   }
 
 
@@ -228,23 +264,28 @@ export default function ChatInterface({
             <div className="mt-2 space-y-2">
               {/* 住宿信息 */}
               {day.accommodation && (
-                <div className="flex items-start gap-2 mt-3 pt-2">
-                  <Hotel className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                      {day.accommodation.name}
-                    </span>
-                    <span className="text-sm text-orange-600 dark:text-orange-400 ml-2">
-                      {day.accommodation.type}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
-                      {day.accommodation.price}
-                    </span>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {day.accommodation.description}
-                    </p>
+                <BookingTooltip 
+                  type="hotel"
+                  onBook={() => handleBooking('hotel', day.accommodation)}
+                >
+                  <div className="flex items-start gap-2 mt-3 pt-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+                    <Hotel className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {day.accommodation.name}
+                      </span>
+                      <span className="text-sm text-orange-600 dark:text-orange-400 ml-2">
+                        {day.accommodation.type}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                        {day.accommodation.price}
+                      </span>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {day.accommodation.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </BookingTooltip>
               )}
               {day.locations.map((location, index) => (
                 <div key={index} className="flex items-start gap-2">
@@ -285,92 +326,102 @@ export default function ChatInterface({
         </div>
 
         {/* 去程 */}
-        <div className="border-l-4 border-green-500 pl-4">
-          <h5 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-            <Plane className="w-4 h-4 text-green-500" />
-            去程 - {transportation.outbound.name}
-          </h5>
-          <div className="mt-2 space-y-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500 dark:text-gray-400">出发</span>
-                <p className="font-medium text-gray-700 dark:text-gray-300">
-                  {transportation.outbound.departureStation}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {transportation.outbound.departureTime}
-                </p>
+        <BookingTooltip 
+          type="outbound"
+          onBook={() => handleBooking('outbound', transportation.outbound)}
+        >
+          <div className="border-l-4 border-green-500 pl-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+            <h5 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+              <Plane className="w-4 h-4 text-green-500" />
+              去程 - {transportation.outbound.name}
+            </h5>
+            <div className="mt-2 space-y-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">出发</span>
+                  <p className="font-medium text-gray-700 dark:text-gray-300">
+                    {transportation.outbound.departureStation}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {transportation.outbound.departureTime}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">到达</span>
+                  <p className="font-medium text-gray-700 dark:text-gray-300">
+                    {transportation.outbound.arrivalStation}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {transportation.outbound.arrivalTime}
+                  </p>
+                </div>
               </div>
-              <div>
-                <span className="text-sm text-gray-500 dark:text-gray-400">到达</span>
-                <p className="font-medium text-gray-700 dark:text-gray-300">
-                  {transportation.outbound.arrivalStation}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {transportation.outbound.arrivalTime}
-                </p>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  🕐 {transportation.outbound.duration}
+                </span>
+                <span className="text-green-600 dark:text-green-400 font-medium">
+                  💰 {transportation.outbound.price}
+                </span>
               </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {transportation.outbound.description}
+              </p>
+              <p className="text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 p-2 rounded">
+                💡 {transportation.outbound.reason}
+              </p>
             </div>
-            <div className="flex items-center gap-4 text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
-                🕐 {transportation.outbound.duration}
-              </span>
-              <span className="text-green-600 dark:text-green-400 font-medium">
-                💰 {transportation.outbound.price}
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {transportation.outbound.description}
-            </p>
-            <p className="text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 p-2 rounded">
-              💡 {transportation.outbound.reason}
-            </p>
           </div>
-        </div>
+        </BookingTooltip>
 
         {/* 返程 */}
-        <div className="border-l-4 border-purple-500 pl-4">
-          <h5 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-            <Plane className="w-4 h-4 text-purple-500 transform rotate-180" />
-            返程 - {transportation.returnTrip.name}
-          </h5>
-          <div className="mt-2 space-y-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500 dark:text-gray-400">出发</span>
-                <p className="font-medium text-gray-700 dark:text-gray-300">
-                  {transportation.returnTrip.departureStation}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {transportation.returnTrip.departureTime}
-                </p>
+        <BookingTooltip 
+          type="return"
+          onBook={() => handleBooking('return', transportation.returnTrip)}
+        >
+          <div className="border-l-4 border-purple-500 pl-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
+            <h5 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+              <Plane className="w-4 h-4 text-purple-500 transform rotate-180" />
+              返程 - {transportation.returnTrip.name}
+            </h5>
+            <div className="mt-2 space-y-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">出发</span>
+                  <p className="font-medium text-gray-700 dark:text-gray-300">
+                    {transportation.returnTrip.departureStation}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {transportation.returnTrip.departureTime}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">到达</span>
+                  <p className="font-medium text-gray-700 dark:text-gray-300">
+                    {transportation.returnTrip.arrivalStation}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {transportation.returnTrip.arrivalTime}
+                  </p>
+                </div>
               </div>
-              <div>
-                <span className="text-sm text-gray-500 dark:text-gray-400">到达</span>
-                <p className="font-medium text-gray-700 dark:text-gray-300">
-                  {transportation.returnTrip.arrivalStation}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {transportation.returnTrip.arrivalTime}
-                </p>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  🕐 {transportation.returnTrip.duration}
+                </span>
+                <span className="text-purple-600 dark:text-purple-400 font-medium">
+                  💰 {transportation.returnTrip.price}
+                </span>
               </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {transportation.returnTrip.description}
+              </p>
+              <p className="text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 p-2 rounded">
+                💡 {transportation.returnTrip.reason}
+              </p>
             </div>
-            <div className="flex items-center gap-4 text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
-                🕐 {transportation.returnTrip.duration}
-              </span>
-              <span className="text-purple-600 dark:text-purple-400 font-medium">
-                💰 {transportation.returnTrip.price}
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {transportation.returnTrip.description}
-            </p>
-            <p className="text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 p-2 rounded">
-              💡 {transportation.returnTrip.reason}
-            </p>
           </div>
-        </div>
+        </BookingTooltip>
       </div>
     )
   }
@@ -572,11 +623,11 @@ export default function ChatInterface({
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {xiaohongshuExtractor && xiaohongshuExtractor}
                 {/* 可以添加更多输入方式 */}
-                <button className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer opacity-50">
+                {/* <button className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer opacity-50">
                   <span className="text-blue-600 dark:text-blue-400 text-sm font-bold">📝</span>
                   <span className="text-gray-400 text-sm font-medium">模板导入</span>
                   <span className="text-xs text-gray-400">(即将上线)</span>
-                </button>
+                </button> */}
                 {onShowHistory && (
                   <button 
                     onClick={onShowHistory}

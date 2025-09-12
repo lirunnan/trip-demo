@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>东京萌萌之旅 - 二日卡通手账</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Nunito', sans-serif;
+            background: url('../bg/japan.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            color: #2d3436;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255, 182, 193, 0.8) 0%, 
+                rgba(255, 192, 203, 0.85) 25%, 
+                rgba(255, 105, 180, 0.8) 50%, 
+                rgba(106, 90, 205, 0.75) 75%, 
+                rgba(123, 104, 238, 0.8) 100%);
+            background-size: 300% 300%;
+            animation: dreamyGradient 15s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes dreamyGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20 20 Q30 10 40 20 T60 20 Q70 10 80 20 Q70 30 60 20 T40 20 Q30 30 20 20' fill='%23fff' opacity='0.06'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='15' fill='none' stroke='%23fff' stroke-width='2' opacity='0.08'/%3E%3Cpath d='M30 40 Q40 30 50 40 Q40 50 30 40' fill='%23fff' opacity='0.06'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M30 15 L35 25 L45 25 L37 32 L40 42 L30 37 L20 42 L23 32 L15 25 L25 25 Z' fill='%23fff' opacity='0.05'/%3E%3C/svg%3E");
+            background-size: 120px 120px, 100px 100px, 80px 80px;
+            background-position: 0 0, 40px 40px, 80px 80px;
+            z-index: -1;
+            animation: patternFloat 30s ease-in-out infinite;
+        }
+
+        @keyframes patternFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(3deg); }
+            66% { transform: translate(-20px, 20px) rotate(-2deg); }
+        }
+
+        .top-decoration {
+            height: 25px;
+            background: linear-gradient(90deg, 
+                #ff69b4 0%, #ffc0cb 20%, #ffb6c1 40%, 
+                #dda0dd 60%, #9370db 80%, #8a2be2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-decoration::after {
+            content: '🌸 🎀 🌸 🎀 🌸 🎀 🌸 🎀 🌸 🎀 🌸 🎀 🌸 🎀 🌸';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            animation: heartBeat 2.5s ease-in-out infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.15); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0.15) 50%,
+                transparent 70%
+            );
+            z-index: -1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 40px;
+            padding: 70px;
+            border: 8px solid #ff69b4;
+            box-shadow: 
+                0 35px 70px rgba(0,0,0,0.15),
+                inset 0 1px 0 rgba(255,255,255,1);
+            transform: rotate(-1deg);
+        }
+
+        .main-title {
+            font-family: 'Nunito', sans-serif;
+            font-size: 5.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff69b4, #ffc0cb, #9370db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+            animation: titleWiggle 3.5s ease-in-out infinite alternate;
+            transform: rotate(1deg);
+        }
+
+        @keyframes titleWiggle {
+            0% { 
+                transform: rotate(1deg) scale(1);
+                filter: hue-rotate(0deg);
+            }
+            100% { 
+                transform: rotate(1deg) scale(1.05);
+                filter: hue-rotate(25deg);
+            }
+        }
+
+        .main-title::before,
+        .main-title::after {
+            content: '🌸';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3.5rem;
+            animation: petalSpin 4.5s ease-in-out infinite;
+        }
+
+        .main-title::before {
+            left: -100px;
+        }
+
+        .main-title::after {
+            right: -100px;
+            content: '🎎';
+            animation-direction: reverse;
+        }
+
+        @keyframes petalSpin {
+            0% { transform: translateY(-50%) rotate(0deg) scale(1); }
+            50% { transform: translateY(-50%) rotate(180deg) scale(1.3); }
+            100% { transform: translateY(-50%) rotate(360deg) scale(1); }
+        }
+
+        .subtitle {
+            font-size: 2rem;
+            color: #9370db;
+            margin-bottom: 20px;
+            font-weight: 700;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.6s forwards;
+        }
+
+        .date-range {
+            font-size: 1.5rem;
+            color: #e91e63;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffc0cb, #ffb6c1);
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: 4px solid #ff69b4;
+            display: inline-block;
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.2s forwards;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff69b4, #9370db);
+            color: #fff;
+            font-size: 2.2rem;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: cuteIndicatorBounce 2.2s infinite;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.5);
+        }
+
+        @keyframes cuteIndicatorBounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-25px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-12px);
+            }
+        }
+
+        .content-section {
+            padding: 120px 0;
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            margin-top: 60px;
+            border-radius: 50px 50px 0 0;
+            border: 8px solid #ff69b4;
+            border-bottom: none;
+        }
+
+        .route-section {
+            margin: 80px 0;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 35px;
+            border: 6px solid #ff69b4;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(90deg, 
+                #ff69b4 0%, #ffc0cb 33%, #9370db 66%, #ff69b4 100%);
+            border-radius: 35px 35px 0 0;
+            z-index: 1;
+        }
+
+        .route-title {
+            font-family: 'Nunito', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #e91e63;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .route-title::before,
+        .route-title::after {
+            content: '🗾';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.5rem;
+            animation: mapFloat 3s ease-in-out infinite alternate;
+        }
+
+        .route-title::before {
+            left: -80px;
+        }
+
+        .route-title::after {
+            right: -80px;
+        }
+
+        @keyframes mapFloat {
+            0% { transform: translateY(-50%) rotate(-5deg) scale(1); }
+            100% { transform: translateY(-50%) rotate(5deg) scale(1.1); }
+        }
+
+        .route-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            border-radius: 25px;
+            overflow: hidden;
+            background: linear-gradient(135deg, 
+                rgba(255, 192, 203, 0.3),
+                rgba(221, 160, 221, 0.3),
+                rgba(147, 112, 219, 0.3));
+        }
+
+        .divider {
+            text-align: center;
+            margin: 80px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, 
+                transparent, #ff69b4, #ffc0cb, #9370db, #ff69b4, transparent);
+            border-radius: 12px;
+            animation: dividerGlow 3.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes dividerGlow {
+            0% { opacity: 0.8; transform: scaleY(1); }
+            100% { opacity: 1; transform: scaleY(2); }
+        }
+
+        .divider-text {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0 50px;
+            font-size: 2.2rem;
+            color: #ff69b4;
+            position: relative;
+            z-index: 1;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            border-radius: 30px;
+            border: 4px solid #ff69b4;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.25);
+        }
+
+        .day-section {
+            margin-bottom: 100px;
+            position: relative;
+        }
+
+        .day-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 40px;
+            padding: 60px;
+            border: 8px solid #ff69b4;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s ease;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.12),
+                inset 0 1px 0 rgba(255,255,255,1);
+        }
+
+        .day-card:hover {
+            transform: translateY(-20px) rotate(1deg);
+            box-shadow: 
+                0 40px 80px rgba(0,0,0,0.18),
+                inset 0 1px 0 rgba(255,255,255,1);
+        }
+
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(90deg, 
+                #ff69b4 0%, #ffc0cb 33%, #9370db 66%, #ff69b4 100%);
+            border-radius: 40px 40px 0 0;
+            z-index: 1;
+        }
+
+        .day-header {
+            position: relative;
+            z-index: 1;
+            border-bottom: 5px dashed #ff69b4;
+            padding-bottom: 30px;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, 
+                rgba(255, 105, 180, 0.06) 0%, 
+                rgba(147, 112, 219, 0.06) 100%);
+            border-radius: 30px;
+            padding: 30px;
+            margin: -30px -30px 50px -30px;
+        }
+
+        .day-title {
+            font-family: 'Nunito', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: #2d3436;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .day-number {
+            background: linear-gradient(135deg, #ff69b4, #9370db);
+            color: #fff;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            font-weight: 900;
+            box-shadow: 
+                0 12px 35px rgba(255, 105, 180, 0.5),
+                inset 0 2px 0 rgba(255,255,255,0.4);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-number::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                rgba(255,255,255,0.4) 90deg,
+                transparent 180deg
+            );
+            animation: numberShine 3.5s linear infinite;
+        }
+
+        @keyframes numberShine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .day-number:hover {
+            transform: scale(1.2) rotate(15deg);
+            box-shadow: 
+                0 18px 50px rgba(255, 105, 180, 0.7),
+                inset 0 2px 0 rgba(255,255,255,0.6);
+        }
+
+        .day-date {
+            font-size: 1.7rem;
+            color: #9370db;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffc0cb, #ffb6c1);
+            padding: 15px 25px;
+            border-radius: 25px;
+            border: 4px solid #ff69b4;
+            display: inline-block;
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
+        }
+
+        .hotel-info {
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 100%);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 50px;
+            border: 5px solid #ff69b4;
+            position: relative;
+            z-index: 1;
+            transition: all 0.5s ease;
+            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.25);
+        }
+
+        .hotel-info:hover {
+            transform: translateY(-10px) rotate(-1deg);
+            box-shadow: 0 25px 60px rgba(255, 105, 180, 0.35);
+        }
+
+        .hotel-info::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ff69b4, #9370db, #ffc0cb, #ff69b4);
+            border-radius: 30px;
+            z-index: -1;
+            animation: borderGlow 4.5s linear infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .hotel-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #e91e63;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hotel-name::before {
+            content: '🏨';
+            font-size: 2.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 50%;
+            border: 4px solid #ff69b4;
+            animation: hotelSway 3.5s ease-in-out infinite;
+        }
+
+        @keyframes hotelSway {
+            0%, 100% { transform: rotate(-8deg) scale(1); }
+            50% { transform: rotate(8deg) scale(1.15); }
+        }
+
+        .hotel-details {
+            color: #e91e63;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .attractions {
+            position: relative;
+            z-index: 1;
+        }
+
+        .attraction-item {
+            display: flex;
+            margin-bottom: 35px;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            border: 5px solid #ff69b4;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.12);
+        }
+
+        .attraction-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 105, 180, 0.15), 
+                rgba(147, 112, 219, 0.15),
+                transparent);
+            transition: left 0.7s ease;
+        }
+
+        .attraction-item:hover::before {
+            left: 100%;
+        }
+
+        .attraction-item:hover {
+            transform: translateX(25px) scale(1.03) rotate(1deg);
+            box-shadow: 0 25px 60px rgba(255, 105, 180, 0.25);
+            border-color: #9370db;
+        }
+
+        .attraction-bullet {
+            color: #ff69b4;
+            font-size: 3rem;
+            margin-right: 30px;
+            margin-top: 12px;
+            flex-shrink: 0;
+            transition: all 0.5s ease;
+        }
+
+        .attraction-item:hover .attraction-bullet {
+            transform: scale(1.5) rotate(720deg);
+            color: #9370db;
+        }
+
+        .attraction-content {
+            flex: 1;
+        }
+
+        .attraction-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2d3436;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .attraction-duration {
+            background: linear-gradient(135deg, #9370db, #ff69b4);
+            color: #fff;
+            padding: 10px 25px;
+            border-radius: 25px;
+            border: 4px solid #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 8px 25px rgba(147, 112, 219, 0.4);
+            transition: all 0.4s ease;
+        }
+
+        .attraction-item:hover .attraction-duration {
+            transform: scale(1.2) rotate(-8deg);
+            box-shadow: 0 12px 35px rgba(147, 112, 219, 0.6);
+        }
+
+        .attraction-description {
+            color: #636e72;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            font-weight: 500;
+            transition: color 0.4s ease;
+        }
+
+        .attraction-item:hover .attraction-description {
+            color: #2d3436;
+        }
+
+        .attraction-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255, 105, 180, 0.95), 
+                rgba(147, 112, 219, 0.95));
+            animation: modalFadeIn 0.4s ease;
+        }
+
+        .attraction-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 35px;
+            padding: 50px;
+            max-width: 600px;
+            width: 90%;
+            border: 8px solid #fff;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+            animation: modalZoomIn 0.4s ease;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: #fff;
+            color: #ff69b4;
+            font-size: 3.5rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            width: 80px;
+            height: 80px;
+            border: 5px solid #ff69b4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+        }
+
+        .modal-close:hover {
+            background: #ff69b4;
+            color: #fff;
+            transform: scale(1.25) rotate(90deg);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #e91e63;
+            margin-bottom: 20px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .modal-description {
+            font-size: 1.4rem;
+            color: #2d3436;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .modal-info {
+            background: linear-gradient(135deg, #ffc0cb, #ffb6c1);
+            padding: 20px;
+            border-radius: 20px;
+            border: 3px solid #ff69b4;
+        }
+
+        .modal-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalZoomIn {
+            from { transform: scale(0.6) rotate(-15deg); }
+            to { transform: scale(1) rotate(0deg); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 80px 0;
+            margin-top: 120px;
+            background: linear-gradient(135deg, #ff69b4, #9370db);
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            border-radius: 50px 50px 0 0;
+        }
+
+        .footer::before {
+            content: '🌸 🎎 🌸 🎎 🌸 🎎 🌸 🎎 🌸 🎎 🌸 🎎 🌸 🎎 🌸 🎎 🌸 🎎 🌸 🎎';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            opacity: 0.25;
+            animation: footerPattern 10s linear infinite;
+        }
+
+        @keyframes footerPattern {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .footer-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.25);
+        }
+
+        .footer-subtitle {
+            font-size: 1.6rem;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff69b4, #9370db, #ffc0cb);
+            background-size: 300% 300%;
+            animation: loadingGradient 2.5s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.6s ease;
+        }
+
+        @keyframes loadingGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .loading.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+            animation: loadingBounce 1.8s ease-in-out infinite alternate;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 40px 60px;
+            border-radius: 40px;
+            border: 6px solid rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes loadingBounce {
+            0% { transform: scale(1) rotate(-3deg); }
+            100% { transform: scale(1.15) rotate(3deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 4rem;
+            }
+
+            .main-title::before,
+            .main-title::after {
+                font-size: 2.5rem;
+                left: -70px;
+                right: -70px;
+            }
+
+            .hero-content {
+                padding: 50px 30px;
+            }
+
+            .day-card {
+                padding: 40px 25px;
+            }
+
+            .day-title {
+                font-size: 2.8rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .day-number {
+                width: 80px;
+                height: 80px;
+                font-size: 2.2rem;
+            }
+
+            .attraction-item {
+                flex-direction: column;
+                text-align: left;
+                padding: 30px;
+            }
+
+            .attraction-bullet {
+                margin-right: 0;
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+
+            .route-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loading-text">东京萌萌之旅</div>
+    </div>
+
+    <div class="top-decoration"></div>
+
+    <div class="container">
+        <section class="hero-section">
+            <div class="hero-bg"></div>
+
+            <div class="hero-content" data-aos="zoom-in" data-aos-duration="1000">
+                <h1 class="main-title">东京萌萌之旅</h1>
+                <p class="subtitle">二日卡通手账 · 可爱东瀛探险记</p>
+                <p class="date-range">2025年3月15日 - 2025年3月16日</p>
+            </div>
+
+            <div class="scroll-indicator" onclick="scrollToContent()">
+                ⬇
+            </div>
+        </section>
+
+        <section class="content-section">
+            <!-- 路线展示区 -->
+            <div class="route-section" data-aos="fade-up">
+                <div class="route-title">🗾 东京游览路线 🗾</div>
+                
+                <div class="route-container">
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M 15 65 C 19.5 65 25.5 50 30 50 C 36 50 44 35 50 35 C 57.5 35 67.5 25 75 25 C 82 25 88 40 92 40"
+                              stroke="#ff69b4" stroke-width="1.2" stroke-dasharray="4,2" fill="none" class="drop-shadow-lg"
+                              stroke-linecap="round" stroke-linejoin="round"></path>
+                        <circle cx="15" cy="65" r="0.8" fill="#ff69b4" class="drop-shadow-sm"></circle>
+                        <circle cx="30" cy="50" r="0.8" fill="#ff69b4" class="drop-shadow-sm"></circle>
+                        <circle cx="50" cy="35" r="0.8" fill="#ff69b4" class="drop-shadow-sm"></circle>
+                        <circle cx="75" cy="25" r="0.8" fill="#ff69b4" class="drop-shadow-sm"></circle>
+                        <circle cx="92" cy="40" r="0.8" fill="#ff69b4" class="drop-shadow-sm"></circle>
+                    </svg>
+                    
+                    <!-- 景点1：浅草寺 -->
+                    <div class="absolute transform -translate-x-1/2 -translate-y-1/2" style="left:15%;top:65%">
+                        <div class="flex flex-col items-center">
+                            <button class="group mb-2" onclick="openAttractionModal('浅草寺', '东京最古老的寺庙，著名的雷门和仲见世商店街，可体验传统日本文化', '寺庙/文化景点', '2小时')">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-200 overflow-hidden relative bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                                        <span class="text-2xl">⛩️</span>
+                                    </div>
+                                </div>
+                            </button>
+                            <div class="px-3 py-2 bg-black/20 rounded-lg backdrop-blur-sm">
+                                <p class="text-sm font-semibold text-white whitespace-nowrap" style="text-shadow:2px 2px 4px rgba(0,0,0,0.8)">浅草寺</p>
+                                <p class="text-xs text-white/95 text-center" style="text-shadow:1px 1px 3px rgba(0,0,0,0.7)">第1天</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 景点2：东京晴空塔 -->
+                    <div class="absolute transform -translate-x-1/2 -translate-y-1/2" style="left:30%;top:50%">
+                        <div class="flex flex-col items-center">
+                            <button class="group mb-2" onclick="openAttractionModal('东京晴空塔', '世界第二高建筑，可俯瞰东京全景，包含购物中心和观景台', '观景台/地标建筑', '3小时')">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-200 overflow-hidden relative bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                                        <span class="text-2xl">🗼</span>
+                                    </div>
+                                </div>
+                            </button>
+                            <div class="px-3 py-2 bg-black/20 rounded-lg backdrop-blur-sm">
+                                <p class="text-sm font-semibold text-white whitespace-nowrap" style="text-shadow:2px 2px 4px rgba(0,0,0,0.8)">东京晴空塔</p>
+                                <p class="text-xs text-white/95 text-center" style="text-shadow:1px 1px 3px rgba(0,0,0,0.7)">第1天</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 景点3：秋叶原 -->
+                    <div class="absolute transform -translate-x-1/2 -translate-y-1/2" style="left:50%;top:35%">
+                        <div class="flex flex-col items-center">
+                            <button class="group mb-2" onclick="openAttractionModal('秋叶原', '著名的电器和动漫文化圣地，拥有众多电子产品商店和动漫周边店', '购物/娱乐区', '2小时')">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-200 overflow-hidden relative bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                                        <span class="text-2xl">🎮</span>
+                                    </div>
+                                </div>
+                            </button>
+                            <div class="px-3 py-2 bg-black/20 rounded-lg backdrop-blur-sm">
+                                <p class="text-sm font-semibold text-white whitespace-nowrap" style="text-shadow:2px 2px 4px rgba(0,0,0,0.8)">秋叶原</p>
+                                <p class="text-xs text-white/95 text-center" style="text-shadow:1px 1px 3px rgba(0,0,0,0.7)">第1天</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 景点4：明治神宫 -->
+                    <div class="absolute transform -translate-x-1/2 -translate-y-1/2" style="left:75%;top:25%">
+                        <div class="flex flex-col items-center">
+                            <button class="group mb-2" onclick="openAttractionModal('明治神宫', '东京最重要的神社之一，供奉明治天皇和昭宪皇太后，拥有广阔的森林庭院', '神社/文化景点', '2小时')">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-200 overflow-hidden relative bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                                        <span class="text-2xl">⛩️</span>
+                                    </div>
+                                </div>
+                            </button>
+                            <div class="px-3 py-2 bg-black/20 rounded-lg backdrop-blur-sm">
+                                <p class="text-sm font-semibold text-white whitespace-nowrap" style="text-shadow:2px 2px 4px rgba(0,0,0,0.8)">明治神宫</p>
+                                <p class="text-xs text-white/95 text-center" style="text-shadow:1px 1px 3px rgba(0,0,0,0.7)">第2天</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 景点5：涩谷十字路口 -->
+                    <div class="absolute transform -translate-x-1/2 -translate-y-1/2" style="left:92%;top:40%">
+                        <div class="flex flex-col items-center">
+                            <button class="group mb-2" onclick="openAttractionModal('涩谷十字路口', '世界最繁忙的十字路口，著名的忠犬八公像和大型购物中心', '地标/商业区', '2小时')">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg group-hover:scale-110 transition-transform duration-200 overflow-hidden relative bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                                        <span class="text-2xl">🏙️</span>
+                                    </div>
+                                </div>
+                            </button>
+                            <div class="px-3 py-2 bg-black/20 rounded-lg backdrop-blur-sm">
+                                <p class="text-sm font-semibold text-white whitespace-nowrap" style="text-shadow:2px 2px 4px rgba(0,0,0,0.8)">涩谷十字路口</p>
+                                <p class="text-xs text-white/95 text-center" style="text-shadow:1px 1px 3px rgba(0,0,0,0.7)">第2天</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-4 right-4 rounded-lg p-3 bg-black/20 backdrop-blur-sm">
+                        <h4 class="font-semibold text-white mb-2 text-sm" style="text-shadow:2px 2px 4px rgba(0,0,0,0.8)">行程概览</h4>
+                        <div class="text-xs text-white space-y-1" style="text-shadow:1px 1px 3px rgba(0,0,0,0.7)">
+                            <div>总天数：2天</div>
+                            <div>主要区域：东京都内</div>
+                            <div>最佳季节：全年皆宜</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider" data-aos="fade-up">
+                <span class="divider-text">🎀 行程安排 🎀</span>
+            </div>
+
+            <!-- 第一天 -->
+            <section class="day-section" data-aos="fade-up" data-aos-delay="100">
+                <div class="day-card">
+                    <div class="day-header">
+                        <div class="day-title">
+                            <span class="day-number">1</span>
+                            <div>
+                                <div>第一天</div>
+                                <div class="day-date">2025-03-15</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hotel-info" data-aos="fade-right" data-aos-delay="200">
+                        <div class="hotel-name">三井花园饭店银座普米尔 <span style="color: #9370db;">★★★★</span></div>
+                        <div class="hotel-details">
+                            <strong>价格：</strong>约15,000日元/晚<br>
+                            <strong>特色：</strong>位于银座核心区，交通便利，房间整洁舒适，部分房间可看到东京塔
+                        </div>
+                    </div>
+
+                    <div class="attractions">
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="300" onclick="openAttractionModal('浅草寺', '东京最古老的寺庙，著名的雷门和仲见世商店街，可体验传统日本文化', '寺庙/文化景点', '2小时')">
+                            <div class="attraction-bullet">⛩️</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    浅草寺
+                                    <span class="attraction-duration">2小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    东京最古老的寺庙，著名的雷门和仲见世商店街，可体验传统日本文化
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="400" onclick="openAttractionModal('东京晴空塔', '世界第二高建筑，可俯瞰东京全景，包含购物中心和观景台', '观景台/地标建筑', '3小时')">
+                            <div class="attraction-bullet">🗼</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    东京晴空塔
+                                    <span class="attraction-duration">3小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    世界第二高建筑，可俯瞰东京全景，包含购物中心和观景台
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="500" onclick="openAttractionModal('秋叶原', '著名的电器和动漫文化圣地，拥有众多电子产品商店和动漫周边店', '购物/娱乐区', '2小时')">
+                            <div class="attraction-bullet">🎮</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    秋叶原
+                                    <span class="attraction-duration">2小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    著名的电器和动漫文化圣地，拥有众多电子产品商店和动漫周边店
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第二天 -->
+            <section class="day-section" data-aos="fade-up" data-aos-delay="200">
+                <div class="day-card">
+                    <div class="day-header">
+                        <div class="day-title">
+                            <span class="day-number">2</span>
+                            <div>
+                                <div>第二天</div>
+                                <div class="day-date">2025-03-16</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hotel-info" data-aos="fade-right" data-aos-delay="300">
+                        <div class="hotel-name">三井花园饭店银座普米尔 <span style="color: #9370db;">★★★★</span></div>
+                        <div class="hotel-details">
+                            <strong>价格：</strong>约15,000日元/晚<br>
+                            <strong>特色：</strong>连续入住同一酒店，避免搬运行李浪费时间
+                        </div>
+                    </div>
+
+                    <div class="attractions">
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="400" onclick="openAttractionModal('明治神宫', '东京最重要的神社之一，供奉明治天皇和昭宪皇太后，拥有广阔的森林庭院', '神社/文化景点', '2小时')">
+                            <div class="attraction-bullet">⛩️</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    明治神宫
+                                    <span class="attraction-duration">2小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    东京最重要的神社之一，供奉明治天皇和昭宪皇太后，拥有广阔的森林庭院
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="500" onclick="openAttractionModal('原宿竹下通', '年轻人时尚潮流圣地，各种特色小店和美食摊位', '购物/时尚街区', '1.5小时')">
+                            <div class="attraction-bullet">🌈</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    原宿竹下通
+                                    <span class="attraction-duration">1.5小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    年轻人时尚潮流圣地，各种特色小店和美食摊位
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="600" onclick="openAttractionModal('涩谷十字路口', '世界最繁忙的十字路口，著名的忠犬八公像和大型购物中心', '地标/商业区', '2小时')">
+                            <div class="attraction-bullet">🏙️</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    涩谷十字路口
+                                    <span class="attraction-duration">2小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    世界最繁忙的十字路口，著名的忠犬八公像和大型购物中心
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="700" onclick="openAttractionModal('新宿御苑', '东京最大的日式庭园和法式庭园结合的公园，四季景色优美', '公园/花园', '2小时')">
+                            <div class="attraction-bullet">🌸</div>
+                            <div class="attraction-content">
+                                <div class="attraction-name">
+                                    新宿御苑
+                                    <span class="attraction-duration">2小时</span>
+                                </div>
+                                <div class="attraction-description">
+                                    东京最大的日式庭园和法式庭园结合的公园，四季景色优美
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <footer class="footer" data-aos="fade-up">
+            <div class="footer-text">可爱的东京之旅结束啦！</div>
+            <div class="footer-subtitle">Cute Tokyo Adventure Complete!</div>
+        </footer>
+    </div>
+
+    <!-- 景点详情模态框 -->
+    <div class="attraction-modal" id="attractionModal" onclick="closeAttractionModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeAttractionModal()">&times;</span>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-description" id="modalDescription"></div>
+            <div class="modal-info">
+                <div class="modal-info-item">
+                    <span>景点类型：</span>
+                    <span id="modalType"></span>
+                </div>
+                <div class="modal-info-item">
+                    <span>建议游览时间：</span>
+                    <span id="modalDuration"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('fade-out');
+            }, 2000);
+        });
+
+        function scrollToContent() {
+            document.querySelector('.content-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function openAttractionModal(name, description, type, duration) {
+            document.getElementById('modalTitle').textContent = name;
+            document.getElementById('modalDescription').textContent = description;
+            document.getElementById('modalType').textContent = type;
+            document.getElementById('modalDuration').textContent = duration;
+            document.getElementById('attractionModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAttractionModal() {
+            document.getElementById('attractionModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAttractionModal();
+            }
+        });
+
+        const emojis = ['🌸', '🎎', '🎀', '⭐', '🌈', '🦄', '🍭', '🎈', '🗾'];
+        setInterval(() => {
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const bullets = document.querySelectorAll('.attraction-bullet');
+            if (bullets.length > 0 && Math.random() > 0.8) {
+                const randomBullet = bullets[Math.floor(Math.random() * bullets.length)];
+                const originalContent = randomBullet.textContent;
+                randomBullet.textContent = randomEmoji;
+                setTimeout(() => {
+                    randomBullet.textContent = originalContent;
+                }, 1200);
+            }
+        }, 3500);
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('.attraction-item, .hotel-info').forEach(element => {
+            element.addEventListener('click', function() {
+                this.style.transform += ' scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = this.style.transform.replace(' scale(0.98)', '');
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

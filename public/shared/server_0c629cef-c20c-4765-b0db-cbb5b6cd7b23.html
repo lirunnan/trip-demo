@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1天旅行计划 - 上海经典一日游</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 25%, #fd79a8 50%, #a29bfe 75%, #6c5ce7 100%);
+            background-size: 300% 300%;
+            animation: dreamyGradient 12s ease infinite;
+            color: #2d3436;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        @keyframes dreamyGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/images/generated-0c629cef-c20c-4765-b0db-cbb5b6cd7b23.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            opacity: 0.3;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20 20 Q30 10 40 20 T60 20 Q70 10 80 20 Q70 30 60 20 T40 20 Q30 30 20 20' fill='%23fff' opacity='0.1'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='15' fill='none' stroke='%23fff' stroke-width='2' opacity='0.1'/%3E%3Cpath d='M30 40 Q40 30 50 40 Q40 50 30 40' fill='%23fff' opacity='0.1'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M30 15 L35 25 L45 25 L37 32 L40 42 L30 37 L20 42 L23 32 L15 25 L25 25 Z' fill='%23fff' opacity='0.08'/%3E%3C/svg%3E");
+            background-size: 100px 100px, 80px 80px, 60px 60px;
+            background-position: 0 0, 30px 30px, 60px 60px;
+            z-index: -1;
+            animation: patternFloat 25s ease-in-out infinite;
+        }
+
+        @keyframes patternFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(20px, -20px) rotate(5deg); }
+            66% { transform: translate(-15px, 15px) rotate(-3deg); }
+        }
+
+        .top-decoration {
+            height: 20px;
+            background: linear-gradient(90deg, 
+                #ff7675 0%, #fd79a8 20%, #fdcb6e 40%, 
+                #6c5ce7 60%, #74b9ff 80%, #00b894 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-decoration::after {
+            content: '♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡ ♡';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            animation: heartBeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 35px;
+            padding: 60px;
+            border: 6px solid #fd79a8;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,1);
+            transform: rotate(-1deg);
+        }
+
+        .main-title {
+            font-family: 'Nunito', sans-serif;
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fd79a8, #fdcb6e, #6c5ce7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            animation: titleWiggle 3s ease-in-out infinite alternate;
+            transform: rotate(1deg);
+        }
+
+        @keyframes titleWiggle {
+            0% { 
+                transform: rotate(1deg) scale(1);
+                filter: hue-rotate(0deg);
+            }
+            100% { 
+                transform: rotate(1deg) scale(1.05);
+                filter: hue-rotate(20deg);
+            }
+        }
+
+        .main-title::before,
+        .main-title::after {
+            content: '🌸';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            animation: petalSpin 4s ease-in-out infinite;
+        }
+
+        .main-title::before {
+            left: -90px;
+        }
+
+        .main-title::after {
+            right: -90px;
+            content: '🎀';
+            animation-direction: reverse;
+        }
+
+        @keyframes petalSpin {
+            0% { transform: translateY(-50%) rotate(0deg) scale(1); }
+            50% { transform: translateY(-50%) rotate(180deg) scale(1.2); }
+            100% { transform: translateY(-50%) rotate(360deg) scale(1); }
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: #6c5ce7;
+            margin-bottom: 15px;
+            font-weight: 700;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.5s forwards;
+        }
+
+        .date-range {
+            font-size: 1.4rem;
+            color: #e17055;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: 3px solid #fd79a8;
+            display: inline-block;
+            opacity: 0;
+            animation: fadeInUp 1s ease 1s forwards;
+            box-shadow: 0 8px 25px rgba(253, 121, 168, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #fd79a8, #6c5ce7);
+            color: #fff;
+            font-size: 2rem;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: cuteIndicatorBounce 2s infinite;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(253, 121, 168, 0.4);
+        }
+
+        @keyframes cuteIndicatorBounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-20px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        .content-section {
+            padding: 100px 0;
+            position: relative;
+            background: rgba(255, 255, 255, 0.9);
+            margin-top: 50px;
+            border-radius: 40px 40px 0 0;
+            border: 6px solid #fd79a8;
+            border-bottom: none;
+        }
+
+        .route-section {
+            margin: 80px 0;
+            position: relative;
+        }
+
+        .route-map {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 35px;
+            border: 6px solid #fd79a8;
+            overflow: hidden;
+            margin-bottom: 60px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        }
+
+        .route-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .route-point {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .route-point-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .route-point-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 25px rgba(253, 121, 168, 0.3);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fd79a8, #6c5ce7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .route-point-btn:hover .route-point-image {
+            transform: scale(1.2);
+            box-shadow: 0 15px 40px rgba(253, 121, 168, 0.5);
+        }
+
+        .route-point-label {
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 15px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+        }
+
+        .route-overview {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .route-overview h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #fd79a8;
+        }
+
+        .route-overview div {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .attraction-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 35px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            border: 6px solid #fd79a8;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .attraction-detail-modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #fd79a8;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fd79a8;
+            margin-bottom: 15px;
+        }
+
+        .modal-type {
+            background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .modal-description {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+
+        .modal-duration {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 12px 20px;
+            border-radius: 20px;
+            border: 3px solid #fd79a8;
+            font-weight: 700;
+            color: #e17055;
+            display: inline-block;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 60px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent, #fd79a8, #fdcb6e, #6c5ce7, #fd79a8, transparent);
+            border-radius: 10px;
+            animation: dividerGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes dividerGlow {
+            0% { opacity: 0.7; transform: scaleY(1); }
+            100% { opacity: 1; transform: scaleY(1.5); }
+        }
+
+        .divider-text {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0 40px;
+            font-size: 2rem;
+            color: #fd79a8;
+            position: relative;
+            z-index: 1;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            border-radius: 25px;
+            border: 3px solid #fd79a8;
+            display: inline-block;
+            box-shadow: 0 8px 25px rgba(253, 121, 168, 0.2);
+        }
+
+        .hotel-info {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            border-radius: 25px;
+            padding: 35px;
+            margin-bottom: 40px;
+            border: 4px solid #fd79a8;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(253, 121, 168, 0.2);
+        }
+
+        .hotel-info:hover {
+            transform: translateY(-8px) rotate(-1deg);
+            box-shadow: 0 20px 50px rgba(253, 121, 168, 0.3);
+        }
+
+        .hotel-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #e17055;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hotel-name::before {
+            content: '🏨';
+            font-size: 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px;
+            border-radius: 50%;
+            border: 3px solid #fd79a8;
+            animation: hotelSway 3s ease-in-out infinite;
+        }
+
+        @keyframes hotelSway {
+            0%, 100% { transform: rotate(-5deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.1); }
+        }
+
+        .hotel-details {
+            color: #e17055;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 60px 0;
+            margin-top: 100px;
+            background: linear-gradient(135deg, #fd79a8, #6c5ce7);
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            border-radius: 40px 40px 0 0;
+        }
+
+        .footer::before {
+            content: '♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★ ♡ ★';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            opacity: 0.2;
+            animation: footerPattern 8s linear infinite;
+        }
+
+        @keyframes footerPattern {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .footer-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .footer-subtitle {
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fd79a8, #6c5ce7, #fdcb6e);
+            background-size: 300% 300%;
+            animation: loadingGradient 2s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes loadingGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .loading.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: loadingBounce 1.5s ease-in-out infinite alternate;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px 50px;
+            border-radius: 35px;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes loadingBounce {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 3.5rem;
+            }
+
+            .main-title::before,
+            .main-title::after {
+                font-size: 2rem;
+                left: -60px;
+                right: -60px;
+            }
+
+            .hero-content {
+                padding: 40px 25px;
+            }
+
+            .route-map {
+                height: 400px;
+            }
+
+            .route-overview {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loading-text">上海1天之旅</div>
+    </div>
+
+    <div class="top-decoration"></div>
+
+    <div class="container">
+        <section class="hero-section">
+            <div class="hero-content" data-aos="zoom-in" data-aos-duration="1000">
+                <h1 class="main-title">1天旅行计划</h1>
+                <p class="subtitle">上海经典一日游 · 东西文化完美融合</p>
+                <p class="date-range">2025年3月15日</p>
+            </div>
+
+            <div class="scroll-indicator" onclick="scrollToContent()">
+                ⬇
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="divider" data-aos="fade-up">
+                <span class="divider-text">🎀 行程路线 🎀</span>
+            </div>
+
+            <div class="route-section" data-aos="fade-up" data-aos-delay="100">
+                <div class="route-map">
+                    <svg class="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path
+                            d="M 15 60 C 25 55 35 70 45 65 C 55 60 65 75 75 70 C 85 65 90 50 85 45"
+                            stroke="#15803d" stroke-width="0.8" stroke-dasharray="3,2" fill="none" 
+                            class="drop-shadow-lg" stroke-linecap="round" stroke-linejoin="round">
+                        </path>
+                        <circle cx="15" cy="60" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                        <circle cx="45" cy="65" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                        <circle cx="75" cy="70" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                        <circle cx="85" cy="45" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                    </svg>
+
+                    <div class="route-point" style="left:15%;top:60%">
+                        <button class="route-point-btn" onclick="showAttractionDetail('外滩', '城市地标', '上海标志性滨江景观带，欣赏万国建筑博览群和黄浦江两岸风光', '1.5小时')">
+                            <div class="route-point-image">🏛️</div>
+                        </button>
+                        <div class="route-point-label">外滩</div>
+                    </div>
+
+                    <div class="route-point" style="left:45%;top:65%">
+                        <button class="route-point-btn" onclick="showAttractionDetail('豫园', '古典园林', '明代古典园林，江南园林艺术的代表作，包含豫园商城和城隍庙', '2小时')">
+                            <div class="route-point-image">🏮</div>
+                        </button>
+                        <div class="route-point-label">豫园</div>
+                    </div>
+
+                    <div class="route-point" style="left:75%;top:70%">
+                        <button class="route-point-btn" onclick="showAttractionDetail('南京路步行街', '商业街区', '中华商业第一街，集购物、餐饮、娱乐于一体的繁华商业街', '1.5小时')">
+                            <div class="route-point-image">🛍️</div>
+                        </button>
+                        <div class="route-point-label">南京路步行街</div>
+                    </div>
+
+                    <div class="route-point" style="left:85%;top:45%">
+                        <button class="route-point-btn" onclick="showAttractionDetail('陆家嘴金融区', '现代都市', '上海现代化金融中心，包含东方明珠、上海中心大厦、金茂大厦等地标建筑', '2小时')">
+                            <div class="route-point-image">🏙️</div>
+                        </button>
+                        <div class="route-point-label">陆家嘴金融区</div>
+                    </div>
+
+                    <div class="route-overview">
+                        <h4>行程概览</h4>
+                        <div>总景点：4个</div>
+                        <div>游览时间：7小时</div>
+                        <div>最佳季节：全年</div>
+                        <div>建议交通：地铁+步行</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider" data-aos="fade-up">
+                <span class="divider-text">🏨 住宿推荐 🏨</span>
+            </div>
+
+            <div class="hotel-info" data-aos="fade-right" data-aos-delay="200">
+                <div class="hotel-name">上海外滩茂悦大酒店 <span style="color: #6c5ce7;">★★★★★</span></div>
+                <div class="hotel-details">
+                    <strong>价格：</strong>¥1200-1800/晚<br>
+                    <strong>特色：</strong>位于外滩北端，拥有绝佳江景视野，交通便利，设施完善<br>
+                    <strong>地址：</strong>上海市黄浦区中山东一路88号
+                </div>
+            </div>
+
+        </section>
+
+        <footer class="footer" data-aos="fade-up">
+            <div class="footer-text">美好的上海一日游结束啦！</div>
+            <div class="footer-subtitle">Wonderful Shanghai One-Day Tour Complete!</div>
+        </footer>
+    </div>
+
+    <!-- 景点详情弹窗 -->
+    <div class="attraction-detail-modal" id="attractionModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="hideAttractionDetail()">&times;</button>
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <div class="modal-type" id="modalType"></div>
+            <div class="modal-description" id="modalDescription"></div>
+            <div class="modal-duration" id="modalDuration"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('fade-out');
+            }, 1800);
+        });
+
+        function scrollToContent() {
+            document.querySelector('.content-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function showAttractionDetail(name, type, description, duration) {
+            document.getElementById('modalTitle').textContent = name;
+            document.getElementById('modalType').textContent = type;
+            document.getElementById('modalDescription').textContent = description;
+            document.getElementById('modalDuration').textContent = `游览时间：${duration}`;
+            
+            const modal = document.getElementById('attractionModal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        function hideAttractionDetail() {
+            const modal = document.getElementById('attractionModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('attractionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAttractionDetail();
+            }
+        });
+
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideAttractionDetail();
+            }
+        });
+
+        // 路线点hover效果
+        document.querySelectorAll('.route-point-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.querySelector('.route-point-image').style.transform = 'scale(1.2) rotate(10deg)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.querySelector('.route-point-image').style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+
+        // 随机emoji动画
+        const emojis = ['🌸', '🎀', '💕', '⭐', '🌈', '🦄', '🍭', '🎈'];
+        setInterval(() => {
+            const routePoints = document.querySelectorAll('.route-point-image');
+            const randomPoint = routePoints[Math.floor(Math.random() * routePoints.length)];
+            if (randomPoint && Math.random() > 0.8) {
+                const originalContent = randomPoint.textContent;
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                randomPoint.textContent = randomEmoji;
+                setTimeout(() => {
+                    randomPoint.textContent = originalContent;
+                }, 1000);
+            }
+        }, 3000);
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 点击反馈效果
+        document.querySelectorAll('.hotel-info, .route-point-btn').forEach(element => {
+            element.addEventListener('click', function() {
+                this.style.transform += ' scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = this.style.transform.replace(' scale(0.95)', '');
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

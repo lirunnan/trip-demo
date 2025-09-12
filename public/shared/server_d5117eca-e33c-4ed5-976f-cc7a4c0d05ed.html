@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1天旅行计划 - 北京经典一日游</title>
+    <title>北京一日游 - 炫酷旅行计划</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     <style>
@@ -15,12 +15,24 @@
 
         body {
             font-family: 'Noto Sans SC', 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 25%, #fd79a8 50%, #a29bfe 75%, #6c5ce7 100%);
+            background: url('/bg/japan.jpg') center/cover fixed;
             background-size: 300% 300%;
             animation: dreamyGradient 12s ease infinite;
             color: #2d3436;
             line-height: 1.7;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(253, 121, 168, 0.1) 0%, rgba(108, 92, 231, 0.1) 50%, rgba(253, 203, 110, 0.1) 100%);
+            z-index: -1;
         }
 
         @keyframes dreamyGradient {
@@ -29,7 +41,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        body::before {
+        body::after {
             content: '';
             position: fixed;
             top: 0;
@@ -109,89 +121,6 @@
                 transparent 70%
             );
             z-index: -1;
-        }
-
-        .hero-images {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .hero-image {
-            position: absolute;
-            border-radius: 25px;
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.15),
-                0 0 0 8px rgba(255,255,255,0.8),
-                0 0 0 16px rgba(255,182,193,0.3);
-            transition: all 0.4s ease;
-            opacity: 0.9;
-            border: 4px solid #fff;
-        }
-
-        .hero-image:hover {
-            transform: scale(1.1) rotate(8deg);
-            opacity: 1;
-            z-index: 10;
-            box-shadow: 
-                0 25px 50px rgba(0,0,0,0.2),
-                0 0 0 8px rgba(255,255,255,1),
-                0 0 0 16px rgba(255,182,193,0.5);
-        }
-
-        .hero-image.img1 {
-            top: 12%;
-            left: 8%;
-            width: 220px;
-            height: 160px;
-            animation: cuteBounce1 5s ease-in-out infinite;
-        }
-
-        .hero-image.img2 {
-            top: 18%;
-            right: 12%;
-            width: 200px;
-            height: 140px;
-            animation: cuteBounce2 6s ease-in-out infinite;
-        }
-
-        .hero-image.img3 {
-            bottom: 22%;
-            left: 12%;
-            width: 180px;
-            height: 220px;
-            animation: cuteBounce3 4s ease-in-out infinite;
-        }
-
-        .hero-image.img4 {
-            bottom: 12%;
-            right: 8%;
-            width: 210px;
-            height: 150px;
-            animation: cuteBounce4 7s ease-in-out infinite;
-        }
-
-        @keyframes cuteBounce1 {
-            0%, 100% { transform: translateY(0px) rotate(-3deg); }
-            50% { transform: translateY(-25px) rotate(3deg); }
-        }
-
-        @keyframes cuteBounce2 {
-            0%, 100% { transform: translateY(0px) rotate(2deg); }
-            50% { transform: translateY(-20px) rotate(-2deg); }
-        }
-
-        @keyframes cuteBounce3 {
-            0%, 100% { transform: translateY(0px) rotate(-5deg); }
-            50% { transform: translateY(-30px) rotate(5deg); }
-        }
-
-        @keyframes cuteBounce4 {
-            0%, 100% { transform: translateY(0px) rotate(4deg); }
-            50% { transform: translateY(-22px) rotate(-4deg); }
         }
 
         .hero-content {
@@ -336,43 +265,101 @@
             border-bottom: none;
         }
 
-        .divider {
-            text-align: center;
-            margin: 60px 0;
+        .route-display {
             position: relative;
+            width: 100%;
+            height: 600px;
+            margin: 40px 0;
+            border-radius: 25px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.9);
+            border: 4px solid #fd79a8;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
-        .divider::before {
+        .route-svg-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .route-point {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .route-point:hover {
+            z-index: 100;
+        }
+
+        .route-point-button {
+            background: rgba(255, 255, 255, 0.95);
+            border: 4px solid #fd79a8;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(253, 121, 168, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-point-button::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, 
-                transparent, #fd79a8, #fdcb6e, #6c5ce7, #fd79a8, transparent);
-            border-radius: 10px;
-            animation: dividerGlow 3s ease-in-out infinite alternate;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                rgba(253, 121, 168, 0.3) 90deg,
+                transparent 180deg
+            );
+            animation: pointShine 3s linear infinite;
         }
 
-        @keyframes dividerGlow {
-            0% { opacity: 0.7; transform: scaleY(1); }
-            100% { opacity: 1; transform: scaleY(1.5); }
+        @keyframes pointShine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .divider-text {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 0 40px;
-            font-size: 2rem;
-            color: #fd79a8;
-            position: relative;
-            z-index: 1;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 800;
-            border-radius: 25px;
-            border: 3px solid #fd79a8;
-            display: inline-block;
-            box-shadow: 0 8px 25px rgba(253, 121, 168, 0.2);
+        .route-point:hover .route-point-button {
+            transform: scale(1.2) rotate(5deg);
+            border-color: #6c5ce7;
+            background: linear-gradient(135deg, #fd79a8, #6c5ce7);
+            color: white;
+            box-shadow: 0 20px 50px rgba(253, 121, 168, 0.5);
+        }
+
+        .route-point-label {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .route-point:hover .route-point-label {
+            opacity: 1;
+            bottom: -70px;
         }
 
         .day-section {
@@ -665,72 +652,115 @@
             color: #2d3436;
         }
 
-        .transportation-section {
-            margin-top: 40px;
-            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(253, 121, 168, 0.1));
-            border-radius: 25px;
-            padding: 35px;
-            border: 4px solid #6c5ce7;
-            position: relative;
-            z-index: 1;
-            transition: all 0.4s ease;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(253, 121, 168, 0.9), 
+                rgba(108, 92, 231, 0.9));
+            animation: fadeIn 0.3s ease;
         }
 
-        .transportation-section:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(108, 92, 231, 0.2);
-        }
-
-        .transportation-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #6c5ce7;
-            margin-bottom: 20px;
+        .modal.active {
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
         }
 
-        .transportation-title::before {
-            content: '🚊';
-            font-size: 2rem;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 8px;
-            border-radius: 50%;
-            border: 3px solid #6c5ce7;
-            animation: transportSway 3s ease-in-out infinite;
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 35px;
+            padding: 50px;
+            max-width: 500px;
+            width: 90%;
+            border: 6px solid #fd79a8;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            animation: zoomIn 0.3s ease;
+            position: relative;
         }
 
-        @keyframes transportSway {
-            0%, 100% { transform: rotate(-3deg) scale(1); }
-            50% { transform: rotate(3deg) scale(1.05); }
-        }
-
-        .transportation-item {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 2px solid #6c5ce7;
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fd79a8;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
             transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            box-shadow: 0 6px 20px rgba(253, 121, 168, 0.3);
         }
 
-        .transportation-item:hover {
-            transform: translateX(10px);
-            border-color: #fd79a8;
+        .modal-close:hover {
+            background: #6c5ce7;
+            transform: scale(1.2) rotate(90deg);
+            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.5);
         }
 
-        .transport-type {
-            font-weight: 700;
-            color: #6c5ce7;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2d3436;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .transport-details {
-            color: #636e72;
+        .modal-description {
             font-size: 1.1rem;
-            line-height: 1.6;
+            color: #636e72;
+            line-height: 1.7;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-detail-item {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 15px;
+            border-radius: 15px;
+            border: 3px solid #fd79a8;
+            text-align: center;
+        }
+
+        .modal-detail-label {
+            font-weight: 700;
+            color: #e17055;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-detail-value {
+            color: #2d3436;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5) rotate(-10deg); }
+            to { transform: scale(1) rotate(0deg); }
         }
 
         .footer {
@@ -872,15 +902,21 @@
                 align-self: flex-start;
             }
 
-            .hero-image {
-                display: none;
+            .route-point-button {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .route-display {
+                height: 400px;
             }
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
-        <div class="loading-text">北京1天之旅</div>
+        <div class="loading-text">北京一日游</div>
     </div>
 
     <div class="top-decoration"></div>
@@ -888,25 +924,10 @@
     <div class="container">
         <section class="hero-section">
             <div class="hero-bg"></div>
-            
-            <div class="hero-images">
-                <div class="hero-image img1">
-                    <img src="https://images.unsplash.com/photo-1508804185872-d7badad00f7d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="天安门广场" />
-                </div>
-                <div class="hero-image img2">
-                    <img src="https://images.unsplash.com/photo-1547036967-23d11aacaee0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="故宫博物院" />
-                </div>
-                <div class="hero-image img3">
-                    <img src="https://images.unsplash.com/photo-1570123106161-c3d6e9f87fa5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="景山公园" />
-                </div>
-                <div class="hero-image img4">
-                    <img src="https://images.unsplash.com/photo-1548919973-5cef591cdbc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="什刹海" />
-                </div>
-            </div>
 
             <div class="hero-content" data-aos="zoom-in" data-aos-duration="1000">
-                <h1 class="main-title">1天旅行计划</h1>
-                <p class="subtitle">北京经典一日游 · 历史文化深度体验</p>
+                <h1 class="main-title">北京一日游</h1>
+                <p class="subtitle">精选古都经典 · 感受皇城魅力</p>
                 <p class="date-range">2025年3月15日</p>
             </div>
 
@@ -916,8 +937,46 @@
         </section>
 
         <section class="content-section">
-            <div class="divider" data-aos="fade-up">
-                <span class="divider-text">🎀 行程安排 🎀</span>
+            <div class="route-display">
+                <svg class="route-svg-container" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path
+                        d="M 15 60 C 25 55 35 70 45 65 C 55 60 65 50 75 45 C 80 42 85 35 90 30"
+                        stroke="#15803d" stroke-width="0.8" stroke-dasharray="3,2" fill="none" class="drop-shadow-lg"
+                        stroke-linecap="round" stroke-linejoin="round"></path>
+                    <circle cx="15" cy="60" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                    <circle cx="45" cy="65" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                    <circle cx="75" cy="45" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                    <circle cx="90" cy="30" r="0.5" fill="#15803d" class="drop-shadow-sm"></circle>
+                </svg>
+
+                <div class="route-point" style="left:15%;top:60%" onclick="showAttractionDetail('天安门广场')">
+                    <div class="route-point-button">🏛️</div>
+                    <div class="route-point-label">天安门广场</div>
+                </div>
+
+                <div class="route-point" style="left:45%;top:65%" onclick="showAttractionDetail('故宫博物院')">
+                    <div class="route-point-button">🏰</div>
+                    <div class="route-point-label">故宫博物院</div>
+                </div>
+
+                <div class="route-point" style="left:75%;top:45%" onclick="showAttractionDetail('景山公园')">
+                    <div class="route-point-button">🌸</div>
+                    <div class="route-point-label">景山公园</div>
+                </div>
+
+                <div class="route-point" style="left:90%;top:30%" onclick="showAttractionDetail('南锣鼓巷')">
+                    <div class="route-point-button">🏮</div>
+                    <div class="route-point-label">南锣鼓巷</div>
+                </div>
+
+                <div style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); color: white; padding: 15px; border-radius: 15px; backdrop-filter: blur(10px);">
+                    <h4 style="font-weight: bold; margin-bottom: 10px;">行程概览</h4>
+                    <div style="font-size: 0.9rem;">
+                        <div>总时长：约7小时</div>
+                        <div>交通方式：步行+地铁</div>
+                        <div>景点数量：4个</div>
+                    </div>
+                </div>
             </div>
 
             <section class="day-section" data-aos="fade-up" data-aos-delay="100">
@@ -935,13 +994,13 @@
                     <div class="hotel-info" data-aos="fade-right" data-aos-delay="200">
                         <div class="hotel-name">北京王府井希尔顿酒店 <span style="color: #6c5ce7;">★★★★★</span></div>
                         <div class="hotel-details">
-                            <strong>价格：</strong>¥1200-1800/晚<br>
-                            <strong>特色：</strong>位于王府井商业区，交通便利，设施完善
+                            <strong>价格：</strong>¥800-1200/晚<br>
+                            <strong>特色：</strong>位于王府井商业区，交通便利，设施完善，服务优质
                         </div>
                     </div>
 
                     <div class="attractions">
-                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="300">
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="300" onclick="showAttractionDetail('天安门广场')">
                             <div class="attraction-bullet">🏛️</div>
                             <div class="attraction-content">
                                 <div class="attraction-name">
@@ -949,12 +1008,12 @@
                                     <span class="attraction-duration">1小时</span>
                                 </div>
                                 <div class="attraction-description">
-                                    世界上最大的城市广场，观看升旗仪式的最佳地点
+                                    世界上最大的城市广场，观看升旗仪式的最佳地点，感受国家庄严氛围
                                 </div>
                             </div>
                         </div>
 
-                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="400">
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="400" onclick="showAttractionDetail('故宫博物院')">
                             <div class="attraction-bullet">🏰</div>
                             <div class="attraction-content">
                                 <div class="attraction-name">
@@ -962,12 +1021,12 @@
                                     <span class="attraction-duration">3小时</span>
                                 </div>
                                 <div class="attraction-description">
-                                    明清两代的皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑群
+                                    明清两代皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑群
                                 </div>
                             </div>
                         </div>
 
-                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="500">
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="500" onclick="showAttractionDetail('景山公园')">
                             <div class="attraction-bullet">🌸</div>
                             <div class="attraction-content">
                                 <div class="attraction-name">
@@ -980,46 +1039,17 @@
                             </div>
                         </div>
 
-                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="600">
-                            <div class="attraction-bullet">🛶</div>
+                        <div class="attraction-item" data-aos="fade-left" data-aos-delay="600" onclick="showAttractionDetail('南锣鼓巷')">
+                            <div class="attraction-bullet">🏮</div>
                             <div class="attraction-content">
                                 <div class="attraction-name">
-                                    什刹海
+                                    南锣鼓巷
                                     <span class="attraction-duration">2小时</span>
                                 </div>
                                 <div class="attraction-description">
-                                    北京著名的历史文化旅游区，包含前海、后海和西海三个湖泊
+                                    北京最古老的街区之一，充满胡同文化和特色小店
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="transportation-section" data-aos="fade-up" data-aos-delay="700">
-                        <div class="transportation-title">🚊 交通指南</div>
-                        
-                        <div class="transportation-item">
-                            <div class="transport-type">🚶 步行</div>
-                            <div class="transport-details">天安门广场到故宫步行约10分钟，故宫到景山公园步行约15分钟</div>
-                        </div>
-
-                        <div class="transportation-item">
-                            <div class="transport-type">🚕 出租车</div>
-                            <div class="transport-details">什刹海区域建议打车，起步价13元，每公里2.3元</div>
-                        </div>
-
-                        <div class="transportation-item">
-                            <div class="transport-type">🚇 地铁</div>
-                            <div class="transport-details">地铁1号线天安门东站可达天安门和故宫，地铁6号线北海北站可达什刹海</div>
-                        </div>
-
-                        <div class="transportation-item">
-                            <div class="transport-type">🚗 租车</div>
-                            <div class="transport-details">不建议租车，市中心停车困难且交通拥堵</div>
-                        </div>
-
-                        <div class="transportation-item">
-                            <div class="transport-type">📝 推荐</div>
-                            <div class="transport-details">建议使用地铁+步行组合，经济便捷且避免堵车</div>
                         </div>
                     </div>
                 </div>
@@ -1027,9 +1057,18 @@
         </section>
 
         <footer class="footer" data-aos="fade-up">
-            <div class="footer-text">美好的北京一日游结束啦！</div>
-            <div class="footer-subtitle">Wonderful Beijing One-Day Tour Complete!</div>
+            <div class="footer-text">精彩的北京一日游结束啦！</div>
+            <div class="footer-subtitle">Amazing Beijing One-Day Tour Complete!</div>
         </footer>
+    </div>
+
+    <div class="modal" id="attractionModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <p class="modal-description" id="modalDescription"></p>
+            <div class="modal-details" id="modalDetails"></div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
@@ -1052,12 +1091,97 @@
             });
         }
 
+        const attractionData = {
+            '天安门广场': {
+                title: '天安门广场',
+                description: '世界上最大的城市广场，观看升旗仪式的最佳地点，感受国家庄严氛围',
+                details: {
+                    '类型': '历史文化广场',
+                    '游玩时长': '1小时',
+                    '位置': '北京市东城区',
+                    '特色': '升旗仪式观看点'
+                }
+            },
+            '故宫博物院': {
+                title: '故宫博物院',
+                description: '明清两代皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑群',
+                details: {
+                    '类型': '历史文化古迹',
+                    '游玩时长': '3小时',
+                    '位置': '北京市东城区',
+                    '特色': '世界文化遗产'
+                }
+            },
+            '景山公园': {
+                title: '景山公园',
+                description: '俯瞰故宫全景的最佳位置，明代皇家园林',
+                details: {
+                    '类型': '城市公园',
+                    '游玩时长': '1小时',
+                    '位置': '北京市西城区',
+                    '特色': '故宫全景观赏点'
+                }
+            },
+            '南锣鼓巷': {
+                title: '南锣鼓巷',
+                description: '北京最古老的街区之一，充满胡同文化和特色小店',
+                details: {
+                    '类型': '历史文化街区',
+                    '游玩时长': '2小时',
+                    '位置': '北京市东城区',
+                    '特色': '胡同文化体验'
+                }
+            }
+        };
+
+        function showAttractionDetail(attraction) {
+            const modal = document.getElementById('attractionModal');
+            const data = attractionData[attraction];
+            
+            document.getElementById('modalTitle').textContent = data.title;
+            document.getElementById('modalDescription').textContent = data.description;
+            
+            const detailsContainer = document.getElementById('modalDetails');
+            detailsContainer.innerHTML = '';
+            
+            Object.entries(data.details).forEach(([key, value]) => {
+                const detailItem = document.createElement('div');
+                detailItem.className = 'modal-detail-item';
+                detailItem.innerHTML = `
+                    <div class="modal-detail-label">${key}</div>
+                    <div class="modal-detail-value">${value}</div>
+                `;
+                detailsContainer.appendChild(detailItem);
+            });
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('attractionModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        document.getElementById('attractionModal').addEventListener('click', (e) => {
+            if (e.target.id === 'attractionModal') {
+                closeModal();
+            }
+        });
+
         const emojis = ['🌸', '🎀', '💕', '⭐', '🌈', '🦄', '🍭', '🎈'];
         setInterval(() => {
             const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
             const bullets = document.querySelectorAll('.attraction-bullet');
-            const randomBullet = bullets[Math.floor(Math.random() * bullets.length)];
-            if (randomBullet && Math.random() > 0.8) {
+            if (bullets.length > 0 && Math.random() > 0.7) {
+                const randomBullet = bullets[Math.floor(Math.random() * bullets.length)];
                 const originalContent = randomBullet.textContent;
                 randomBullet.textContent = randomEmoji;
                 setTimeout(() => {
@@ -1066,20 +1190,7 @@
             }
         }, 3000);
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        document.querySelectorAll('.attraction-item, .hotel-info, .transportation-item').forEach(element => {
+        document.querySelectorAll('.attraction-item, .route-point, .hotel-info').forEach(element => {
             element.addEventListener('click', function() {
                 this.style.transform += ' scale(0.98)';
                 setTimeout(() => {
